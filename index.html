@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5f7f2">
+    <title>SUNNY SPORT CLUB | Team Manager</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <div class="app-shell" id="app-shell">
+      <aside class="sidebar">
+        <button class="mobile-nav-close" id="mobile-nav-close" type="button" aria-label="Close navigation" data-i18n-aria="closeNavigation">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        </button>
+        <a class="brand" href="#" aria-label="Sunny Sport Club home" data-i18n-aria="clubHome">
+          <img class="brand-mark" src="https://i.postimg.cc/7h9WSCCs/no-backdound.png" alt="">
+          <span class="brand-copy"><strong>SUNNY SPORT</strong><span data-i18n="clubManager">CLUB MANAGER</span></span>
+        </a>
+        <div class="sidebar-section-label" data-i18n="workspace">WORKSPACE</div>
+        <nav class="side-nav" id="main-navigation" aria-label="Main navigation" data-i18n-aria="mainNavigation">
+          <a class="nav-link active" href="#overview" aria-current="page">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg>
+            <span data-i18n="overview">Overview</span>
+          </a>
+          <a class="nav-link" href="#roster">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.8 20v-1.6a5.9 5.9 0 0 1 11.8 0V20H2.8Zm13-9.2a3.5 3.5 0 1 0-1.4-6.7m2.8 8.2a5.8 5.8 0 0 1 4 5.5V20h-5"/></svg>
+            <span data-i18n="teamRoster">Team roster</span>
+            <span class="nav-count" id="nav-count">0</span>
+          </a>
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="sidebar-note">
+            <span class="note-icon" aria-hidden="true">✦</span>
+            <strong data-i18n="sidebarMotto">One team. One dream.</strong>
+            <p data-i18n="sidebarNote">Every great season starts with a great team.</p>
+          </div>
+          <div class="sidebar-user">
+            <div class="user-avatar" id="user-avatar">?</div>
+            <div><strong id="user-name">User</strong><span id="user-role">Viewer</span></div>
+            <button type="button" class="user-dots" id="logout-button">↪</button>
+          </div>
+        </div>
+      </aside>
+      <button class="sidebar-backdrop" id="sidebar-backdrop" type="button" aria-label="Close navigation" data-i18n-aria="closeNavigation" tabindex="-1"></button>
+
+      <main class="main-content" id="overview">
+        <header class="topbar">
+          <button class="mobile-nav-toggle" id="mobile-nav-toggle" type="button" aria-label="Open navigation" aria-controls="main-navigation" aria-expanded="false" data-i18n-aria="openNavigation">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </button>
+          <div class="breadcrumb"><span data-i18n="workspace">Workspace</span><span class="breadcrumb-slash">/</span><strong data-i18n="overview">Overview</strong></div>
+          <div class="topbar-right">
+            <span class="season-pill"><span class="status-dot"></span> <span data-i18n="teamSeason">TEAM SEASON</span></span>
+            <span class="topbar-divider"></span>
+            <span class="today-label" id="today-label"></span>
+            <button class="language-toggle" id="language-toggle" type="button" aria-label="Switch language">ខ្មែរ</button>
+            <button class="appearance-toggle" id="appearance-toggle" type="button" aria-label="Change page background" data-i18n-aria="changeBackground" title="Change page background">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18h1.2a2.1 2.1 0 0 0 1.6-3.5 1.7 1.7 0 0 1 1.3-2.8h1.2a3.7 3.7 0 0 0 3.7-3.7C21 6.6 17 3 12 3Z"/><circle cx="7.5" cy="11" r="1" fill="currentColor"/><circle cx="10" cy="7.5" r="1" fill="currentColor"/><circle cx="15" cy="7.5" r="1" fill="currentColor"/><circle cx="17.5" cy="11" r="1" fill="currentColor"/></svg>
+            </button>
+            <div class="top-avatar" id="top-avatar" aria-label="Current user">SC</div>
+            <button type="button" class="logout-icon" id="top-logout-button" aria-label="Log out" title="Log out">↪</button>
+          </div>
+        </header>
+
+        <div class="page-content">
+          <section class="welcome-row">
+            <div>
+              <div class="eyebrow"><span class="eyebrow-line"></span> <span data-i18n="dashboard">CLUB DASHBOARD</span></div>
+              <h1><span data-i18n="greeting">Good to see you,</span> <span id="welcome-role">coach</span>. <span class="wave" aria-hidden="true">✳</span></h1>
+              <p class="welcome-subtitle" data-i18n="welcomeSubtitle">A quick look at everything happening with your team.</p>
+            </div>
+            <button class="button button-primary" id="add-member-button" type="button">
+              <span class="plus-icon" aria-hidden="true">+</span> <span data-i18n="addMember">Add team member</span>
+            </button>
+          </section>
+
+          <section class="team-spotlight-section" id="team-spotlight-section" aria-labelledby="team-spotlight-title" hidden>
+            <div class="section-heading teams-heading">
+              <div><div class="eyebrow"><span class="eyebrow-line"></span> <span data-i18n="showcaseLabel">CLUB SHOWCASE</span></div><h2 id="team-spotlight-title" data-i18n="showcaseTitle">Meet our teams</h2></div>
+              <div class="spotlight-controls"><button class="button button-secondary button-small" id="spotlight-previous" type="button" aria-label="Previous team" data-i18n-aria="previousTeam">‹</button><span id="spotlight-position" aria-live="polite"></span><button class="button button-secondary button-small" id="spotlight-next" type="button" aria-label="Next team" data-i18n-aria="nextTeam">›</button></div>
+            </div>
+            <details class="spotlight-disclosure" id="spotlight-details">
+              <summary class="spotlight-summary" id="spotlight-summary">
+                <span class="spotlight-summary-logo" id="spotlight-summary-logo" aria-hidden="true">⚽</span>
+                <strong id="spotlight-summary-name"></strong>
+                <span id="spotlight-summary-location"></span>
+                <span class="team-card-summary-toggle"><span class="spotlight-toggle-show" data-i18n="showTeamDetails">Show details</span><span class="spotlight-toggle-hide" data-i18n="hideTeamDetails">Hide details</span><span class="team-card-chevron" aria-hidden="true">⌄</span></span>
+              </summary>
+              <article class="spotlight-card" id="spotlight-card" aria-live="polite">
+                <div class="spotlight-team-identity"><div class="spotlight-logo" id="spotlight-logo"></div><div><h3 id="spotlight-name"></h3><p id="spotlight-location"></p></div></div>
+                <div class="spotlight-roster" id="spotlight-roster"></div>
+              </article>
+            </details>
+          </section>
+
+          <section class="management-hub" id="management-hub" aria-labelledby="management-title" hidden>
+            <div class="management-hub-copy">
+              <div class="eyebrow"><span class="eyebrow-line"></span> <span data-i18n="managementEyebrow">TEAM OPERATIONS</span></div>
+              <h2 id="management-title" data-i18n="managementTitle">Team management</h2>
+              <p data-i18n="managementDescription">Manage your team identity and build a complete squad roster.</p>
+            </div>
+            <div class="management-hub-actions">
+              <strong class="management-current-team" id="management-current-team"></strong>
+              <button class="button button-primary button-small" id="management-create-team-button" type="button" data-i18n="createTeam" hidden>Create team</button>
+              <button class="button button-secondary button-small" id="management-edit-team-button" type="button" data-i18n="editTeam" hidden>Edit team</button>
+              <button class="button button-secondary button-small" id="management-add-member-button" type="button" data-i18n="addMember" hidden>Add team member</button>
+            </div>
+          </section>
+
+          <section class="teams-section">
+            <div class="section-heading teams-heading">
+              <div><div class="eyebrow"><span class="eyebrow-line"></span> <span data-i18n="teamsDirectory">TEAM DIRECTORY</span></div><h2><span data-i18n="teams">Teams</span> <span class="section-count" id="teams-count">0</span></h2></div>
+            </div>
+            <div class="teams-grid" id="teams-grid"></div>
+            <p class="directory-empty" id="directory-empty" hidden data-i18n="directoryEmpty">No teams yet. A Dev Owner/Admin can create the first team.</p>
+          </section>
+
+          <section class="admin-section" id="admin-section" hidden>
+            <div class="section-heading">
+              <div><div class="eyebrow"><span class="eyebrow-line"></span> <span id="access-panel-label" data-i18n="administration">ADMINISTRATION</span></div><h2 data-i18n="teamAccess">Team access</h2></div>
+              <button class="button button-primary button-small" id="create-account-button" type="button">+ <span data-i18n="createAccount">Create account</span></button>
+            </div>
+            <p class="dialog-description" id="access-panel-description" data-i18n="accountsDescription">Viewers can browse all teams but have read-only access. A coach can create one team and grant its existing accounts team-manager access. Admins have full access after the Dev Owner promotes them.</p>
+            <div id="account-roles"></div>
+          </section>
+
+          <section class="club-banner" aria-labelledby="club-name">
+            <div class="banner-decoration banner-decoration-one" aria-hidden="true"></div>
+            <div class="banner-decoration banner-decoration-two" aria-hidden="true"></div>
+            <div class="banner-content">
+              <div class="club-crest" aria-hidden="true">
+                <img class="club-logo-default" src="https://i.postimg.cc/7h9WSCCs/no-backdound.png" alt="">
+                <img id="club-logo" alt="" hidden>
+              </div>
+              <div class="club-heading">
+                <div class="banner-kicker" data-i18n="bannerKicker">EST. WITH TEAM SPIRIT</div>
+                <h2 id="club-name">SUNNY SPORT CLUB</h2>
+                <div class="club-location"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M16 8.3c0 4.2-6 9-6 9s-6-4.8-6-9a6 6 0 1 1 12 0Z"/><circle cx="10" cy="8" r="2"/></svg><span id="club-location">Add your club location</span></div>
+              </div>
+            </div>
+            <div class="banner-actions">
+              <span class="club-badge"><span aria-hidden="true">●</span> <span data-i18n="activeClub">ACTIVE CLUB</span></span>
+              <button class="icon-button banner-edit" id="edit-club-button" type="button" aria-label="Edit club details" title="Edit club details">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 5 5 5M4 20l4.5-1 11-11a2.1 2.1 0 0 0-3-3l-11 11L4 20Z"/></svg>
+              </button>
+            </div>
+            <div class="banner-ball" aria-hidden="true">
+              <svg viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="36" fill="white" fill-opacity=".09" stroke="white" stroke-opacity=".14"/><path d="m40 20 9 7-3 11H34l-3-11 9-7Zm-18 17 10-2 7 9-5 10-11-2-3-15Zm36 0-3 15-11 2-5-10 7-9 12 2ZM30 55l10-5 10 5-2 11-8 4-8-4-2-11Z" fill="white" fill-opacity=".22" stroke="white" stroke-opacity=".36" stroke-width="2" stroke-linejoin="round"/></svg>
+            </div>
+          </section>
+
+          <section class="stats-grid" aria-label="Team summary" data-i18n-aria="teamSummary">
+            <article class="stat-card">
+              <div class="stat-top"><span class="stat-label" data-i18n="squadMembers">SQUAD MEMBERS</span><span class="stat-icon green-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.8 20v-1.6a5.9 5.9 0 0 1 11.8 0V20H2.8Zm13-9.2a3.5 3.5 0 1 0-1.4-6.7m2.8 8.2a5.8 5.8 0 0 1 4 5.5V20h-5"/></svg></span></div>
+              <div class="stat-value" id="member-total">0</div>
+              <div class="stat-foot"><span class="stat-accent" id="role-summary"></span></div>
+            </article>
+            <article class="stat-card">
+              <div class="stat-top"><span class="stat-label" data-i18n="coachingStaff">COACHING STAFF</span><span class="stat-icon amber-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 14.4 8l5 .8-3.6 3.6.9 5.1-4.7-2.5-4.7 2.5.9-5.1-3.6-3.6 5-.8L12 3.5Z"/></svg></span></div>
+              <div class="stat-value" id="staff-total">0</div>
+              <div class="stat-foot" data-i18n="leadership">Coach &amp; team leadership</div>
+            </article>
+            <article class="stat-card contact-stat">
+              <div class="stat-top"><span class="stat-label" data-i18n="clubContact">CLUB CONTACT</span><span class="stat-icon blue-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h3l2 5-2.2 1.5a15 15 0 0 0 5.7 5.7L15 14l5 2v3c0 1.1-.9 2-2 2C10 21 3 14 3 6c0-1.1.9-2 2-2Z"/></svg></span></div>
+              <a class="contact-value" id="club-phone" href="#" aria-label="Club contact number"></a>
+              <div class="stat-foot contact-links"><a id="telegram-link" href="#" target="_blank" rel="noopener noreferrer">Telegram <span aria-hidden="true">↗</span></a><span>·</span><button type="button" id="contact-edit-button" data-i18n="editDetails">Edit details</button></div>
+            </article>
+          </section>
+
+          <section class="roster-section" id="roster">
+            <div class="section-heading">
+              <div><div class="eyebrow"><span class="eyebrow-line"></span> <span data-i18n="yourPeople">YOUR PEOPLE</span></div><h2><span data-i18n="meetTeam">Meet the team</span> <span class="section-count" id="roster-count">0</span></h2></div>
+              <div class="roster-tools">
+                <label class="search-box"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg><input id="search-input" type="search" placeholder="Search members..." aria-label="Search team members" data-i18n-placeholder="searchMembers" data-i18n-aria="searchMembers"></label>
+                <label class="filter-select"><span class="sr-only" data-i18n="filterByRole">Filter by role</span><select id="role-filter" aria-label="Filter by role" data-i18n-aria="filterByRole"><option value="all" data-i18n="allRoles">All roles</option><option value="Head Coach" data-role-i18n>Head Coach</option><option value="Assistant Coach" data-role-i18n>Assistant Coach</option><option value="Coach" data-role-i18n>Coach</option><option value="Captain" data-role-i18n>Captain</option><option value="Player" data-role-i18n>Player</option><option value="Goalkeeper" data-role-i18n>Goalkeeper</option><option value="Defender" data-role-i18n>Defender</option><option value="Midfielder" data-role-i18n>Midfielder</option><option value="Forward" data-role-i18n>Forward</option><option value="Medical Staff" data-role-i18n>Medical staff</option><option value="Manager" data-role-i18n>Manager</option></select></label>
+              </div>
+            </div>
+            <div class="roster-grid" id="roster-grid"></div>
+            <div class="empty-state" id="empty-state">
+              <div class="empty-illustration" aria-hidden="true"><span>⚽</span></div>
+              <h3 data-i18n="emptyTitle">Your squad starts here</h3>
+              <p data-i18n="emptyText">Add your coach, captain, and players to bring the team together.</p>
+              <button class="button button-primary button-small" id="empty-add-button" type="button"><span class="plus-icon" aria-hidden="true">+</span> <span data-i18n="addFirstMember">Add your first member</span></button>
+            </div>
+            <div class="no-results" id="no-results" hidden><span>⚽</span><strong data-i18n="noResults">No members match your search.</strong><button id="clear-search" type="button" data-i18n="clearFilters">Clear filters</button></div>
+          </section>
+
+          <section class="social-feed-section" aria-labelledby="feed-title">
+            <div class="section-heading">
+              <div><div class="eyebrow"><span class="eyebrow-line"></span> <span data-i18n="clubCommunity">CLUB COMMUNITY</span></div><h2 id="feed-title" data-i18n="teamUpdates">Team updates</h2></div>
+            </div>
+            <form class="post-composer" id="post-composer" hidden>
+              <label class="sr-only" for="post-message" data-i18n="postComposerLabel">Write an update</label>
+              <textarea id="post-message" maxlength="1200" placeholder="Share a team update..." data-i18n-placeholder="shareUpdate"></textarea>
+              <div class="post-composer-tools">
+                <label class="media-upload-button"><span data-i18n="addPhotoVideo">Add photos or video</span><input id="post-media-input" type="file" accept="image/*,video/*" multiple></label>
+                <span id="post-media-name" data-i18n="noMediaSelected">No media selected</span>
+                <label class="post-team-select"><span data-i18n="postTo">Post to</span><select id="post-team-select"></select></label>
+                <button class="button button-primary button-small" type="submit" data-i18n="postUpdate">Post update</button>
+              </div>
+              <p class="form-error" id="post-error" role="alert" hidden></p>
+            </form>
+            <div class="post-list" id="post-list"></div>
+            <p class="directory-empty" id="posts-empty" data-i18n="noUpdates">No updates yet.</p>
+          </section>
+
+          <footer class="page-footer"><span data-i18n="footerMotto">Made for the love of the game.</span><span>SUNNY SPORT CLUB <span class="footer-dot">·</span> <span data-i18n="teamManagement">TEAM MANAGEMENT</span></span></footer>
+        </div>
+      </main>
+    </div>
+
+    <section class="auth-screen" id="auth-screen" aria-labelledby="auth-title">
+      <div class="auth-layout">
+        <div class="auth-showcase">
+          <div class="auth-showcase-top">
+            <div class="auth-brand"><img class="brand-mark" src="https://i.postimg.cc/7h9WSCCs/no-backdound.png" alt=""><span><strong>SUNNY SPORT</strong><small data-i18n="clubManager">CLUB MANAGER</small></span></div>
+            <button class="language-toggle auth-language-toggle" id="auth-language-toggle" type="button" aria-label="Switch language" data-i18n-aria="switchLanguage">ខ្មែរ</button>
+          </div>
+          <div class="auth-showcase-copy">
+            <div class="eyebrow"><span class="eyebrow-line"></span> <span data-i18n="loginSection">TEAM STAFF &amp; ADMIN</span></div>
+            <h2 data-i18n="authHeadline">Built for the love of the game.</h2>
+            <p class="auth-intro" data-i18n="loginIntro">Teams and rosters are open to view. Owners, developers, admins, coaches, and team leaders can sign in for their tools.</p>
+            <div class="auth-match-card">
+              <div class="auth-match-label"><span class="status-dot"></span><span data-i18n="authPlatform">THE CLUB PLATFORM</span></div>
+              <div class="auth-match-main">
+                <div class="auth-match-crest"><img src="https://i.postimg.cc/7h9WSCCs/no-backdound.png" alt=""></div>
+                <div><strong data-i18n="authClubName">SUNNY SPORT CLUB</strong><span data-i18n="authMatchSubtitle">One club. Every team.</span></div>
+                <span class="auth-ball" aria-hidden="true">⚽</span>
+              </div>
+              <div class="auth-match-footer"><span data-i18n="authOpenDirectory">OPEN TEAM DIRECTORY</span><span data-i18n="authSeason">CLUB SEASON · 2026</span></div>
+            </div>
+            <div class="auth-role-list"><span data-i18n="authRolesLabel">ACCESS FOR</span><div><span data-i18n="devOwnerRole">Dev Owner</span><span data-i18n="adminSystemRole">Admin</span><span data-i18n="coachRole">Coach</span><span data-i18n="captainRole">Team Leader</span><span data-i18n="managerRole">Team manager</span></div></div>
+          </div>
+          <div class="auth-showcase-foot"><span data-i18n="footerMotto">Made for the love of the game.</span><span>EST. SUNNY SPORT CLUB</span></div>
+        </div>
+        <div class="auth-card">
+          <div class="auth-panel-heading">
+            <span class="auth-panel-icon" aria-hidden="true">↗</span>
+            <div class="eyebrow"><span class="eyebrow-line"></span> <span data-i18n="authSecureAccess">STAFF ACCESS</span></div>
+            <h1 id="auth-title" data-i18n="teamLogin">Team login</h1>
+            <p class="auth-panel-intro" data-i18n="authPanelIntro">Sign in with the username and password assigned to you.</p>
+          </div>
+          <form id="auth-form" novalidate>
+            <label class="form-field"><span data-i18n="username">Username</span><input id="auth-username" name="username" type="text" minlength="3" maxlength="24" autocomplete="username" required></label>
+            <label class="form-field"><span data-i18n="password">Password</span><input id="auth-password" name="password" type="password" minlength="8" autocomplete="current-password" required></label>
+            <p class="auth-hint" id="auth-hint" data-i18n="loginHint">Your Dev Owner/Admin creates your username and password. Contact them if you need an account.</p>
+            <p class="form-error" id="auth-error" role="alert" hidden></p>
+            <button class="button button-primary auth-submit" id="auth-submit" type="submit"><span data-i18n="logIn">Log in</span><span aria-hidden="true">→</span></button>
+          </form>
+          <div class="auth-signed-in" id="auth-signed-in" hidden>
+            <p class="auth-hint" id="auth-session-label"></p>
+            <button class="button button-secondary auth-submit" id="bottom-logout-button" type="button" data-i18n="logOut">Log out</button>
+          </div>
+          <div class="auth-panel-foot"><span class="auth-lock" aria-hidden="true">◇</span><span data-i18n="authPrivateNote">Private team tools · Authorized accounts only</span></div>
+        </div>
+      </div>
+    </section>
+
+    <dialog class="app-dialog settings-dialog" id="team-dialog" aria-labelledby="team-dialog-title">
+      <form id="team-form" novalidate>
+        <div class="dialog-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> <span data-i18n="teamSetup">TEAM SETUP</span></div><h2 id="team-dialog-title" data-i18n="createTeamTitle">Create a team</h2></div><button class="dialog-close" type="button" data-close-dialog aria-label="Close dialog" data-i18n-aria="closeDialog">×</button></div>
+        <p class="dialog-description" data-i18n="teamDescription">Teams are public in this prototype. Contact details and rosters are visible to signed-in users.</p>
+        <label class="form-field"><span data-i18n="teamName">Team name</span><input id="team-name-input" type="text" maxlength="60" required></label>
+        <label class="form-field"><span>Location</span><input id="team-location-input" type="text" maxlength="100"></label>
+        <label class="form-field"><span data-i18n="teamLogo">Team logo</span><input id="team-logo-input" type="file" accept="image/*"><span class="logo-file-help" id="team-logo-name" data-i18n="logoHelp">Optional image (up to 1 MB)</span></label>
+        <label class="form-field"><span data-i18n="teamContact">Contact number</span><input id="team-phone-input" type="tel" maxlength="30"></label>
+        <label class="form-field"><span data-i18n="telegramLink">Telegram link</span><input id="team-telegram-input" type="text" maxlength="200"></label>
+        <p class="form-error" id="team-error" role="alert" hidden></p>
+        <div class="dialog-actions"><button class="button button-secondary" type="button" data-close-dialog data-i18n="cancel">Cancel</button><button class="button button-primary" type="submit" data-i18n="createTeam">Create team</button></div>
+      </form>
+    </dialog>
+
+    <dialog class="app-dialog settings-dialog" id="account-dialog" aria-labelledby="account-dialog-title">
+      <form id="account-form" novalidate>
+        <div class="dialog-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> <span data-i18n="accountAccess">ACCOUNT ACCESS</span></div><h2 id="account-dialog-title" data-i18n="createAccount">Create account</h2></div><button class="dialog-close" type="button" data-close-dialog aria-label="Close dialog" data-i18n-aria="closeDialog">×</button></div>
+        <p class="dialog-description" data-i18n="accountDescription">Set the username and temporary password to give to this user. They can sign in without an email address or phone number.</p>
+        <label class="form-field"><span data-i18n="username">Username</span><input id="new-account-username" type="text" minlength="3" maxlength="24" autocomplete="off" required></label>
+        <label class="form-field"><span data-i18n="password">Password</span><input id="new-account-password" type="password" minlength="8" autocomplete="new-password" required></label>
+        <label class="form-field"><span data-i18n="accessForTeam">Team access</span><select id="new-account-role"><option value="Viewer" data-i18n="viewOnly">View only</option><option value="Team Manager" data-i18n="assignManagerRole">Team manager for this team</option><option value="Coach" data-i18n="coachForThisTeam">Coach for this team</option><option value="Captain" data-i18n="leaderForThisTeam">Team Leader for this team</option><option value="create-team-coach" data-i18n="createTeamAsCoach">Coach — create one team</option><option value="create-team-captain" data-i18n="createTeamAsCaptain">Team Leader — create one team</option></select></label>
+        <p class="form-error" id="account-error" role="alert" hidden></p>
+        <div class="dialog-actions"><button class="button button-secondary" type="button" data-close-dialog data-i18n="cancel">Cancel</button><button class="button button-primary" type="submit" data-i18n="createAccount">Create account</button></div>
+      </form>
+    </dialog>
+
+    <dialog class="app-dialog" id="member-dialog" aria-labelledby="member-dialog-title">
+      <form id="member-form" novalidate>
+        <div class="dialog-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> <span data-i18n="squadDetails">SQUAD DETAILS</span></div><h2 id="member-dialog-title">Add team member</h2></div><button class="dialog-close" type="button" data-close-dialog aria-label="Close dialog" data-i18n-aria="closeDialog">×</button></div>
+        <input id="member-id" type="hidden">
+        <div class="photo-upload">
+          <div class="photo-preview" id="photo-preview"><span id="photo-initials">?</span></div>
+          <div class="photo-upload-copy"><strong data-i18n="profilePhoto">Profile photo</strong><span data-i18n="photoHelp">Make your squad easy to recognize.</span><label class="upload-button" for="member-photo"><span data-i18n="uploadPhoto">Upload photo</span> <input id="member-photo" type="file" accept="image/*"></label></div>
+          <button type="button" id="remove-photo" class="remove-photo" hidden data-i18n="remove">Remove</button>
+        </div>
+        <label class="form-field"><span><span data-i18n="fullName">Full name</span> <span class="required-mark">*</span></span><input id="member-name" name="name" type="text" maxlength="60" placeholder="e.g. Alex Morgan" data-i18n-placeholder="nameExample" required autocomplete="name"></label>
+        <div class="form-row">
+          <label class="form-field"><span><span data-i18n="teamRole">Team role</span> <span class="required-mark">*</span></span><select id="member-role" name="role" required><option value="" data-i18n="selectRole">Select a role</option><option value="Head Coach" data-role-i18n>Head Coach</option><option value="Assistant Coach" data-role-i18n>Assistant Coach</option><option value="Coach" data-role-i18n>Coach</option><option value="Captain" data-role-i18n>Captain</option><option value="Player" data-role-i18n>Player</option><option value="Goalkeeper" data-role-i18n>Goalkeeper</option><option value="Defender" data-role-i18n>Defender</option><option value="Midfielder" data-role-i18n>Midfielder</option><option value="Forward" data-role-i18n>Forward</option><option value="Medical Staff" data-role-i18n>Medical staff</option><option value="Manager" data-role-i18n>Manager</option></select></label>
+          <label class="form-field"><span><span data-i18n="jerseyNumber">Jersey number</span> <span class="optional-mark" data-i18n="optional">OPTIONAL</span></span><input id="member-number" name="number" type="number" min="0" max="99" placeholder="e.g. 10" data-i18n-placeholder="numberExample"></label>
+        </div>
+        <label class="form-field"><span><span data-i18n="contactNumber">Contact number</span> <span class="optional-mark" data-i18n="optional">OPTIONAL</span></span><input id="member-contact" name="contact" type="tel" maxlength="30" placeholder="e.g. +1 555 010 1234" data-i18n-placeholder="phoneExample"></label>
+        <p class="form-error" id="member-error" role="alert" hidden></p>
+        <div class="dialog-actions"><button class="button button-secondary" type="button" data-close-dialog data-i18n="cancel">Cancel</button><button class="button button-primary" type="submit" id="save-member-button">Add member</button></div>
+      </form>
+    </dialog>
+
+    <dialog class="app-dialog settings-dialog" id="club-dialog" aria-labelledby="club-dialog-title">
+      <form id="club-form" novalidate>
+        <div class="dialog-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> <span data-i18n="clubProfile">CLUB PROFILE</span></div><h2 id="club-dialog-title">Club details</h2></div><button class="dialog-close" type="button" data-close-dialog aria-label="Close dialog" data-i18n-aria="closeDialog">×</button></div>
+        <p class="dialog-description" data-i18n="clubDescription">Keep your team’s location and contact information up to date.</p>
+        <label class="form-field"><span data-i18n="clubName">Club name</span><input id="club-name-input" type="text" maxlength="60" required></label>
+        <label class="form-field"><span data-i18n="location">Location</span><input id="club-location-input" type="text" maxlength="100" placeholder="City, country" data-i18n-placeholder="locationExample"></label>
+        <label class="form-field"><span>Team logo</span><input id="club-logo-input" type="file" accept="image/*"><span class="logo-file-help" id="club-logo-name">Optional image (up to 1 MB)</span></label>
+        <label class="form-field"><span data-i18n="contactNumber">Contact number</span><input id="club-phone-input" type="tel" maxlength="30" placeholder="+1 555 010 1234" data-i18n-placeholder="phoneExample"></label>
+        <label class="form-field"><span data-i18n="telegramLink">Telegram link</span><input id="club-telegram-input" type="url" maxlength="200" placeholder="https://t.me/yourclub" data-i18n-placeholder="telegramExample"></label>
+        <p class="form-error" id="club-error" role="alert" hidden></p>
+        <div class="dialog-actions"><button class="button button-secondary" type="button" data-close-dialog data-i18n="cancel">Cancel</button><button class="button button-primary" type="submit" data-i18n="saveClubDetails">Save club details</button></div>
+      </form>
+    </dialog>
+
+    <dialog class="app-dialog settings-dialog appearance-dialog" id="appearance-dialog" aria-labelledby="appearance-dialog-title">
+      <div class="dialog-heading">
+        <div><div class="eyebrow"><span class="eyebrow-line"></span> <span data-i18n="personalizeWorkspace">PERSONALIZE WORKSPACE</span></div><h2 id="appearance-dialog-title" data-i18n="changeBackground">Change background</h2></div>
+        <button class="dialog-close" type="button" data-close-dialog aria-label="Close dialog" data-i18n-aria="closeDialog">×</button>
+      </div>
+      <p class="dialog-description" data-i18n="backgroundDescription">Choose a color or upload a photo to personalize your workspace on this device.</p>
+      <div class="background-preview" id="background-preview" role="img" aria-label="Background preview" data-i18n-aria="backgroundPreview"></div>
+      <p class="background-status" id="background-status" role="status" aria-live="polite"></p>
+      <label class="form-field background-color-field">
+        <span data-i18n="backgroundColor">Background color</span>
+        <span class="background-color-control"><input id="background-color-input" type="color" value="#f3f6f4"><span data-i18n="chooseColor">Choose a color</span></span>
+      </label>
+      <label class="button button-secondary background-upload-button">
+        <span data-i18n="uploadBackgroundPhoto">Upload a background photo</span>
+        <input id="background-photo-input" type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/avif">
+      </label>
+      <p class="background-help" data-i18n="backgroundPhotoHelp">PNG, JPG, WebP, GIF, or AVIF · Up to 1 MB · Saved only in this browser</p>
+      <div class="dialog-actions">
+        <button class="button button-secondary" id="reset-background-button" type="button" data-i18n="resetBackground">Reset background</button>
+        <button class="button button-primary" type="button" data-close-dialog data-i18n="done">Done</button>
+      </div>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>
