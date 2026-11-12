@@ -42,12 +42,21 @@ const VALID_ROLES = new Set([
   "Manager",
 ]);
 const TEAM_MANAGEMENT_ROLES = new Set(["Coach", "Captain", "Team Manager"]);
+const TEAM_CATEGORY_COLORS = {
+  football: "#0d4a32",
+  volleyball: "#d4a03a",
+  basketball: "#b65c31",
+  futsal: "#277342",
+  esports: "#5461a8",
+};
 const LANGUAGE_KEY = "sunny-sport-club-language";
 const WORKSPACE_BACKGROUND_KEY = "sunny-sport-club-workspace-background-v1";
+const CONTENT_SIGNATURE_KEY = "sunny-sport-club-content-signature-v1";
+const CONTENT_IMAGE_SOURCE_PATTERN = /\.(?:png|jpe?g|webp|gif|avif|svg)$/i;
 const MAX_BACKGROUND_IMAGE_BYTES = 1024 * 1024;
 const DEFAULT_WORKSPACE_BACKGROUND = {
   mode: "color",
-  color: "#f3f6f4",
+  color: "#faf8f3",
   image: "",
 };
 const TRANSLATIONS = {
@@ -60,6 +69,10 @@ const TRANSLATIONS = {
     openNavigation: "Open navigation",
     closeNavigation: "Close navigation",
     overview: "Overview",
+    backToTeams: "Back to teams",
+    skipToContent: "Skip to main content",
+    staffLogin: "Staff Login",
+    celebrateTeam: "Celebrate this team",
     teamRoster: "Team roster",
     sidebarMotto: "One team. One dream.",
     sidebarNote: "Every great season starts with a great team.",
@@ -178,7 +191,23 @@ const TRANSLATIONS = {
     previousTeam: "Previous team",
     nextTeam: "Next team",
     teamsDirectory: "TEAM DIRECTORY",
+    directoryTitle: "Our teams",
+    directorySubtitle: "Browse all teams in the Sunny Sport Club family.",
+    directoryEmptyTitle: "No teams yet",
     teams: "Teams",
+    teamCategory: "Team category",
+    categoryFootball: "Football",
+    categoryVolleyball: "Volleyball",
+    categoryBasketball: "Basketball",
+    categoryFutsal: "Futsal",
+    categoryEsports: "eSports",
+    logoPreview: "Logo preview",
+    playerCountLabel: "PLAYERS",
+    registeredPlayers: "Registered players",
+    teamActivity: "TEAM ACTIVITY",
+    updatesThisWeek: "Updates this week",
+    players: "players",
+    backToTeamsToast: "Team created. Find it in the directory.",
     showTeamDetails: "Show details",
     hideTeamDetails: "Hide details",
     createTeam: "Create team",
@@ -221,6 +250,7 @@ const TRANSLATIONS = {
     noContactNumber: "No contact number",
     viewing: "Viewing",
     viewTeam: "View team",
+    viewTeamNamed: "View team {name}",
     deleteTeam: "Delete {name}",
     deleteTeamConfirm: "Delete {name} and its roster?",
     postPhotoAlt: "Photo attached to team update",
@@ -311,6 +341,10 @@ const TRANSLATIONS = {
     openNavigation: "បើកម៉ឺនុយ",
     closeNavigation: "បិទម៉ឺនុយ",
     overview: "ទិដ្ឋភាពទូទៅ",
+    backToTeams: "ត្រឡប់ទៅបញ្ជីក្រុម",
+    skipToContent: "រំលងទៅមាតិកាសំខាន់",
+    staffLogin: "ចូលគណនីបុគ្គលិក",
+    celebrateTeam: "អបអរក្រុមនេះ",
     teamRoster: "បញ្ជីសមាជិកក្រុម",
     sidebarMotto: "ក្រុមតែមួយ ក្តីសុបិនតែមួយ។",
     sidebarNote: "រដូវកាលដ៏អស្ចារ្យ ចាប់ផ្តើមពីក្រុមដ៏អស្ចារ្យ។",
@@ -429,7 +463,23 @@ const TRANSLATIONS = {
     previousTeam: "ក្រុមមុន",
     nextTeam: "ក្រុមបន្ទាប់",
     teamsDirectory: "បញ្ជីក្រុម",
+    directoryTitle: "ក្រុមរបស់យើង",
+    directorySubtitle: "ស្វែងរកក្រុមទាំងអស់ក្នុងគ្រួសារ Sunny Sport Club។",
+    directoryEmptyTitle: "មិនទាន់មានក្រុមទេ",
     teams: "ក្រុម",
+    teamCategory: "ប្រភេទក្រុម",
+    categoryFootball: "បាល់ទាត់",
+    categoryVolleyball: "បាល់ទះ",
+    categoryBasketball: "បាល់បោះ",
+    categoryFutsal: "ហ្វូតសាល",
+    categoryEsports: "កីឡាអេឡិចត្រូនិក",
+    logoPreview: "មើលឡូហ្គោ",
+    playerCountLabel: "កីឡាករ",
+    registeredPlayers: "កីឡាករដែលបានចុះឈ្មោះ",
+    teamActivity: "សកម្មភាពក្រុម",
+    updatesThisWeek: "ព័ត៌មានក្នុងសប្តាហ៍នេះ",
+    players: "កីឡាករ",
+    backToTeamsToast: "បានបង្កើតក្រុម។ ស្វែងរកក្នុងបញ្ជីក្រុម។",
     showTeamDetails: "បង្ហាញព័ត៌មាន",
     hideTeamDetails: "លាក់ព័ត៌មាន",
     createTeam: "បង្កើតក្រុម",
@@ -472,6 +522,7 @@ const TRANSLATIONS = {
     noContactNumber: "មិនទាន់មានលេខទំនាក់ទំនង",
     viewing: "កំពុងមើល",
     viewTeam: "មើលក្រុម",
+    viewTeamNamed: "មើលក្រុម {name}",
     deleteTeam: "លុប {name}",
     deleteTeamConfirm: "តើអ្នកចង់លុប {name} និងបញ្ជីសមាជិករបស់វាមែនទេ?",
     postPhotoAlt: "រូបថតភ្ជាប់ជាមួយព័ត៌មានក្រុម",
@@ -560,6 +611,8 @@ let store = loadData();
 let data = structuredClone(DEFAULT_DATA);
 let activeAccount = null;
 let currentTeamId = "";
+let lastRenderedRoute = "";
+let directoryHighlightId = "";
 let language = loadLanguage();
 let workspaceBackground = loadWorkspaceBackground();
 let draftPhoto = "";
@@ -620,7 +673,26 @@ document.querySelector("#mobile-nav-toggle").addEventListener("click", () => {
 document.querySelector("#mobile-nav-close").addEventListener("click", () => setMobileNavigationOpen(false, true));
 document.querySelector("#sidebar-backdrop").addEventListener("click", () => setMobileNavigationOpen(false, true));
 document.querySelector("#main-navigation").addEventListener("click", (event) => {
-  if (event.target.closest("a")) setMobileNavigationOpen(false);
+  const link = event.target.closest("a");
+  if (!link) return;
+  setMobileNavigationOpen(false);
+  if (link.hash === "#overview") {
+    event.preventDefault();
+    window.location.hash = "#teams";
+  } else if (link.hash === "#roster") {
+    event.preventDefault();
+    window.location.hash = currentTeamId
+      ? `#team/${encodeURIComponent(currentTeamId)}/roster`
+      : "#teams";
+  }
+});
+window.addEventListener("hashchange", renderRouteFromHash);
+document.querySelector("#staff-login-float").addEventListener("click", (event) => {
+  event.preventDefault();
+  document.querySelector("#auth-screen").scrollIntoView({ behavior: "smooth" });
+  window.setTimeout(() => {
+    document.querySelector(activeAccount ? "#bottom-logout-button" : "#auth-username")?.focus();
+  }, 350);
 });
 document.addEventListener("keydown", (event) => {
   const isNavigationOpen = document.querySelector("#app-shell").classList.contains("sidebar-open");
@@ -716,6 +788,65 @@ function getBackgroundLuminance(color) {
   return channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
 }
 
+function hexToRgb(color) {
+  const match = /^#([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(color);
+  if (!match) return { red: 255, green: 255, blue: 255 };
+  return {
+    red: Number.parseInt(match[1], 16),
+    green: Number.parseInt(match[2], 16),
+    blue: Number.parseInt(match[3], 16),
+  };
+}
+
+function mixHexColors(foreground, background, foregroundWeight) {
+  const front = hexToRgb(foreground);
+  const back = hexToRgb(background);
+  return `#${["red", "green", "blue"].map((channel) => {
+    const value = Math.round(front[channel] * foregroundWeight + back[channel] * (1 - foregroundWeight));
+    return value.toString(16).padStart(2, "0");
+  }).join("")}`;
+}
+
+function getContrastRatio(luminanceA, luminanceB) {
+  const lighter = Math.max(luminanceA, luminanceB);
+  const darker = Math.min(luminanceA, luminanceB);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+function getReadableSoftColor(foreground, background, backgroundLuminance) {
+  for (let weight = 0.5; weight <= 0.95; weight += 0.05) {
+    const candidate = mixHexColors(foreground, background, weight);
+    if (getContrastRatio(getBackgroundLuminance(candidate), backgroundLuminance) >= 4.5) {
+      return candidate;
+    }
+  }
+  return foreground;
+}
+
+function buildWorkspacePalette(backgroundHex, backgroundLuminance) {
+  const darkText = "#0b1712";
+  const lightText = "#ffffff";
+  const darkContrast = getContrastRatio(getBackgroundLuminance(darkText), backgroundLuminance);
+  const lightContrast = getContrastRatio(getBackgroundLuminance(lightText), backgroundLuminance);
+  const useDarkText = darkContrast >= lightContrast;
+  const foreground = useDarkText ? darkText : lightText;
+  const preferredAccent = useDarkText ? "#0d5a3a" : "#d7f0a3";
+  const accent = getContrastRatio(
+    getBackgroundLuminance(preferredAccent),
+    backgroundLuminance,
+  ) >= 3
+    ? preferredAccent
+    : foreground;
+  return {
+    tone: useDarkText ? "light" : "dark",
+    foreground,
+    muted: getReadableSoftColor(foreground, backgroundHex, backgroundLuminance),
+    accent,
+    boundary: useDarkText ? "rgb(15 40 26 / 22%)" : "rgb(255 255 255 / 30%)",
+    surface: useDarkText ? "rgb(255 255 255 / 72%)" : "rgb(8 16 12 / 45%)",
+  };
+}
+
 function scanWorkspaceImage(imageDataUrl) {
   return new Promise((resolve, reject) => {
     const image = new Image();
@@ -756,10 +887,21 @@ function applyWorkspaceBackground() {
   const mainContent = document.querySelector(".main-content");
   const isPhoto = workspaceBackground.mode === "photo";
   const imageTone = workspaceBackground.imageTone || "light";
-  const isDarkBackground = isPhoto
+  const backgroundBase = isPhoto
     ? imageTone === "light"
-    : getBackgroundLuminance(workspaceBackground.color) <= 0.179;
-  mainContent.dataset.workspaceTone = isDarkBackground ? "dark" : "light";
+      ? "#000000"
+      : "#ffffff"
+    : workspaceBackground.color;
+  const palette = buildWorkspacePalette(
+    backgroundBase,
+    getBackgroundLuminance(backgroundBase),
+  );
+  mainContent.dataset.workspaceTone = palette.tone;
+  mainContent.style.setProperty("--workspace-foreground", palette.foreground);
+  mainContent.style.setProperty("--workspace-muted", palette.muted);
+  mainContent.style.setProperty("--workspace-accent", palette.accent);
+  mainContent.style.setProperty("--workspace-boundary", palette.boundary);
+  mainContent.style.setProperty("--workspace-surface", palette.surface);
   root.style.setProperty("--workspace-background", workspaceBackground.color);
   root.style.setProperty(
     "--workspace-background-overlay",
@@ -775,10 +917,14 @@ function applyWorkspaceBackground() {
       ? `linear-gradient(var(--workspace-background-overlay), var(--workspace-background-overlay)), url("${workspaceBackground.image}")`
       : "none",
   );
+  const themeColor = document.querySelector('meta[name="theme-color"]');
+  if (themeColor) themeColor.setAttribute("content", workspaceBackground.color);
   updateBackgroundPreview();
 }
 
 function saveWorkspaceBackground(nextBackground) {
+  workspaceBackground = nextBackground;
+  applyWorkspaceBackground();
   try {
     localStorage.setItem(WORKSPACE_BACKGROUND_KEY, JSON.stringify(nextBackground));
   } catch (error) {
@@ -786,8 +932,6 @@ function saveWorkspaceBackground(nextBackground) {
     showToast(t("backgroundSaveFailed"));
     return false;
   }
-  workspaceBackground = nextBackground;
-  applyWorkspaceBackground();
   return true;
 }
 
@@ -805,36 +949,54 @@ function readImageAsDataUrl(file) {
   });
 }
 
-function bindLogoInput(inputSelector, nameSelector, setLogo) {
+function bindLogoInput(inputSelector, nameSelector, setLogo, previewSelector = "") {
   const input = document.querySelector(inputSelector);
   const name = document.querySelector(nameSelector);
+  const preview = previewSelector ? document.querySelector(previewSelector) : null;
   input.addEventListener("change", async () => {
     const file = input.files?.[0];
     if (!file) return;
     if (!/^image\/(png|jpeg|webp|gif|avif)$/.test(file.type)) {
       showToast(t("teamLogoType"));
       input.value = "";
+      setLogo("");
+      preview?.classList.remove("has-logo");
+      if (preview) preview.innerHTML = `<span class="team-logo-preview-empty">${escapeHtml(t("logoPreview"))}</span>`;
       return;
     }
     if (file.size > 1024 * 1024) {
       showToast(t("teamLogoTooLarge"));
       input.value = "";
+      setLogo("");
+      preview?.classList.remove("has-logo");
+      if (preview) preview.innerHTML = `<span class="team-logo-preview-empty">${escapeHtml(t("logoPreview"))}</span>`;
       return;
     }
     try {
-      setLogo(await readImageAsDataUrl(file));
+      const logo = await readImageAsDataUrl(file);
+      setLogo(logo);
       name.textContent = file.name;
+      if (preview) {
+        const image = document.createElement("img");
+        image.src = logo;
+        image.alt = `${file.name} preview`;
+        preview.replaceChildren(image);
+        preview.classList.add("has-logo");
+      }
     } catch (error) {
       console.error("Could not read the selected team logo.", error);
       showToast(t("logoReadFailed"));
       input.value = "";
+      setLogo("");
+      preview?.classList.remove("has-logo");
+      if (preview) preview.innerHTML = `<span class="team-logo-preview-empty">${escapeHtml(t("logoPreview"))}</span>`;
     }
   });
 }
 
 bindLogoInput("#team-logo-input", "#team-logo-name", (logo) => {
   draftTeamLogo = logo;
-});
+}, "#team-logo-preview");
 bindLogoInput("#club-logo-input", "#club-logo-name", (logo) => {
   draftClubLogo = logo;
 });
@@ -845,6 +1007,43 @@ function t(key, values = {}) {
     message = message.replaceAll(`{${name}}`, value);
   }
   return message;
+}
+
+function formatNumber(value) {
+  return new Intl.NumberFormat(
+    language === "km" ? "km-KH" : "en-US",
+    language === "km" ? { numberingSystem: "khmr" } : undefined,
+  ).format(value);
+}
+
+function localizeDigits(value) {
+  if (language !== "km") return String(value);
+  return String(value).replace(/\d/g, (digit) => "០១២៣៤៥៦៧៨៩"[Number(digit)]);
+}
+
+function teamAccentColor(team) {
+  const saved = team.club.accentColor;
+  if (/^#[\da-f]{6}$/i.test(saved || "")) return saved;
+  if (TEAM_CATEGORY_COLORS[team.club.category]) {
+    return TEAM_CATEGORY_COLORS[team.club.category];
+  }
+  let hash = 0;
+  for (const character of team.club.name) {
+    hash = (hash * 31 + character.charCodeAt(0)) >>> 0;
+  }
+  return `hsl(${hash % 360} 48% 36%)`;
+}
+
+function teamAccentTextColor(team) {
+  const accent = teamAccentColor(team);
+  if (!/^#[\da-f]{6}$/i.test(accent)) return accent;
+  for (let weight = 1; weight >= 0.45; weight -= 0.05) {
+    const candidate = mixHexColors(accent, "#000000", weight);
+    if (getContrastRatio(getBackgroundLuminance(candidate), 1) >= 4.5) {
+      return candidate;
+    }
+  }
+  return "#0d4a32";
 }
 
 function translatedRole(role) {
@@ -882,8 +1081,7 @@ function applyLanguage() {
   document.querySelectorAll("[data-role-i18n]").forEach((element) => {
     element.textContent = translatedRole(element.value || element.textContent);
   });
-  document.querySelector("#language-toggle").textContent =
-    language === "en" ? "ខ្មែរ" : "English";
+  document.querySelector("#language-toggle").dataset.language = language;
   document.querySelector("#auth-language-toggle").textContent =
     language === "en" ? "ខ្មែរ" : "English";
   document
@@ -928,162 +1126,466 @@ function applyLanguage() {
   render();
 }
 
-function loadData() {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (!saved) {
-      return {
-        users: BOOTSTRAP_USERS.map((user) => ({ ...user, teamRoles: {} })),
-        teams: [],
-        posts: [],
-        activeUserId: "",
-        selectedTeamId: "",
-      };
-    }
-    const parsed = JSON.parse(saved);
-    const savedTeams = Array.isArray(parsed.teams)
-      ? parsed.teams
-      : parsed.club
-        ? [{ id: "legacy-team", club: parsed.club, members: parsed.members }]
-        : [];
-    const teams = savedTeams
-      .filter((team) => team && typeof team.id === "string")
-      .map((team) => {
-        const savedClub = team.club && typeof team.club === "object" ? team.club : {};
-        return {
-          id: team.id,
-          club: {
-            name: typeof savedClub.name === "string" && savedClub.name.trim()
-              ? savedClub.name
-              : DEFAULT_DATA.club.name,
-            location: typeof savedClub.location === "string" ? savedClub.location : "",
-            trainingDay:
-              typeof savedClub.trainingDay === "string" ? savedClub.trainingDay : "",
-            trainingTime:
-              typeof savedClub.trainingTime === "string" ? savedClub.trainingTime : "",
-            logo:
-              typeof savedClub.logo === "string" &&
-              /^data:image\/(png|jpeg|webp|gif|avif);base64,/i.test(savedClub.logo)
-                ? savedClub.logo
-                : "",
-            phone: typeof savedClub.phone === "string" ? savedClub.phone : "",
-            telegram: typeof savedClub.telegram === "string" ? savedClub.telegram : "",
-          },
-          members: Array.isArray(team.members)
-            ? team.members.filter(
-                (member) =>
-                  member &&
-                  typeof member.id === "string" &&
-                  typeof member.name === "string" &&
-                  VALID_ROLES.has(member.role),
-              ).map((member) => ({
-                id: member.id,
-                name: member.name,
-                role: member.role,
-                number:
-                  typeof member.number === "string" || typeof member.number === "number"
-                    ? String(member.number)
-                    : "",
-                contact: typeof member.contact === "string" ? member.contact : "",
-                photo:
-                  typeof member.photo === "string" && member.photo.startsWith("data:image/")
-                    ? member.photo
-                    : "",
-              }))
-            : [],
-        };
+function isSafeImageSource(value) {
+  if (typeof value !== "string") return false;
+  const source = value.trim();
+  if (!source) return false;
+  if (/^data:image\/(?:png|jpeg|webp|gif|avif|svg\+xml);base64,/i.test(source)) {
+    return true;
+  }
+  if (/^[a-z][a-z\d+.-]*:/i.test(source) || source.startsWith("//") || source.startsWith("/")) {
+    return false;
+  }
+  if (source.includes("..") || source.includes("\\") || /[\r\n]/.test(source)) {
+    return false;
+  }
+  return CONTENT_IMAGE_SOURCE_PATTERN.test(source) &&
+    source.split("/").every((part) => part && part !== ".");
+}
+
+function contentText(value, fallback = "") {
+  return typeof value === "string" ? value.trim() : fallback;
+}
+
+function contentSlug(value, fallback) {
+  const slug = contentText(value)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return slug || fallback;
+}
+
+function readContentConfig() {
+  const source = globalThis.SUNNY_DATA;
+  const data = source && typeof source === "object" ? source : {};
+  const config = { teams: [], staff: [], accounts: [] };
+
+  if (Array.isArray(data.teams)) {
+    data.teams.forEach((team, index) => {
+      if (!team || typeof team !== "object") return;
+      const name = contentText(team.name);
+      if (!name) return;
+      config.teams.push({
+        id: contentText(team.id) || `data-team-${index + 1}`,
+        name,
+        location: contentText(team.location),
+        category: Object.hasOwn(TEAM_CATEGORY_COLORS, team.category) ? team.category : "",
+        accentColor: /^#[\da-f]{6}$/i.test(team.accentColor || "") ? team.accentColor : "",
+        description: contentText(team.description),
+        foundedYear: contentText(team.foundedYear),
+        trainingDay: contentText(team.trainingDay),
+        trainingTime: contentText(team.trainingTime),
+        logo: isSafeImageSource(team.logo) ? team.logo.trim() : "",
+        phone: contentText(team.phone),
+        telegram: contentText(team.telegram),
       });
-    const users = Array.isArray(parsed.users)
-      ? parsed.users.filter(
-          (user) =>
-            user &&
-            typeof user.id === "string" &&
-            typeof user.username === "string" &&
-            ((typeof user.password === "string" && user.password.length > 0) ||
-              (typeof user.passwordSalt === "string" &&
-                typeof user.passwordHash === "string")),
-        ).map((user) => ({
-          id: user.id,
-          username: user.username,
-          ...(typeof user.password === "string" && user.password.length > 0
-            ? { password: user.password }
-            : { passwordSalt: user.passwordSalt, passwordHash: user.passwordHash }),
-          systemRole: user.username.toLowerCase() === "ddomm7"
-            ? "owner"
-            : user.systemRole === "admin"
-              ? "admin"
-              : "viewer",
-          canPost: Boolean(user.canPost),
-          teamCreationRole: ["Coach", "Captain"].includes(user.teamCreationRole)
-            ? user.teamCreationRole
-            : "",
-          teamCreationUsed: Boolean(user.teamCreationUsed),
-          teamRoles: user.teamRoles && typeof user.teamRoles === "object"
-            ? user.teamRoles
-            : {},
-        }))
-      : [];
-    for (const bootstrapUser of BOOTSTRAP_USERS) {
-      const existing = users.find(
-        (user) => user.username.toLowerCase() === bootstrapUser.username,
-      );
-      if (!existing) {
-        users.push({ ...bootstrapUser, teamRoles: {} });
-      } else {
-        if (
-          typeof existing.password !== "string" &&
-          (!isValidBase64Bytes(existing.passwordSalt, 16) ||
-            !isValidBase64Bytes(existing.passwordHash, 32))
-        ) {
-          existing.passwordSalt = bootstrapUser.passwordSalt;
-          existing.passwordHash = bootstrapUser.passwordHash;
-        }
-        if (bootstrapUser.username === "ddomm7") {
-          existing.systemRole = "owner";
+    });
+  }
+
+  const firstTeamId = config.teams[0]?.id || "";
+
+  if (Array.isArray(data.staff)) {
+    data.staff.forEach((member, index) => {
+      if (!member || typeof member !== "object") return;
+      const name = contentText(member.name);
+      if (!name) return;
+      const role = VALID_ROLES.has(member.role) ? member.role : "Player";
+      if (member.role && !VALID_ROLES.has(member.role)) {
+        console.warn(`Unknown staff role "${member.role}" for ${name}. Using "Player".`);
+      }
+      config.staff.push({
+        id: contentText(member.id) || `data-staff-${index + 1}`,
+        teamId: contentText(member.teamId) || firstTeamId,
+        name,
+        role,
+        number: typeof member.number === "number"
+          ? String(member.number)
+          : contentText(member.number),
+        contact: contentText(member.contact),
+        photo: isSafeImageSource(member.photo) ? member.photo.trim() : "",
+      });
+    });
+  }
+
+  if (Array.isArray(data.accounts)) {
+    data.accounts.forEach((account, index) => {
+      if (!account || typeof account !== "object") return;
+      const username = contentText(account.username);
+      if (!username || typeof account.password !== "string" || !account.password) return;
+      const teamRoles = {};
+      if (account.teamRoles && typeof account.teamRoles === "object") {
+        for (const [teamId, role] of Object.entries(account.teamRoles)) {
+          if (TEAM_MANAGEMENT_ROLES.has(role)) teamRoles[teamId] = role;
         }
       }
+      config.accounts.push({
+        id: contentText(account.id) ||
+          `data-account-${contentSlug(username, String(index + 1))}`,
+        username,
+        password: account.password,
+        systemRole: ["owner", "admin", "viewer"].includes(account.systemRole)
+          ? account.systemRole
+          : "viewer",
+        teamRoles,
+      });
+    });
+  }
+
+  return config;
+}
+
+function contentToStoreTeam(team, members) {
+  const timestamp = new Date().toISOString();
+  return {
+    id: team.id,
+    club: {
+      name: team.name,
+      location: team.location,
+      category: team.category,
+      accentColor: team.accentColor,
+      description: team.description,
+      foundedYear: team.foundedYear,
+      trainingDay: team.trainingDay,
+      trainingTime: team.trainingTime,
+      logo: team.logo,
+      phone: team.phone,
+      telegram: team.telegram,
+    },
+    members,
+    createdAt: timestamp,
+    updatedAt: timestamp,
+    views: 0,
+  };
+}
+
+function applyContentConfig(store, config) {
+  const managed = store.contentManaged && typeof store.contentManaged === "object"
+    ? store.contentManaged
+    : {};
+  const previousTeamIds = new Set(Array.isArray(managed.teamIds) ? managed.teamIds : []);
+  const previousMemberIds = new Set(Array.isArray(managed.memberIds) ? managed.memberIds : []);
+  const previousUsernames = new Set(
+    Array.isArray(managed.usernames)
+      ? managed.usernames.map((username) => String(username).toLowerCase())
+      : [],
+  );
+  const nextTeamIds = new Set();
+  const nextMemberIds = new Set();
+  const nextUsernames = new Set();
+
+  for (const account of config.accounts) {
+    const normalizedUsername = account.username.toLowerCase();
+    nextUsernames.add(normalizedUsername);
+    const existing = store.users.find(
+      (user) => user.username.toLowerCase() === normalizedUsername,
+    );
+    if (existing) {
+      existing.password = account.password;
+      delete existing.passwordSalt;
+      delete existing.passwordHash;
+      existing.systemRole = normalizedUsername === "ddomm7" ? "owner" : account.systemRole;
+      existing.teamRoles = { ...(existing.teamRoles || {}), ...account.teamRoles };
+    } else {
+      store.users.push({
+        id: account.id,
+        username: account.username,
+        password: account.password,
+        systemRole: normalizedUsername === "ddomm7" ? "owner" : account.systemRole,
+        canPost: false,
+        teamCreationRole: "",
+        teamCreationUsed: false,
+        teamRoles: { ...account.teamRoles },
+      });
     }
-    const posts = Array.isArray(parsed.posts)
-      ? parsed.posts.filter(
-          (post) =>
-            post &&
-            typeof post.id === "string" &&
-            typeof post.author === "string" &&
-            typeof post.message === "string",
-        ).map((post) => ({
-          id: post.id,
-          author: post.author,
-          message: post.message,
-          media: Array.isArray(post.media)
-            ? post.media.filter((item) =>
-                item &&
-                typeof item.id === "string" &&
-                typeof item.type === "string",
-              ).map((item) => ({ id: item.id, type: item.type }))
-            : typeof post.mediaId === "string" && post.mediaId
-              ? [{ id: post.mediaId, type: typeof post.mediaType === "string" ? post.mediaType : "" }]
-              : [],
-          teamId: typeof post.teamId === "string" ? post.teamId : "",
-          createdAt: typeof post.createdAt === "string" ? post.createdAt : new Date(0).toISOString(),
-        }))
-      : [];
-    return {
-      users,
-      teams,
-      posts,
-      activeUserId: typeof parsed.activeUserId === "string" ? parsed.activeUserId : "",
-      selectedTeamId: typeof parsed.selectedTeamId === "string" ? parsed.selectedTeamId : "",
-    };
+  }
+  store.users = store.users.filter((user) => {
+    const normalizedUsername = user.username.toLowerCase();
+    return !previousUsernames.has(normalizedUsername) || nextUsernames.has(normalizedUsername);
+  });
+
+  for (const team of config.teams) {
+    nextTeamIds.add(team.id);
+    const members = config.staff
+      .filter((member) => member.teamId === team.id)
+      .map(({ id, name, role, number, contact, photo }) => ({
+        id,
+        name,
+        role,
+        number,
+        contact,
+        photo,
+      }));
+    const nextTeamMemberIds = new Set(members.map((member) => member.id));
+    for (const member of members) nextMemberIds.add(member.id);
+
+    const existing = store.teams.find((item) => item.id === team.id);
+    if (existing) {
+      existing.club = {
+        ...existing.club,
+        name: team.name,
+        location: team.location,
+        category: team.category,
+        accentColor: team.accentColor,
+        description: team.description,
+        foundedYear: team.foundedYear,
+        trainingDay: team.trainingDay,
+        trainingTime: team.trainingTime,
+        logo: team.logo,
+        phone: team.phone,
+        telegram: team.telegram,
+      };
+      for (const member of members) {
+        const memberIndex = existing.members.findIndex((item) => item.id === member.id);
+        if (memberIndex >= 0) {
+          existing.members[memberIndex] = { ...existing.members[memberIndex], ...member };
+        } else {
+          existing.members.push(member);
+        }
+      }
+      existing.members = existing.members.filter((member) =>
+        !previousMemberIds.has(member.id) || nextTeamMemberIds.has(member.id),
+      );
+      existing.updatedAt = new Date().toISOString();
+    } else {
+      store.teams.push(contentToStoreTeam(team, members));
+    }
+  }
+  store.teams = store.teams.filter((team) =>
+    !previousTeamIds.has(team.id) || nextTeamIds.has(team.id),
+  );
+
+  const remainingTeamIds = new Set(store.teams.map((team) => team.id));
+  if (store.selectedTeamId && !remainingTeamIds.has(store.selectedTeamId)) {
+    store.selectedTeamId = "";
+  }
+  if (store.activeUserId && !store.users.some((user) => user.id === store.activeUserId)) {
+    store.activeUserId = "";
+  }
+
+  store.contentManaged = {
+    teamIds: [...nextTeamIds],
+    memberIds: [...nextMemberIds],
+    usernames: [...nextUsernames],
+  };
+  return store;
+}
+
+function syncContentFiles(store) {
+  const source = globalThis.SUNNY_DATA;
+  if (!source || typeof source !== "object") return store;
+  const config = readContentConfig();
+  const signature = JSON.stringify(config);
+  let savedSignature = "";
+  try {
+    savedSignature = localStorage.getItem(CONTENT_SIGNATURE_KEY) || "";
   } catch (error) {
-    console.error("Could not load saved club data.", error);
-    showToast("Saved data could not be read. Starting with an empty workspace.");
-    return {
+    console.error("Could not read the content data signature.", error);
+  }
+  if (savedSignature === signature) return store;
+
+  applyContentConfig(store, config);
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+    localStorage.setItem(CONTENT_SIGNATURE_KEY, signature);
+  } catch (error) {
+    console.error("Could not save the content from the data files.", error);
+  }
+  return store;
+}
+
+function loadData() {
+  const emptyManaged = { teamIds: [], memberIds: [], usernames: [] };
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    const result = {
       users: BOOTSTRAP_USERS.map((user) => ({ ...user, teamRoles: {} })),
       teams: [],
       posts: [],
       activeUserId: "",
       selectedTeamId: "",
+      contentManaged: emptyManaged,
     };
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      const savedTeams = Array.isArray(parsed.teams)
+        ? parsed.teams
+        : parsed.club
+          ? [{ id: "legacy-team", club: parsed.club, members: parsed.members }]
+          : [];
+      result.teams = savedTeams
+        .filter((team) => team && typeof team.id === "string")
+        .map((team) => {
+          const savedClub = team.club && typeof team.club === "object" ? team.club : {};
+          return {
+            id: team.id,
+            club: {
+              name: typeof savedClub.name === "string" && savedClub.name.trim()
+                ? savedClub.name
+                : DEFAULT_DATA.club.name,
+              location: typeof savedClub.location === "string" ? savedClub.location : "",
+              category: Object.hasOwn(TEAM_CATEGORY_COLORS, savedClub.category)
+                ? savedClub.category
+                : "",
+              accentColor: /^#[\da-f]{6}$/i.test(savedClub.accentColor || "")
+                ? savedClub.accentColor
+                : "",
+              description: typeof savedClub.description === "string" ? savedClub.description : "",
+              foundedYear: typeof savedClub.foundedYear === "string" ? savedClub.foundedYear : "",
+              trainingDay:
+                typeof savedClub.trainingDay === "string" ? savedClub.trainingDay : "",
+              trainingTime:
+                typeof savedClub.trainingTime === "string" ? savedClub.trainingTime : "",
+              logo: isSafeImageSource(savedClub.logo) ? savedClub.logo.trim() : "",
+              phone: typeof savedClub.phone === "string" ? savedClub.phone : "",
+              telegram: typeof savedClub.telegram === "string" ? savedClub.telegram : "",
+            },
+            members: Array.isArray(team.members)
+              ? team.members.filter(
+                  (member) =>
+                    member &&
+                    typeof member.id === "string" &&
+                    typeof member.name === "string" &&
+                    VALID_ROLES.has(member.role),
+                ).map((member) => ({
+                  id: member.id,
+                  name: member.name,
+                  role: member.role,
+                  number:
+                    typeof member.number === "string" || typeof member.number === "number"
+                      ? String(member.number)
+                      : "",
+                  contact: typeof member.contact === "string" ? member.contact : "",
+                  photo: isSafeImageSource(member.photo) ? member.photo.trim() : "",
+                }))
+              : [],
+            createdAt: typeof team.createdAt === "string"
+              ? team.createdAt
+              : new Date(0).toISOString(),
+            updatedAt: typeof team.updatedAt === "string"
+              ? team.updatedAt
+              : typeof team.createdAt === "string"
+                ? team.createdAt
+                : new Date(0).toISOString(),
+            views: Number.isSafeInteger(team.views) && team.views >= 0 ? team.views : 0,
+          };
+        });
+      const users = Array.isArray(parsed.users)
+        ? parsed.users.filter(
+            (user) =>
+              user &&
+              typeof user.id === "string" &&
+              typeof user.username === "string" &&
+              ((typeof user.password === "string" && user.password.length > 0) ||
+                (typeof user.passwordSalt === "string" &&
+                  typeof user.passwordHash === "string")),
+          ).map((user) => ({
+            id: user.id,
+            username: user.username,
+            ...(typeof user.password === "string" && user.password.length > 0
+              ? { password: user.password }
+              : { passwordSalt: user.passwordSalt, passwordHash: user.passwordHash }),
+            systemRole: user.username.toLowerCase() === "ddomm7" || user.systemRole === "owner"
+              ? "owner"
+              : user.systemRole === "admin"
+                ? "admin"
+                : "viewer",
+            canPost: Boolean(user.canPost),
+            teamCreationRole: ["Coach", "Captain"].includes(user.teamCreationRole)
+              ? user.teamCreationRole
+              : "",
+            teamCreationUsed: Boolean(user.teamCreationUsed),
+            teamRoles: user.teamRoles && typeof user.teamRoles === "object"
+              ? user.teamRoles
+              : {},
+          }))
+        : [];
+      for (const bootstrapUser of BOOTSTRAP_USERS) {
+        const existing = users.find(
+          (user) => user.username.toLowerCase() === bootstrapUser.username,
+        );
+        if (!existing) {
+          users.push({ ...bootstrapUser, teamRoles: {} });
+        } else {
+          if (
+            typeof existing.password !== "string" &&
+            (!isValidBase64Bytes(existing.passwordSalt, 16) ||
+              !isValidBase64Bytes(existing.passwordHash, 32))
+          ) {
+            existing.passwordSalt = bootstrapUser.passwordSalt;
+            existing.passwordHash = bootstrapUser.passwordHash;
+          }
+          if (bootstrapUser.username === "ddomm7") {
+            existing.systemRole = "owner";
+          }
+        }
+      }
+      result.users = users;
+      result.posts = Array.isArray(parsed.posts)
+        ? parsed.posts.filter(
+            (post) =>
+              post &&
+              typeof post.id === "string" &&
+              typeof post.author === "string" &&
+              typeof post.message === "string",
+          ).map((post) => ({
+            id: post.id,
+            author: post.author,
+            message: post.message,
+            media: Array.isArray(post.media)
+              ? post.media.filter((item) =>
+                  item &&
+                  typeof item.id === "string" &&
+                  typeof item.type === "string",
+                ).map((item) => ({ id: item.id, type: item.type }))
+              : typeof post.mediaId === "string" && post.mediaId
+                ? [{
+                    id: post.mediaId,
+                    type: typeof post.mediaType === "string" ? post.mediaType : "",
+                  }]
+                : [],
+            teamId: typeof post.teamId === "string" ? post.teamId : "",
+            createdAt: typeof post.createdAt === "string"
+              ? post.createdAt
+              : new Date(0).toISOString(),
+          }))
+        : [];
+      result.activeUserId =
+        typeof parsed.activeUserId === "string" ? parsed.activeUserId : "";
+      result.selectedTeamId =
+        typeof parsed.selectedTeamId === "string" ? parsed.selectedTeamId : "";
+      result.contentManaged = parsed.contentManaged &&
+        typeof parsed.contentManaged === "object"
+        ? {
+            teamIds: Array.isArray(parsed.contentManaged.teamIds)
+              ? parsed.contentManaged.teamIds.filter((id) => typeof id === "string")
+              : [],
+            memberIds: Array.isArray(parsed.contentManaged.memberIds)
+              ? parsed.contentManaged.memberIds.filter((id) => typeof id === "string")
+              : [],
+            usernames: Array.isArray(parsed.contentManaged.usernames)
+              ? parsed.contentManaged.usernames.filter((name) => typeof name === "string")
+              : [],
+          }
+        : emptyManaged;
+    }
+    return syncContentFiles(result);
+  } catch (error) {
+    console.error("Could not load saved club data.", error);
+    showToast("Saved data could not be read. Starting with an empty workspace.");
+    const fallback = {
+      users: BOOTSTRAP_USERS.map((user) => ({ ...user, teamRoles: {} })),
+      teams: [],
+      posts: [],
+      activeUserId: "",
+      selectedTeamId: "",
+      contentManaged: emptyManaged,
+    };
+    try {
+      applyContentConfig(fallback, readContentConfig());
+    } catch (contentError) {
+      console.error("Could not load the content data files.", contentError);
+    }
+    return fallback;
   }
 }
 
@@ -1094,7 +1596,14 @@ function persistData() {
       posts: store.posts || [],
       teams: currentTeamId
         ? store.teams.map((team) =>
-        team.id === currentTeamId ? { ...team, club: data.club, members: data.members } : team,
+        team.id === currentTeamId
+          ? {
+              ...team,
+              club: data.club,
+              members: data.members,
+              updatedAt: new Date().toISOString(),
+            }
+          : team,
           )
         : store.teams,
       activeUserId: activeAccount?.id || "",
@@ -1268,66 +1777,104 @@ function updatePostTeamOptions() {
 function selectTeam(teamId) {
   const team = store.teams.find((item) => item.id === teamId);
   if (!team) return;
+  if (currentTeamId !== team.id) team.views = (team.views || 0) + 1;
   currentTeamId = team.id;
   spotlightIndex = store.teams.findIndex((item) => item.id === teamId);
   data = { club: team.club, members: team.members };
   persistData();
+  const nextHash = `#team/${encodeURIComponent(team.id)}`;
+  if (window.location.hash !== nextHash) window.location.hash = nextHash;
+  else render();
+}
+
+function renderWithPageTransition() {
+  const page = document.querySelector(".page-content");
+  if (typeof document.startViewTransition === "function") {
+    document.startViewTransition(() => render());
+    return;
+  }
+  page.classList.remove("route-fade-in");
   render();
+  void page.offsetWidth;
+  page.classList.add("route-fade-in");
+  window.setTimeout(() => page.classList.remove("route-fade-in"), 360);
+}
+
+function renderRouteFromHash() {
+  const route = window.location.hash || "#teams";
+  if (route === lastRenderedRoute) return;
+  lastRenderedRoute = route;
+  const match = window.location.hash.match(/^#team\/([^/]+)(?:\/(roster|overview))?$/);
+  if (!match) {
+    currentTeamId = "";
+    data = structuredClone(DEFAULT_DATA);
+    renderWithPageTransition();
+    if (window.location.hash && window.location.hash !== "#teams") {
+      window.location.hash = "#teams";
+    }
+    return;
+  }
+  let teamId;
+  try {
+    teamId = decodeURIComponent(match[1]);
+  } catch {
+    window.location.hash = "#teams";
+    return;
+  }
+  const team = store.teams.find((item) => item.id === teamId);
+  if (!team) {
+    window.location.hash = "#teams";
+    return;
+  }
+  data = { club: team.club, members: team.members };
+  if (currentTeamId !== team.id) {
+    currentTeamId = team.id;
+    team.views = (team.views || 0) + 1;
+    persistData();
+  }
+  renderWithPageTransition();
+  if (match[2] === "roster") {
+    requestAnimationFrame(() => document.querySelector("#roster").scrollIntoView({ behavior: "smooth" }));
+  } else {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
 }
 
 function renderTeams() {
   const grid = document.querySelector("#teams-grid");
-  const teamIds = new Set(store.teams.map((team) => team.id));
-  for (const teamId of expandedTeamIds) {
-    if (!teamIds.has(teamId)) expandedTeamIds.delete(teamId);
-  }
-  grid.querySelectorAll(".team-card-disclosure[open]").forEach((details) => {
-    expandedTeamIds.add(details.dataset.teamDisclosure);
-  });
-  document.querySelector("#teams-count").textContent = store.teams.length;
+  document.querySelector("#teams-count").textContent = formatNumber(store.teams.length);
   document.querySelector("#directory-empty").hidden = store.teams.length > 0;
   grid.innerHTML = store.teams.map((team) => {
-    const selected = team.id === currentTeamId;
-    const role = !activeAccount
-      ? t("publicView")
-      : isAdmin()
-        ? getSystemRoleLabel(activeAccount.systemRole)
-        : t(activeAccount.teamRoles[team.id] === "Coach"
-          ? "coachRole"
-          : activeAccount.teamRoles[team.id] === "Captain"
-            ? "captainRole"
-            : activeAccount.teamRoles[team.id] === "Team Manager"
-              ? "managerRole"
-              : "viewOnly");
-    const roster = team.members.length
-      ? `<ul class="team-roster-preview">${sortMembersByTeamHierarchy(team.members).map((member) => `<li><strong>${escapeHtml(member.name)}</strong><span>· ${escapeHtml(translatedRole(member.role))}${member.number ? ` · #${escapeHtml(member.number)}` : ""}</span></li>`).join("")}</ul>`
-      : `<p class="team-roster-preview team-roster-empty">${escapeHtml(t("membersNotListed"))}</p>`;
+    const category = team.club.category
+      ? t(`category${team.club.category[0].toUpperCase()}${team.club.category.slice(1)}`)
+      : t("categoryFootball");
     const memberCountLabel = t(team.members.length === 1 ? "teamMemberSingular" : "teamMemberPlural");
-    return `<article class="team-card${selected ? " selected" : ""}">
-      <details class="team-card-disclosure" data-team-disclosure="${escapeHtml(team.id)}"${expandedTeamIds.has(team.id) ? " open" : ""}>
-        <summary class="team-card-summary">
-          ${team.club.logo ? `<img class="team-card-logo" src="${escapeHtml(team.club.logo)}" alt="">` : '<span class="team-card-logo-fallback" aria-hidden="true">⚽</span>'}
-          <span class="team-card-summary-name">${escapeHtml(team.club.name)}</span>
-          <span class="team-card-summary-count">${team.members.length} ${escapeHtml(memberCountLabel)}</span>
-          <span class="team-card-summary-toggle"><span class="team-card-toggle-show">${escapeHtml(t("showTeamDetails"))}</span><span class="team-card-toggle-hide">${escapeHtml(t("hideTeamDetails"))}</span><span class="team-card-chevron" aria-hidden="true">⌄</span></span>
-        </summary>
-        <div class="team-card-details">
-          <p class="team-card-location">${escapeHtml(team.club.location || t("locationNotProvided"))}</p>
-          ${roster}
-          <div class="team-card-contact">${team.club.phone ? `<a href="tel:${escapeHtml(team.club.phone.replace(/[^\d+]/g, ""))}">${escapeHtml(team.club.phone)}</a>` : `<span>${escapeHtml(t("noContactNumber"))}</span>`}</div>
-          <div class="team-card-footer"><span>${escapeHtml(role)}</span><div class="team-card-actions">${canManageTeam(team.id) ? `<button type="button" class="button button-secondary button-small" data-team-edit="${escapeHtml(team.id)}" aria-label="${escapeHtml(t("editTeamNamed", { name: team.club.name }))}">${escapeHtml(t("editTeam"))}</button>` : ""}<button type="button" class="button button-secondary button-small" data-team-open="${escapeHtml(team.id)}">${escapeHtml(t(selected ? "viewing" : "viewTeam"))}</button></div></div>
-          ${isAdmin() ? `<button type="button" class="team-delete" data-team-delete="${escapeHtml(team.id)}" aria-label="${escapeHtml(t("deleteTeam", { name: team.club.name }))}">×</button>` : ""}
-        </div>
-      </details>
+    const logo = team.club.logo
+      ? `<img class="team-card-logo" src="${escapeHtml(team.club.logo)}" alt="">`
+      : '<span class="team-card-logo-fallback" aria-hidden="true">⚽</span>';
+    return `<article class="team-card${team.id === directoryHighlightId ? " team-card-highlight" : ""}" data-team-card="${escapeHtml(team.id)}" style="--team-accent:${escapeHtml(teamAccentColor(team))};--team-accent-ink:${escapeHtml(teamAccentTextColor(team))};--card-index:${store.teams.indexOf(team)}">
+      <button class="team-card-open" type="button" data-team-open="${escapeHtml(team.id)}" aria-label="${escapeHtml(t("viewTeamNamed", { name: team.club.name }))}">
+        <span class="team-card-accent" aria-hidden="true"></span>
+        <span class="team-card-topline">
+          <span class="team-card-logo-ring">${logo}</span>
+          <span class="team-card-category">${escapeHtml(category)}</span>
+        </span>
+        <span class="team-card-copy">
+          <strong class="team-card-name">${escapeHtml(team.club.name)}</strong>
+          <span class="team-card-location">${escapeHtml(team.club.location || t("locationNotProvided"))}</span>
+        </span>
+        <span class="team-card-bottom">
+          <span class="team-card-member-count">${formatNumber(team.members.length)} ${escapeHtml(memberCountLabel)}</span>
+          <span class="team-card-view">${escapeHtml(t("viewTeam"))} <span aria-hidden="true">→</span></span>
+        </span>
+      </button>
+      <div class="team-card-management">
+        ${canManageTeam(team.id) ? `<button type="button" class="button button-secondary button-small" data-team-edit="${escapeHtml(team.id)}" aria-label="${escapeHtml(t("editTeamNamed", { name: team.club.name }))}">${escapeHtml(t("editTeam"))}</button>` : ""}
+        ${isAdmin() ? `<button type="button" class="team-delete" data-team-delete="${escapeHtml(team.id)}" aria-label="${escapeHtml(t("deleteTeam", { name: team.club.name }))}">×</button>` : ""}
+      </div>
     </article>`;
   }).join("");
-  grid.querySelectorAll(".team-card-disclosure").forEach((details) => {
-    details.addEventListener("toggle", () => {
-      if (details.open) expandedTeamIds.add(details.dataset.teamDisclosure);
-      else expandedTeamIds.delete(details.dataset.teamDisclosure);
-    });
-  });
-  renderSpotlight();
+  document.querySelector("#team-spotlight-section").hidden = true;
 }
 
 function renderSpotlight() {
@@ -1409,6 +1956,7 @@ async function renderPosts() {
   const list = document.querySelector("#post-list");
   updatePostTeamOptions();
   const visiblePosts = [...(store.posts || [])]
+    .filter((post) => currentTeamId && post.teamId === currentTeamId)
     .sort((left, right) => right.createdAt.localeCompare(left.createdAt));
   document.querySelector("#posts-empty").hidden = visiblePosts.length > 0;
   document.querySelector("#post-composer").hidden = !canPublishPosts();
@@ -1522,6 +2070,9 @@ function roleClass(role) {
 
 function renderClub() {
   const { club } = data;
+  const accent = teamAccentColor(currentTeam());
+  document.querySelector(".main-content").style.setProperty("--team-accent", accent);
+  document.querySelector(".club-banner").style.setProperty("--team-accent", accent);
   document.querySelector("#club-name").textContent =
     club.name.trim() || DEFAULT_DATA.club.name;
   document.querySelector("#club-location").textContent =
@@ -1588,15 +2139,21 @@ function renderStats() {
       member.role,
     ),
   ).length;
+  const weekStart = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  const activity = (store.posts || []).filter((post) =>
+    post.teamId === currentTeamId && Date.parse(post.createdAt) >= weekStart,
+  ).length;
 
-  document.querySelector("#member-total").textContent = total;
-  document.querySelector("#staff-total").textContent = staff;
-  document.querySelector("#nav-count").textContent = total;
-  document.querySelector("#roster-count").textContent = total;
+  document.querySelector("#member-total").textContent = formatNumber(total);
+  document.querySelector("#staff-total").textContent = formatNumber(staff);
+  document.querySelector("#player-total").textContent = formatNumber(players);
+  document.querySelector("#activity-total").textContent = formatNumber(activity);
+  document.querySelector("#nav-count").textContent = formatNumber(total);
+  document.querySelector("#roster-count").textContent = formatNumber(total);
   document.querySelector("#role-summary").textContent =
     total === 0
       ? t("readySquad")
-      : `${players} ${t(players === 1 ? "playerCount" : "playersCount")} · ${total - players} ${t("staffCount")}`;
+      : `${formatNumber(players)} ${t(players === 1 ? "playerCount" : "playersCount")} · ${formatNumber(total - players)} ${t("staffCount")}`;
 }
 
 function renderMembers() {
@@ -1620,7 +2177,7 @@ function renderMembers() {
       const photo = member.photo
         ? `<img src="${escapeHtml(member.photo)}" alt="">`
         : escapeHtml(initials(member.name));
-      const number = member.number !== "" ? `#${escapeHtml(member.number)}` : "";
+      const number = member.number !== "" ? `#${escapeHtml(localizeDigits(member.number))}` : "";
       const role = escapeHtml(translatedRole(member.role));
       const phone = member.contact
         ? `<a class="member-phone" href="tel:${escapeHtml(member.contact.replace(/[^\d+]/g, ""))}">${escapeHtml(member.contact)}</a>`
@@ -1656,12 +2213,16 @@ function render() {
   const team = currentTeam();
   const hasTeam = Boolean(team);
   const canManageTeamNow = canManageCurrentTeam();
+  const mainContent = document.querySelector(".main-content");
+  mainContent.dataset.view = hasTeam ? "team" : "directory";
+  mainContent.style.setProperty("--team-accent", hasTeam ? teamAccentColor(team) : "#d4a03a");
   document.querySelector("#auth-screen").hidden = false;
   document.querySelector("#app-shell").hidden = false;
   document.querySelector("#auth-form").hidden = Boolean(activeAccount);
   document.querySelector("#auth-signed-in").hidden = !activeAccount;
   document.querySelector("#logout-button").hidden = !activeAccount;
   document.querySelector("#top-logout-button").hidden = !activeAccount;
+  document.querySelector("#staff-login-float").hidden = Boolean(activeAccount);
   document.querySelector("#user-name").textContent = activeAccount?.username || "Public visitor";
   document.querySelector("#user-avatar").textContent =
     activeAccount ? initials(activeAccount.username) || "?" : "PV";
@@ -1695,9 +2256,22 @@ function render() {
   document.querySelector("#add-member-button").hidden = !canManageTeamNow;
   document.querySelector("#edit-club-button").hidden = !canManageTeamNow;
   document.querySelector("#contact-edit-button").hidden = !canManageTeamNow;
+  document.querySelector("#back-to-teams").hidden = !hasTeam;
+  document.querySelector("#team-directory-page").hidden = hasTeam;
+  document.querySelector(".welcome-row").hidden = true;
   document.querySelector(".club-banner").hidden = !hasTeam;
+  document.querySelector("#team-contact-card").hidden = !hasTeam;
   document.querySelector(".stats-grid").hidden = !hasTeam;
   document.querySelector("#roster").hidden = !hasTeam;
+  document.querySelector(".social-feed-section").hidden = !hasTeam;
+  document.querySelectorAll("#main-navigation .nav-link").forEach((link) => {
+    const active = hasTeam
+      ? link.getAttribute("href") === "#roster"
+      : link.getAttribute("href") === "#overview";
+    link.classList.toggle("active", active);
+    if (active) link.setAttribute("aria-current", "page");
+    else link.removeAttribute("aria-current");
+  });
   document.querySelector("#add-member-button").disabled = !canManageTeamNow;
   renderTeams();
   renderAccountRoles();
@@ -1981,15 +2555,6 @@ async function authenticate(event) {
     }
     activeAccount = existing;
 
-    const selectedTeam = store.teams.find((team) => team.id === store.selectedTeamId);
-    const managesSelectedTeam = selectedTeam &&
-      TEAM_MANAGEMENT_ROLES.has(existing.teamRoles[selectedTeam.id]);
-    const assignedTeam = store.teams.find((team) =>
-      TEAM_MANAGEMENT_ROLES.has(existing.teamRoles[team.id]),
-    );
-    currentTeamId = isAdmin() || managesSelectedTeam
-      ? selectedTeam?.id || store.teams[0]?.id || ""
-      : assignedTeam?.id || selectedTeam?.id || store.teams[0]?.id || "";
     const team = currentTeam();
     data = team ? { club: team.club, members: team.members } : structuredClone(DEFAULT_DATA);
     if (!persistData()) {
@@ -2084,8 +2649,12 @@ function openTeamDialog() {
   if (!canCreateTeam()) return;
   teamForm.reset();
   draftTeamLogo = "";
+  const logoPreview = document.querySelector("#team-logo-preview");
+  logoPreview.classList.remove("has-logo");
+  logoPreview.innerHTML = `<span class="team-logo-preview-empty">${escapeHtml(t("logoPreview"))}</span>`;
   document.querySelector("#team-logo-name").textContent = t("logoHelp");
   document.querySelector("#team-error").hidden = true;
+  document.querySelector("#team-category-input").value = "football";
   teamDialog.showModal();
   document.querySelector("#team-name-input").focus();
 }
@@ -2119,8 +2688,15 @@ teamForm.addEventListener("submit", (event) => {
       logo: draftTeamLogo,
       phone: document.querySelector("#team-phone-input").value.trim(),
       telegram,
+      category: document.querySelector("#team-category-input").value,
+      accentColor: TEAM_CATEGORY_COLORS[document.querySelector("#team-category-input").value],
+      description: "",
+      foundedYear: "",
     },
     members: [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    views: 0,
   };
   const previousTeams = store.teams.slice();
   const previousTeamId = currentTeamId;
@@ -2133,8 +2709,6 @@ teamForm.addEventListener("submit", (event) => {
     activeAccount.teamCreationRole = "";
     activeAccount.teamCreationUsed = true;
   }
-  currentTeamId = team.id;
-  data = { club: team.club, members: team.members };
   if (!persistData()) {
     store.teams = previousTeams;
     if (!isAdmin()) {
@@ -2146,9 +2720,22 @@ teamForm.addEventListener("submit", (event) => {
     data = previousData;
     return;
   }
+  directoryHighlightId = team.id;
+  currentTeamId = "";
+  data = structuredClone(DEFAULT_DATA);
   render();
   teamDialog.close();
   showToast(t("teamCreated"));
+  if (window.location.hash !== "#teams") window.location.hash = "#teams";
+  requestAnimationFrame(() => {
+    const card = [...document.querySelectorAll("[data-team-card]")]
+      .find((item) => item.dataset.teamCard === team.id);
+    card?.scrollIntoView({ behavior: "smooth", block: "center" });
+    window.setTimeout(() => {
+      card?.classList.remove("team-card-highlight");
+      if (directoryHighlightId === team.id) directoryHighlightId = "";
+    }, 2000);
+  });
 });
 document.querySelector("#teams-grid").addEventListener("click", (event) => {
   const openButton = event.target.closest("[data-team-open]");
@@ -2170,16 +2757,33 @@ document.querySelector("#teams-grid").addEventListener("click", (event) => {
     const oldTeamRoles = store.users.map((user) => ({ user, roles: { ...user.teamRoles } }));
     store.teams = store.teams.filter((item) => item.id !== team.id);
     for (const user of store.users) delete user.teamRoles[team.id];
-    if (currentTeamId === team.id) currentTeamId = store.teams[0]?.id || "";
-    const nextTeam = currentTeam();
-    data = nextTeam ? { club: nextTeam.club, members: nextTeam.members } : structuredClone(DEFAULT_DATA);
+    const deletedCurrentTeam = currentTeamId === team.id;
+    if (deletedCurrentTeam) {
+      currentTeamId = "";
+      data = structuredClone(DEFAULT_DATA);
+    }
     if (!persistData()) {
       store.teams = oldTeams;
       for (const { user, roles } of oldTeamRoles) user.teamRoles = roles;
       return;
     }
     render();
+    if (deletedCurrentTeam && window.location.hash !== "#teams") {
+      window.location.hash = "#teams";
+    }
     showToast(t("teamDeleted"));
+  }
+});
+document.querySelector("#banner-ball").addEventListener("click", (event) => {
+  const ball = event.currentTarget;
+  ball.querySelectorAll(".confetti-particle").forEach((particle) => particle.remove());
+  for (let index = 0; index < 12; index += 1) {
+    const particle = document.createElement("span");
+    particle.className = "confetti-particle";
+    particle.style.setProperty("--particle-angle", `${index * 30}deg`);
+    particle.style.setProperty("--particle-color", ["#d4a03a", "#faf8f3", "#9acb74"][index % 3]);
+    ball.append(particle);
+    window.setTimeout(() => particle.remove(), 1000);
   }
 });
 document.querySelector("#account-roles").addEventListener("change", (event) => {
@@ -2586,11 +3190,7 @@ document.querySelector("#roster-grid").addEventListener("click", (event) => {
 });
 
 activeAccount = null;
-currentTeamId = store.teams.some((team) => team.id === store.selectedTeamId)
-  ? store.selectedTeamId
-  : store.teams[0]?.id || "";
-const initialTeam = currentTeam();
-data = initialTeam
-  ? { club: initialTeam.club, members: initialTeam.members }
-  : structuredClone(DEFAULT_DATA);
+currentTeamId = "";
+data = structuredClone(DEFAULT_DATA);
 applyLanguage();
+renderRouteFromHash();
