@@ -6,7 +6,7 @@ These files hold the content you can edit without touching the app code.
 | --- | --- |
 | `teams.js` | Team names, categories, locations, logos and contacts |
 | `staff.js` | Coaches, captains, players and staff members |
-| `accounts.js` | Usernames, passwords and login roles |
+| `accounts.js` | Seed usernames, passwords and login roles for local/offline use |
 
 ## How changes are applied
 
@@ -42,13 +42,18 @@ Then reference the path from the data file.
 ## Members and staff accounts
 
 Visitors create their own member accounts from the login screen with a real
-email address or international phone number, so those accounts live in browser
-storage, not in this folder. `accounts.js` is for staff accounts the owner
-issues directly (Owner, Admin, Developer, Coach). Keep it to that purpose.
+email address or international phone number. Those accounts are saved to
+Supabase, so they work on any device.
+
+Staff accounts (Owner, Admin, Developer, Coach) created in the management panel
+are also saved to Supabase. `accounts.js` is only a seed/fallback list for local
+or offline use.
 
 ## Passwords
 
-`accounts.js` stores passwords as readable text because this is a local,
-browser-only app with no server. Anyone who can open this folder can read them.
-Do not use real secrets if you publish the site on the internet. A public site
-needs a backend and hashed passwords.
+Passwords for shared accounts are hashed by Supabase and are not stored here.
+
+`accounts.js` and local fallback accounts store passwords as readable text.
+Anyone who can open this folder can read them. Do not use real secrets in
+`accounts.js` if you publish the site, and prefer creating accounts through the
+website so they are saved to Supabase.

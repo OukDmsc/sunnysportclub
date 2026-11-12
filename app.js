@@ -402,6 +402,7 @@ const TRANSLATIONS = {
     signInIncorrect: "Incorrect username or password.",
     signInDamaged: "This account's sign-in data is damaged. Ask the Dev Owner/Admin to recreate the account.",
     signInFailed: "Could not complete sign-in. Please try again.",
+    authRateLimited: "Too many attempts. Please wait a few minutes and try again.",
     chooseTeam: "Select a team to assign a role",
     noAccounts: "No accounts exist yet.",
     publicGreeting: "football fan",
@@ -735,6 +736,7 @@ const TRANSLATIONS = {
     signInIncorrect: "ឈ្មោះអ្នកប្រើ ឬពាក្យសម្ងាត់មិនត្រឹមត្រូវទេ។",
     signInDamaged: "ទិន្នន័យចូលគណនីនេះខូច។ សូមស្នើម្ចាស់/អ្នកគ្រប់គ្រងបង្កើតគណនីឡើងវិញ។",
     signInFailed: "មិនអាចចូលគណនីបានទេ។ សូមព្យាយាមម្តងទៀត។",
+    authRateLimited: "មានការព្យាយាមច្រើនពេក។ សូមរង់ចាំពីរបីនាទី ហើយព្យាយាមម្តងទៀត។",
     chooseTeam: "ជ្រើសរើសក្រុមដើម្បីកំណត់តួនាទី",
     noAccounts: "មិនទាន់មានគណនីទេ។",
     publicGreeting: "អ្នកគាំទ្របាល់ទាត់",
@@ -2933,6 +2935,191 @@ function usernameFromContact(type, value) {
   return candidate;
 }
 
+const SESSION_TOKEN_KEY = "sunny-session-token";
+let sessionToken = "";
+try {
+  sessionToken = localStorage.getItem(SESSION_TOKEN_KEY) || "";
+} catch (error) {
+  console.error("Could not read the saved session.", error);
+}
+
+function saveSessionToken(token) {
+  sessionToken = typeof token === "string" ? token.trim() : "";
+  try {
+    if (sessionToken) localStorage.setItem(SESSION_TOKEN_KEY, sessionToken);
+    else localStorage.removeItem(SESSION_TOKEN_KEY);
+  } catch (error) {
+    console.error("Could not save the session.", error);
+  }
+}
+
+async function authRequest(path, options = {}) {
+  const controller = new AbortController();
+  const timer = window.setTimeout(() => controller.abort(), 12000);
+  try {
+    const response = await fetch(`/api/auth${path}`, {
+      method: options.method || "GET",
+      headers: {
+        "Content-Type": "application/json",
+        ...(sessionToken ? { Authorization: `Bearer ${sessionToken}` } : {}),
+      },
+      body: options.body === undefined ? undefined : JSON.stringify(options.body),
+      signal: controller.signal,
+      cache: "no-store",
+    });
+    let payload = null;
+    try {
+      payload = await response.json();
+    } catch {
+      payload = null;
+    }
+    return { status: response.status, ok: response.ok, payload };
+  } catch {
+    return { status: 0, ok: false, payload: null, network: true };
+  } finally {
+    window.clearTimeout(timer);
+  }
+}
+
+function isRemoteUnavailable(result) {
+  return Boolean(
+    result.network || [404, 405, 501, 502, 503, 504].includes(result.status),
+  );
+}
+
+function remoteErrorKey(result, fallbackKey) {
+  const code = result?.payload?.error;
+  const keys = {
+    invalid_name: "registerInvalidName",
+    invalid_contact: "registerInvalidContact",
+    invalid_email: "registerInvalidEmail",
+    invalid_phone: "registerInvalidPhone",
+    weak_password: "registerPasswordShort",
+    contact_exists: "registerContactExists",
+    username_exists: "usernameExists",
+    invalid_username: "usernamePasswordInvalid",
+    invalid_credentials: "signInIncorrect",
+    rate_limited: "authRateLimited",
+    team_role_limit: "teamRoleLimit",
+    not_allowed: "roleNotAllowed",
+    server_error: fallbackKey,
+  };
+  return keys[code] || fallbackKey;
+}
+
+function remoteUserFromAccount(account) {
+  return {
+    ...account,
+    teamRoles:
+      account.teamRoles && typeof account.teamRoles === "object" ? account.teamRoles : {},
+    teamCreationRole: account.teamCreationRole || "",
+    teamCreationUsed: Boolean(account.teamCreationUsed),
+    contactVerified: Boolean(account.contactVerified),
+  };
+}
+
+function applyRemoteAccount(account) {
+  const existing = mergeRemoteAccountFields(account);
+  if (existing) {
+    store.activeUserId = existing.id;
+    activeAccount = existing;
+  }
+  return existing;
+}
+
+function mergeRemoteAccountFields(account) {
+  const remote = remoteUserFromAccount(account);
+  const existing =
+    store.users.find((user) => user.id === remote.id) ||
+    store.users.find(
+      (user) =>
+        (remote.email && (user.email || "").toLowerCase() === remote.email.toLowerCase()) ||
+        (remote.phone && remote.phone && user.phone === remote.phone) ||
+        (remote.username &&
+          user.username.toLowerCase() === remote.username.toLowerCase()),
+    );
+  if (existing) {
+    const localPassword = existing.password;
+    Object.assign(existing, remote);
+    if (localPassword) existing.password = localPassword;
+    if (activeAccount?.id === existing.id) activeAccount = existing;
+    return existing;
+  }
+  store.users.push(remote);
+  return remote;
+}
+
+async function verifyLocalAccount(account, password) {
+  if (!account) return false;
+  if (typeof account.password === "string") return account.password === password;
+  if (
+    !isValidBase64Bytes(account.passwordSalt, 16) ||
+    !isValidBase64Bytes(account.passwordHash, 32)
+  ) {
+    return false;
+  }
+  return verifyLegacyPassword(
+    password,
+    base64ToBytes(account.passwordSalt),
+    account.passwordHash,
+  );
+}
+
+function finishRemoteSignIn(account, token, celebration) {
+  saveSessionToken(token);
+  applyRemoteAccount(account);
+  const team = currentTeam();
+  data = team ? { club: team.club, members: team.members } : structuredClone(DEFAULT_DATA);
+  if (!persistData()) {
+    saveSessionToken("");
+    activeAccount = null;
+    return false;
+  }
+  document.querySelector("#auth-form").reset();
+  document.querySelector("#register-form").reset();
+  render();
+  window.scrollTo(0, 0);
+  stopStadiumAmbience();
+  if (celebration === "register") playCheer();
+  else playWhistle();
+  showWelcome();
+  loadRemoteAccounts();
+  return true;
+}
+
+async function loadRemoteAccounts() {
+  if (!sessionToken || !activeAccount) return;
+  if (!isAdmin() && !Object.keys(activeAccount.teamRoles || {}).length) return;
+  const result = await authRequest("/accounts");
+  if (!result.ok || !Array.isArray(result.payload?.accounts)) return;
+  result.payload.accounts.forEach((account) => mergeRemoteAccountFields(account));
+  activeAccount =
+    store.users.find((user) => user.id === activeAccount?.id) || activeAccount;
+  store.activeUserId = activeAccount?.id || "";
+  if (persistData()) render();
+}
+
+async function restoreRemoteSession() {
+  if (!sessionToken) return;
+  const result = await authRequest("/session");
+  if (result.status === 401 || result.status === 403) {
+    saveSessionToken("");
+    return;
+  }
+  if (!result.ok || !result.payload?.account) return;
+  applyRemoteAccount(result.payload.account);
+  const team = currentTeam();
+  data = team ? { club: team.club, members: team.members } : structuredClone(DEFAULT_DATA);
+  if (!persistData()) {
+    saveSessionToken("");
+    activeAccount = null;
+    render();
+    return;
+  }
+  render();
+  loadRemoteAccounts();
+}
+
 function showAuthError(message) {
   const error = document.querySelector("#auth-error");
   error.textContent = message;
@@ -3055,26 +3242,64 @@ async function authenticate(event) {
   const submitButton = document.querySelector("#auth-submit");
   submitButton.disabled = true;
   try {
+    const remote = await authRequest("/login", {
+      method: "POST",
+      body: { identifier, password },
+    });
+    if (remote.ok && remote.payload?.account && remote.payload?.token) {
+      finishRemoteSignIn(remote.payload.account, remote.payload.token, "login");
+      return;
+    }
+    if (remote.status === 401 || remote.payload?.error === "invalid_credentials") {
+      const local = findAccountByIdentifier(identifier);
+      if (
+        local &&
+        (local.email || local.phone) &&
+        (await verifyLocalAccount(local, password))
+      ) {
+        const migrated = await authRequest("/register", {
+          method: "POST",
+          body: {
+            name: local.name || local.username,
+            contact: local.email || local.phone,
+            password,
+            username: /^[a-zA-Z0-9._-]{3,24}$/.test(local.username)
+              ? local.username
+              : undefined,
+          },
+        });
+        if (migrated.ok && migrated.payload?.account && migrated.payload?.token) {
+          finishRemoteSignIn(migrated.payload.account, migrated.payload.token, "login");
+          return;
+        }
+      }
+      showAuthError(t("signInIncorrect"));
+      return;
+    }
+    if (remote.status === 429) {
+      showAuthError(t("authRateLimited"));
+      return;
+    }
+    if (!isRemoteUnavailable(remote)) {
+      showAuthError(t(remoteErrorKey(remote, "signInFailed")));
+      return;
+    }
+
     const existing = findAccountByIdentifier(identifier);
     if (!existing) {
       showAuthError(t("signInIncorrect"));
       return;
     }
-    let verified = typeof existing.password === "string" && existing.password === password;
     const usesLegacyCredentials = typeof existing.password !== "string";
-    if (usesLegacyCredentials) {
-      if (!isValidBase64Bytes(existing.passwordSalt, 16) ||
-          !isValidBase64Bytes(existing.passwordHash, 32)) {
-        showAuthError(t("signInDamaged"));
-        return;
-      }
-      verified = await verifyLegacyPassword(
-        password,
-        base64ToBytes(existing.passwordSalt),
-        existing.passwordHash,
-      );
+    if (
+      usesLegacyCredentials &&
+      (!isValidBase64Bytes(existing.passwordSalt, 16) ||
+        !isValidBase64Bytes(existing.passwordHash, 32))
+    ) {
+      showAuthError(t("signInDamaged"));
+      return;
     }
-    if (!verified) {
+    if (!(await verifyLocalAccount(existing, password))) {
       showAuthError(t("signInIncorrect"));
       return;
     }
@@ -3114,7 +3339,7 @@ async function authenticate(event) {
 
 document.querySelector("#auth-form").addEventListener("submit", authenticate);
 
-document.querySelector("#register-form").addEventListener("submit", (event) => {
+document.querySelector("#register-form").addEventListener("submit", async (event) => {
   event.preventDefault();
   if (activeAccount) return;
   const name = document.querySelector("#register-name").value.trim();
@@ -3146,6 +3371,20 @@ document.querySelector("#register-form").addEventListener("submit", (event) => {
   const submitButton = document.querySelector("#register-submit");
   submitButton.disabled = true;
   try {
+    const remote = await authRequest("/register", {
+      method: "POST",
+      body: { name, contact, password },
+    });
+    if (remote.ok && remote.payload?.account && remote.payload?.token) {
+      if (finishRemoteSignIn(remote.payload.account, remote.payload.token, "register")) return;
+      fail("registerFailed");
+      return;
+    }
+    if (remote.status === 429) return fail("authRateLimited");
+    if (!isRemoteUnavailable(remote)) {
+      return fail(remoteErrorKey(remote, "registerFailed"));
+    }
+
     const user = {
       id: createId(),
       username: usernameFromContact(contactType, contact),
@@ -3186,6 +3425,7 @@ document.querySelector("#register-form").addEventListener("submit", (event) => {
 
 function logout() {
   hideWelcome(true);
+  saveSessionToken("");
   activeAccount = null;
   store.activeUserId = "";
   authMode = "login";
@@ -3238,6 +3478,36 @@ accountForm.addEventListener("submit", async (event) => {
     error.textContent = t("usernameExists");
     error.hidden = false;
     return;
+  }
+  if (sessionToken) {
+    const remote = await authRequest("/accounts", {
+      method: "POST",
+      body: {
+        username,
+        password,
+        teamId: currentTeam() ? currentTeamId : "",
+        teamRole: TEAM_MANAGEMENT_ROLES.has(role) ? role : "",
+        teamCreationRole: isAdmin() && role === "create-team-coach" ? "Coach" : "",
+      },
+    });
+    if (remote.ok && remote.payload?.account) {
+      const created = remoteUserFromAccount(remote.payload.account);
+      created.password = password;
+      store.users.push(created);
+      if (!persistData()) {
+        store.users = store.users.filter((item) => item.id !== created.id);
+        return;
+      }
+      accountDialog.close();
+      render();
+      showToast(t("accountCreated", { username }));
+      return;
+    }
+    if (!isRemoteUnavailable(remote)) {
+      error.textContent = t(remoteErrorKey(remote, "registerFailed"));
+      error.hidden = false;
+      return;
+    }
   }
   const user = {
     id: createId(),
@@ -3406,7 +3676,7 @@ document.querySelector("#banner-ball").addEventListener("click", (event) => {
     window.setTimeout(() => particle.remove(), 1000);
   }
 });
-document.querySelector("#account-roles").addEventListener("change", (event) => {
+document.querySelector("#account-roles").addEventListener("change", async (event) => {
   const systemRoleSelect = event.target.closest("[data-system-role]");
   if (systemRoleSelect) {
     if (!isOwner()) return;
@@ -3416,6 +3686,29 @@ document.querySelector("#account-roles").addEventListener("change", (event) => {
     const nextRole = ["admin", "developer", "viewer"].includes(systemRoleSelect.value)
       ? systemRoleSelect.value
       : "viewer";
+    if (sessionToken) {
+      const remote = await authRequest(`/accounts/${encodeURIComponent(user.id)}`, {
+        method: "PATCH",
+        body: { systemRole: nextRole },
+      });
+      if (remote.ok && remote.payload?.account) {
+        mergeRemoteAccountFields(remote.payload.account);
+        if (persistData()) render();
+        showToast(
+          t(nextRole === "admin"
+            ? "adminPromoted"
+            : nextRole === "developer"
+              ? "developerPromoted"
+              : "adminDemoted"),
+        );
+        return;
+      }
+      if (!isRemoteUnavailable(remote) && remote.status !== 404) {
+        showToast(t(remoteErrorKey(remote, "signInFailed")));
+        render();
+        return;
+      }
+    }
     user.systemRole = nextRole;
     if (!persistData()) {
       user.systemRole = previousRole;
@@ -3453,6 +3746,25 @@ document.querySelector("#account-roles").addEventListener("change", (event) => {
     showToast(t("teamRoleLimit"));
     render();
     return;
+  }
+  if (sessionToken) {
+    const remote = await authRequest(`/accounts/${encodeURIComponent(user.id)}`, {
+      method: "PATCH",
+      body: {
+        teamId: currentTeamId,
+        teamRole: TEAM_MANAGEMENT_ROLES.has(select.value) ? select.value : "Viewer",
+      },
+    });
+    if (remote.ok && remote.payload?.account) {
+      mergeRemoteAccountFields(remote.payload.account);
+      if (persistData()) render();
+      return;
+    }
+    if (!isRemoteUnavailable(remote) && remote.status !== 404) {
+      showToast(t(remoteErrorKey(remote, "signInFailed")));
+      render();
+      return;
+    }
   }
   const previousRole = user.teamRoles[currentTeamId];
   if (TEAM_MANAGEMENT_ROLES.has(select.value)) {
@@ -4030,3 +4342,4 @@ currentTeamId = "";
 data = structuredClone(DEFAULT_DATA);
 applyLanguage();
 renderRouteFromHash();
+restoreRemoteSession();

@@ -24,6 +24,7 @@ This project is a browser-based club management interface built with plain HTML,
 - Team management and administration controls
 - Self-service member sign-up with a real email address or international phone number
 - Sign in with email, phone number, or username
+- **Shared accounts across devices** (phone, tablet, PC) through Supabase Auth
 - Sign-in gate: club content stays hidden until a visitor logs in or creates an account
 - Animated, colourful welcome screen after sign-in with the member's name and role
 - Owner, Admin, Developer, and Coach accounts issued only by the club owner
@@ -35,7 +36,7 @@ This project is a browser-based club management interface built with plain HTML,
 - Workspace background customization
 - **Automatic text contrast** that keeps text readable on any background colour or photo
 - **Editable content files** for teams, staff, accounts, logos and photos
-- Local browser storage persistence
+- Local browser storage keeps teams, members, and appearance settings per device
 
 ## Project structure
 
@@ -47,24 +48,60 @@ This project is a browser-based club management interface built with plain HTML,
 ├── data/
 │   ├── teams.js       ← team names, logos, contacts
 │   ├── staff.js       ← coaches, players and staff
-│   ├── accounts.js    ← usernames, passwords and roles
+│   ├── accounts.js    ← seed usernames, passwords and roles
 │   └── README.md      ← editing guide
 ├── assets/
 │   ├── logos/         ← put team logos here
 │   └── photos/        ← put staff/player photos here
+├── api/
+│   ├── _lib/auth.js   ← shared server helpers (never exposed as a route)
+│   └── auth/          ← register, login, session, account management
+├── vercel.json        ← API region (Seoul)
+├── .env.example       ← list of required secrets (no values)
 ├── AGENTS.md          ← instructions for VS Code AI agents
 ├── .gitignore
 └── README.md
 ```
 
+## Shared accounts
+
+Accounts are stored in Supabase Auth, so the same email, phone number, username,
+and password work on every device. The browser still keeps teams, members, and
+appearance settings locally.
+
+- **Public sign-up** accepts real email addresses and international phone numbers.
+- **Staff accounts** created by an Owner or Admin in the app are saved to Supabase
+  and can sign in on any device.
+- **Role changes** made by an Owner or Admin are also saved to Supabase.
+- **Sessions** last 30 days; signing out clears the session on that device.
+- **Offline / local fallback**: if the API is unreachable (for example, opening
+  `index.html` without the API), the app falls back to local accounts.
+- **Migration**: if an account exists only in this browser, signing in with it
+  once while the API is reachable copies it to the shared database. After that it
+  works on other devices.
+
+Phone numbers are mapped to a private synthetic email internally
+(`<digits>@phone.sunnyclub.app`), and staff accounts use
+`<username>@staff.sunnyclub.app`. These addresses are not real mailboxes.
+
 ## Run locally
 
-### Option 1: Open directly in a browser
+### Option 1: Serve with the API (shared accounts)
 
-1. Open `index.html` directly in your browser.
-2. The app loads without a build step.
+The API routes run on Vercel Functions. Install the CLI once and start the local
+server from the project folder:
 
-### Option 2: Serve locally with a small web server
+```bash
+npm install -g vercel   # once
+vercel env pull .env.local
+vercel dev
+```
+
+Then open the address printed by `vercel dev` (usually
+`http://localhost:3000`). Shared accounts work here because the same API routes
+run locally.
+
+### Option 2: Serve static files only (local accounts)
 
 From the project folder, run:
 
@@ -78,6 +115,9 @@ Then open:
 http://localhost:8000
 ```
 
+Without the API, sign-in falls back to accounts stored in this browser only.
+Opening `index.html` directly works the same way.
+
 ## Deploy to Vercel
 
 1. Push this repository to GitHub (`OukDmsc/sunnysportclub`).
@@ -85,12 +125,22 @@ http://localhost:8000
 3. Use the `main` branch and the repository root.
 4. Choose the **Other** framework preset. Leave the build command empty and
    use `.` as the output directory.
-5. Deploy. Vercel serves `index.html`, `styles.css`, `app.js`, `data/` and
-   `assets/` as static files.
+5. Add these Environment Variables in **Project → Settings → Environment
+   Variables** for Production and Preview:
 
-No environment variables are required. Data is still stored per browser, so a
-Vercel deployment will not automatically share browser data saved at another
-address or on another device.
+   | Name | Purpose |
+   | --- | --- |
+   | `SUPABASE_URL` | Supabase project URL |
+   | `SUPABASE_ANON_KEY` | Supabase public API key (used to verify passwords) |
+   | `SUPABASE_SERVICE_ROLE_KEY` | Server-only admin key (never expose in the browser) |
+   | `AUTH_SECRET` | Long random string used to sign 30-day session tokens |
+
+6. Deploy. Vercel serves `index.html`, `styles.css`, `app.js`, `data/` and
+   `assets/` as static files and turns `api/auth/*` into serverless functions.
+
+`SUPABASE_SERVICE_ROLE_KEY` must stay server-side. Do not put it in `app.js`,
+`data/`, or any file committed to Git. `.env.local` is already gitignored.
+`api/_lib/` is not deployed as a public route.
 
 ## Edit content without coding
 
@@ -143,13 +193,16 @@ Recommended: square images, logos at least 256 x 256 px, photos around
 
 ### Passwords and security
 
-`data/accounts.js` stores passwords as readable text because this is a local,
-browser-only app with no server. Anyone who can open the project folder can
-read them, and the browser stores them in local storage.
+Passwords for **shared accounts** are hashed by Supabase and never stored in this
+repository. The browser only keeps the 30-day session token.
 
-- Use this only for a private/local club tool.
-- Do not use real secrets if you publish the site on the internet.
-- A public website needs a backend and hashed passwords.
+`data/accounts.js` and browser-created local accounts store passwords as readable
+text because they are fallback data for offline/local use:
+
+- Use local accounts only for a private/local club tool.
+- Do not put real secrets in `data/accounts.js` if you publish the site.
+- Accounts created through the website while the API is reachable go to Supabase
+  and do not store a readable password locally.
 
 The built-in owner account `ddomm7` still works and is not listed in
 `data/accounts.js` because its password is stored as a secure hash.
@@ -185,16 +238,21 @@ Example prompts you can give an agent:
 
 ## Notes
 
-- Data is stored in the browser using local storage.
-- The app is designed for local use and does not require a backend or database.
-- Team and member data are saved on the current browser/device.
-- To move data to another browser, edit the files in `data/` and refresh there.
+- Accounts are shared across devices through Supabase Auth.
+- Teams, members, and appearance settings are stored in the browser using local
+  storage, so they stay on the current device.
+- To move team/member data to another browser, edit the files in `data/` and
+  refresh there.
+- If an older account exists only in one browser, sign in with it once while the
+  site is online so it is copied to the shared database.
 
 ## Tech stack
 
 - HTML
 - CSS
 - JavaScript
+- Supabase Auth (accounts)
+- Vercel Functions (API)
 
 ## License
 

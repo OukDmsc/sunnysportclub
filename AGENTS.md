@@ -1,7 +1,8 @@
 # Agent guide
 
-This is a static HTML/CSS/JavaScript club management site. There is no build
-step, package manager, framework, or backend.
+This is a static HTML/CSS/JavaScript club management site with no build step or
+framework. Accounts are shared across devices through Supabase Auth. Team and
+member data stay in browser local storage. API routes are Vercel Functions.
 
 ## Read this first
 
@@ -10,8 +11,11 @@ step, package manager, framework, or backend.
 - `styles.css` — all styling.
 - `data/teams.js` — editable team content.
 - `data/staff.js` — editable staff and player content.
-- `data/accounts.js` — editable login accounts.
+- `data/accounts.js` — editable seed/local accounts.
 - `assets/logos/` and `assets/photos/` — local images.
+- `api/auth/` — register, login, session, and account-management endpoints.
+- `api/_lib/auth.js` — shared server helpers; `_lib` is not a public route.
+- `vercel.json` — pins the API region to Seoul (`icn1`).
 
 ## Rules for agents
 
@@ -27,8 +31,11 @@ step, package manager, framework, or backend.
    `applyWorkspaceBackground`. It sets the `--workspace-*` CSS variables.
 6. When adding new text that sits directly on the workspace background, add it
    to the contrast selectors near the end of `styles.css`.
-7. Do not store secrets in code. `data/accounts.js` is plain text by design
-   for local use only; warn the user if a site will be public.
+7. Do not store secrets in code. `SUPABASE_SERVICE_ROLE_KEY` and `AUTH_SECRET`
+   belong only in `.env.local` (local) and Vercel environment variables. Never
+   reference them from `app.js`, `data/`, or committed files. `data/accounts.js`
+   and local fallback accounts are plain text by design; warn the user if a site
+   will be public.
 8. Keep the existing bilingual strings (`TRANSLATIONS`) intact when editing UI.
 9. The landing ambience uses Web Audio and must only start after a user gesture.
    Keep the `#auth-sound-toggle` mute control and the reduced-motion rules.
@@ -41,6 +48,18 @@ step, package manager, framework, or backend.
     `#app-shell` toggling in `render()` so no club content renders before
     sign-in. After a successful login or registration, call `showWelcome()`;
     keep the welcome overlay dismissible by button, Escape and a 5.2s timer.
+12. Auth is remote-first with a local fallback. Keep `authRequest`,
+    `finishRemoteSignIn`, `restoreRemoteSession`, and `loadRemoteAccounts`
+    working, and keep the local fallback when the API is unreachable
+    (`isRemoteUnavailable`). Do not remove the one-time migration of local
+    accounts on a 401 from `/api/auth/login`.
+13. Session tokens are 30-day HS256 JWTs in
+    `localStorage["sunny-session-token"]`, signed with `AUTH_SECRET`. Clearing
+    the token on logout is required. Do not log tokens or passwords.
+14. Server-side account role rules must mirror the UI: only an owner sets
+    `systemRole`; admins and coaches assign team roles; a coach cannot assign
+    Coach or manage other teams; an account manages only one team. Keep
+    `api/_lib/auth.js` authoritative for account writes.
 
 ## Content shapes
 
@@ -87,9 +106,21 @@ node --check app.js
 node --check data/teams.js
 node --check data/staff.js
 node --check data/accounts.js
+node --check api/_lib/auth.js
+node --check api/auth/login.js
+node --check api/auth/register.js
+node --check api/auth/session.js
+node --check api/auth/accounts/index.js
+node --check "api/auth/accounts/[id].js"
 ```
 
-Then serve the folder and verify in a browser:
+Then serve the app and verify in a browser. Shared accounts need the API:
+
+```bash
+vercel dev
+```
+
+Static-only checks (local fallback) can use:
 
 ```bash
 python -m http.server 8000
@@ -100,6 +131,7 @@ Check that:
 - the page loads with no console errors,
 - only the login gate is visible before sign-in,
 - sign-in shows the welcome screen and then the workspace,
+- a new account can sign in after clearing browser storage (cross-device),
 - teams and staff from `data/` appear,
 - changing the workspace background updates the text colour,
 - login still works for existing accounts.
