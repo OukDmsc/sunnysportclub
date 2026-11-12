@@ -5463,3 +5463,33 @@ body {
     white-space: normal;
   }
 }
+
+/* Team name must stay readable on the dark club banner in both languages */
+html[lang] .club-banner .club-heading h2 {
+  background: none;
+  color: #fff;
+  -webkit-text-fill-color: currentColor;
+  text-shadow: 0 1px 14px rgb(0 0 0 / 22%);
+  animation: none;
+}
+
+@media (max-width: 760px) {
+  /* Put the sign-in form above the showcase so it opens on screen */
+  .auth-card {
+    order: -1;
+  }
+}
+
+@media (max-width: 560px) {
+  /* Log out stays available in the mobile navigation drawer */
+  #top-logout-button {
+    display: none;
+  }
+  .management-current-team {
+    flex: 1 0 100%;
+    margin-right: 0;
+  }
+  .management-hub-actions .button {
+    flex: 1 1 calc(50% - 4px);
+  }
+}
