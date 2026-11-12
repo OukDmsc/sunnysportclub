@@ -324,6 +324,9 @@ const TRANSLATIONS = {
     teamMembersWillAppear: "Team members will appear here when the roster is added.",
     loginSection: "TEAM STAFF & ADMIN",
     teamLogin: "Team login",
+    soundOn: "Sound on",
+    soundOff: "Sound off",
+    soundToggle: "Toggle stadium sound",
     loginIntro: "Teams and rosters are open to view. Owners, developers, admins, coaches, and team leaders can sign in for their tools.",
     authHeadline: "Built for the love of the game.",
     authPlatform: "THE CLUB PLATFORM",
@@ -628,6 +631,9 @@ const TRANSLATIONS = {
     teamMembersWillAppear: "សមាជិកក្រុមនឹងបង្ហាញនៅទីនេះ នៅពេលបញ្ចូលបញ្ជីរួច។",
     loginSection: "សម្រាប់បុគ្គលិកក្រុម និងអ្នកគ្រប់គ្រង",
     teamLogin: "ចូលគណនីក្រុម",
+    soundOn: "សំឡេងបើក",
+    soundOff: "សំឡេងបិទ",
+    soundToggle: "បើក ឬបិទសំឡេងកីឡដ្ឋាន",
     loginIntro: "អ្នកគ្រប់គ្នាអាចមើលក្រុម និងបញ្ជីសមាជិកបាន។ ម្ចាស់ អ្នកអភិវឌ្ឍន៍ អ្នកគ្រប់គ្រង គ្រូបង្វឹក និងប្រធានក្រុមអាចចូលគណនីដើម្បីប្រើឧបករណ៍គ្រប់គ្រង។",
     authHeadline: "បង្កើតឡើងសម្រាប់ក្តីស្រឡាញ់ចំពោះបាល់ទាត់។",
     authPlatform: "ប្រព័ន្ធគ្រប់គ្រងក្លឹប",
@@ -693,6 +699,9 @@ let currentTeamId = "";
 let lastRenderedRoute = "";
 let directoryHighlightId = "";
 let language = loadLanguage();
+const SOUND_KEY = "sunny-sport-club-sound";
+let soundEnabled = loadSoundPreference();
+let stadiumAudio = null;
 let workspaceBackground = loadWorkspaceBackground();
 let draftPhoto = "";
 let draftPostFile = null;
@@ -1164,6 +1173,7 @@ function applyLanguage() {
   document
     .querySelector("#auth-language-toggle")
     .setAttribute("aria-label", t("switchLanguage"));
+  updateSoundToggle();
   document.querySelector("#edit-club-button").title = t("editClub");
   document.querySelector("#edit-club-button").setAttribute("aria-label", t("editClub"));
   document.querySelector("#appearance-toggle").title = t("changeBackground");
@@ -2868,6 +2878,8 @@ async function authenticate(event) {
     }
     document.querySelector("#auth-form").reset();
     render();
+    stopStadiumAmbience();
+    playWhistle();
   } catch (caught) {
     console.error("Could not complete local account authentication.", caught);
     showAuthError(t("signInFailed"));
@@ -3035,6 +3047,7 @@ teamForm.addEventListener("submit", (event) => {
   render();
   teamDialog.close();
   showToast(t("teamCreated"));
+  playCheer();
   if (window.location.hash !== "#teams") window.location.hash = "#teams";
   requestAnimationFrame(() => {
     const card = [...document.querySelectorAll("[data-team-card]")]
@@ -3304,6 +3317,161 @@ function toggleLanguage() {
 }
 document.querySelector("#language-toggle").addEventListener("click", toggleLanguage);
 document.querySelector("#auth-language-toggle").addEventListener("click", toggleLanguage);
+function loadSoundPreference() {
+  try {
+    return localStorage.getItem(SOUND_KEY) !== "false";
+  } catch {
+    return true;
+  }
+}
+
+function updateSoundToggle() {
+  const button = document.querySelector("#auth-sound-toggle");
+  if (!button) return;
+  const label = document.querySelector("#auth-sound-label");
+  button.setAttribute("aria-pressed", String(soundEnabled));
+  button.classList.toggle("is-muted", !soundEnabled);
+  if (label) label.textContent = t(soundEnabled ? "soundOn" : "soundOff");
+}
+
+function getStadiumAudio() {
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) return null;
+  if (!stadiumAudio) {
+    const context = new AudioContextClass();
+    const master = context.createGain();
+    master.gain.value = 0.7;
+    master.connect(context.destination);
+    stadiumAudio = { context, master, ambience: null };
+  }
+  if (stadiumAudio.context.state === "suspended") {
+    stadiumAudio.context.resume().catch(() => {});
+  }
+  return stadiumAudio;
+}
+
+function startStadiumAmbience() {
+  if (!soundEnabled) return;
+  const audio = getStadiumAudio();
+  if (!audio || audio.ambience) return;
+  const { context, master } = audio;
+  const buffer = context.createBuffer(1, context.sampleRate * 3, context.sampleRate);
+  const samples = buffer.getChannelData(0);
+  let smooth = 0;
+  for (let index = 0; index < samples.length; index += 1) {
+    smooth = (smooth + 0.02 * (Math.random() * 2 - 1)) / 1.02;
+    samples[index] = smooth * 3.4;
+  }
+  const source = context.createBufferSource();
+  source.buffer = buffer;
+  source.loop = true;
+  const filter = context.createBiquadFilter();
+  filter.type = "lowpass";
+  filter.frequency.value = 760;
+  const gain = context.createGain();
+  gain.gain.value = 0.0001;
+  const lfo = context.createOscillator();
+  lfo.frequency.value = 0.11;
+  const lfoDepth = context.createGain();
+  lfoDepth.gain.value = 0.009;
+  lfo.connect(lfoDepth).connect(gain.gain);
+  source.connect(filter).connect(gain).connect(master);
+  const now = context.currentTime;
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(0.024, now + 2.2);
+  source.start();
+  lfo.start();
+  audio.ambience = { source, lfo, gain };
+}
+
+function stopStadiumAmbience() {
+  if (!stadiumAudio?.ambience) return;
+  const { context, ambience } = stadiumAudio;
+  stadiumAudio.ambience = null;
+  try {
+    ambience.gain.gain.cancelScheduledValues(context.currentTime);
+    ambience.gain.gain.setTargetAtTime(0.0001, context.currentTime, 0.25);
+    window.setTimeout(() => {
+      try {
+        ambience.source.stop();
+      } catch {}
+      try {
+        ambience.lfo.stop();
+      } catch {}
+    }, 700);
+  } catch {}
+}
+
+function playWhistle() {
+  if (!soundEnabled) return;
+  const audio = getStadiumAudio();
+  if (!audio) return;
+  const { context, master } = audio;
+  const now = context.currentTime;
+  for (const offset of [0, 0.17]) {
+    const start = now + offset;
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(2050, start);
+    oscillator.frequency.exponentialRampToValueAtTime(2380, start + 0.07);
+    gain.gain.setValueAtTime(0.0001, start);
+    gain.gain.exponentialRampToValueAtTime(0.07, start + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.22);
+    oscillator.connect(gain).connect(master);
+    oscillator.start(start);
+    oscillator.stop(start + 0.24);
+  }
+}
+
+function playCheer() {
+  if (!soundEnabled) return;
+  const audio = getStadiumAudio();
+  if (!audio) return;
+  const { context, master } = audio;
+  const now = context.currentTime;
+  const buffer = context.createBuffer(1, context.sampleRate * 1.1, context.sampleRate);
+  const samples = buffer.getChannelData(0);
+  for (let index = 0; index < samples.length; index += 1) {
+    samples[index] = (Math.random() * 2 - 1) * (1 - index / samples.length);
+  }
+  const source = context.createBufferSource();
+  source.buffer = buffer;
+  const filter = context.createBiquadFilter();
+  filter.type = "bandpass";
+  filter.frequency.value = 950;
+  filter.Q.value = 0.7;
+  const gain = context.createGain();
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(0.055, now + 0.12);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 1);
+  source.connect(filter).connect(gain).connect(master);
+  source.start(now);
+}
+
+function syncStadiumSound() {
+  updateSoundToggle();
+  if (soundEnabled) startStadiumAmbience();
+  else stopStadiumAmbience();
+}
+
+document.querySelector("#auth-sound-toggle").addEventListener("click", () => {
+  soundEnabled = !soundEnabled;
+  try {
+    localStorage.setItem(SOUND_KEY, String(soundEnabled));
+  } catch (error) {
+    console.error("Could not save the sound preference.", error);
+  }
+  syncStadiumSound();
+  if (soundEnabled) playWhistle();
+});
+document.querySelector("#auth-screen").addEventListener(
+  "pointerdown",
+  () => {
+    if (soundEnabled) startStadiumAmbience();
+  },
+  { once: true },
+);
 document.querySelector("#appearance-toggle").addEventListener("click", () => {
   updateBackgroundPreview();
   appearanceDialog.showModal();

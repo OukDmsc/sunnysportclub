@@ -759,6 +759,33 @@
     <section class="auth-screen" id="auth-screen" aria-labelledby="auth-title">
       <div class="auth-layout">
         <div class="auth-showcase">
+          <div class="pitch-atmosphere" aria-hidden="true">
+            <span class="pitch-beam pitch-beam-left"></span>
+            <span class="pitch-beam pitch-beam-right"></span>
+            <span class="pitch-ball pitch-ball-one">
+              <svg viewBox="0 0 64 64" focusable="false">
+                <circle cx="32" cy="32" r="30" fill="#f7fbf5" />
+                <path d="M32 17 43 25 39 38H25L21 25Z" fill="#123f2b" />
+                <path d="M14 12 25 17 21 25 10 25Z" fill="#123f2b" />
+                <path d="M50 12 54 25 39 25 39 17Z" fill="#123f2b" />
+                <path d="M12 45 24 38 32 49 24 57 14 54Z" fill="#123f2b" />
+                <path d="M52 45 50 54 40 57 32 49 40 38Z" fill="#123f2b" />
+              </svg>
+            </span>
+            <span class="pitch-ball pitch-ball-two">
+              <svg viewBox="0 0 64 64" focusable="false">
+                <circle cx="32" cy="32" r="30" fill="#f7fbf5" />
+                <path d="M32 17 43 25 39 38H25L21 25Z" fill="#123f2b" />
+                <path d="M14 12 25 17 21 25 10 25Z" fill="#123f2b" />
+                <path d="M50 12 54 25 39 25 39 17Z" fill="#123f2b" />
+                <path d="M12 45 24 38 32 49 24 57 14 54Z" fill="#123f2b" />
+                <path d="M52 45 50 54 40 57 32 49 40 38Z" fill="#123f2b" />
+              </svg>
+            </span>
+            <span class="pitch-spark spark-one"></span>
+            <span class="pitch-spark spark-two"></span>
+            <span class="pitch-spark spark-three"></span>
+          </div>
           <div class="auth-showcase-top">
             <div class="auth-brand">
               <img
@@ -770,15 +797,32 @@
                 ><small data-i18n="clubManager">CLUB MANAGER</small></span
               >
             </div>
-            <button
-              class="language-toggle auth-language-toggle"
-              id="auth-language-toggle"
-              type="button"
-              aria-label="Switch language"
-              data-i18n-aria="switchLanguage"
-            >
-              ខ្មែរ
-            </button>
+            <div class="auth-top-actions">
+              <button
+                class="auth-sound-toggle"
+                id="auth-sound-toggle"
+                type="button"
+                aria-pressed="true"
+                aria-label="Toggle stadium sound"
+                data-i18n-aria="soundToggle"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 9v6h4l5 4V5L8 9H4Z" />
+                  <path class="sound-wave" d="M16 8.5a5 5 0 0 1 0 7" />
+                  <path class="sound-wave" d="M18.5 6a8.5 8.5 0 0 1 0 12" />
+                </svg>
+                <span id="auth-sound-label">Sound on</span>
+              </button>
+              <button
+                class="language-toggle auth-language-toggle"
+                id="auth-language-toggle"
+                type="button"
+                aria-label="Switch language"
+                data-i18n-aria="switchLanguage"
+              >
+                ខ្មែរ
+              </button>
+            </div>
           </div>
           <div class="auth-showcase-copy">
             <div class="eyebrow">

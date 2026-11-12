@@ -30,6 +30,8 @@ step, package manager, framework, or backend.
 7. Do not store secrets in code. `data/accounts.js` is plain text by design
    for local use only; warn the user if a site will be public.
 8. Keep the existing bilingual strings (`TRANSLATIONS`) intact when editing UI.
+9. The landing ambience uses Web Audio and must only start after a user gesture.
+   Keep the `#auth-sound-toggle` mute control and the reduced-motion rules.
 
 ## Content shapes
 
