@@ -14,7 +14,7 @@
     <script src="data/accounts.js" defer></script>
     <script src="app.js" defer></script>
   </head>
-  <body>
+  <body class="auth-gate">
     <div class="app-shell" id="app-shell">
       <aside class="sidebar">
         <button
@@ -1031,6 +1031,38 @@
             >
           </div>
         </div>
+      </div>
+    </section>
+
+    <section class="welcome-screen" id="welcome-screen" hidden>
+      <div class="welcome-aurora" aria-hidden="true">
+        <span class="welcome-blob blob-emerald"></span>
+        <span class="welcome-blob blob-gold"></span>
+        <span class="welcome-blob blob-teal"></span>
+        <span class="welcome-blob blob-sky"></span>
+        <span class="welcome-blob blob-violet"></span>
+        <span class="welcome-swirl"></span>
+        <span class="welcome-pitch"></span>
+        <span class="welcome-spark spark-a"></span>
+        <span class="welcome-spark spark-b"></span>
+        <span class="welcome-spark spark-c"></span>
+        <span class="welcome-spark spark-d"></span>
+        <span class="welcome-spark spark-e"></span>
+        <span class="welcome-spark spark-f"></span>
+      </div>
+      <div class="welcome-content">
+        <div class="welcome-crest-wrap">
+          <img src="assets/logos/sunny-sport-club-logo.png" alt="" />
+        </div>
+        <p class="welcome-kicker" data-i18n="welcomeKicker">
+          WELCOME TO THE CLUB
+        </p>
+        <h1 class="welcome-title" id="welcome-title">Welcome</h1>
+        <p class="welcome-subtitle" id="welcome-subtitle"></p>
+        <button class="welcome-enter" id="welcome-enter" type="button">
+          <span data-i18n="enterClub">Enter the club</span
+          ><span aria-hidden="true">→</span>
+        </button>
       </div>
     </section>
 

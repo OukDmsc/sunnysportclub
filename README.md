@@ -24,6 +24,8 @@ This project is a browser-based club management interface built with plain HTML,
 - Team management and administration controls
 - Self-service member sign-up with a real email address or international phone number
 - Sign in with email, phone number, or username
+- Sign-in gate: club content stays hidden until a visitor logs in or creates an account
+- Animated, colourful welcome screen after sign-in with the member's name and role
 - Owner, Admin, Developer, and Coach accounts issued only by the club owner
 - Role-based team creation: Owner, Admin, Developer, or Coach
 - Team Leader and Team Manager access assigned by the team Coach

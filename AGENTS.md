@@ -37,6 +37,10 @@ step, package manager, framework, or backend.
     public form: `owner`, `admin`, `developer`, and Coach access are issued from
     the management panel by the owner. Validate contacts with `normalizeEmail`
     and `normalizePhone` in `app.js` and reject duplicates.
+11. The app is gated: keep `body.auth-gate` and the `#auth-screen` /
+    `#app-shell` toggling in `render()` so no club content renders before
+    sign-in. After a successful login or registration, call `showWelcome()`;
+    keep the welcome overlay dismissible by button, Escape and a 5.2s timer.
 
 ## Content shapes
 
@@ -94,6 +98,8 @@ python -m http.server 8000
 Check that:
 
 - the page loads with no console errors,
+- only the login gate is visible before sign-in,
+- sign-in shows the welcome screen and then the workspace,
 - teams and staff from `data/` appear,
 - changing the workspace background updates the text colour,
 - login still works for existing accounts.

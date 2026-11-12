@@ -322,26 +322,26 @@ const TRANSLATIONS = {
     postFailed: "Could not publish this update. Check local storage is available and try again.",
     deleteUpdateConfirm: "Delete this update?",
     teamMembersWillAppear: "Team members will appear here when the roster is added.",
-    loginSection: "TEAM STAFF & ADMIN",
-    teamLogin: "Team login",
+    loginSection: "MEMBERS & STAFF",
+    teamLogin: "Club login",
     soundOn: "Sound on",
     soundOff: "Sound off",
     soundToggle: "Toggle stadium sound",
-    loginIntro: "Teams and rosters are open to view. Fans can create a member account with an email address or mobile number; staff accounts are issued by the club owner.",
+    loginIntro: "Sign in to enter the club workspace. New members can create an account with a real email address or mobile number.",
     authHeadline: "Built for the love of the game.",
     authPlatform: "THE CLUB PLATFORM",
     authClubName: "SUNNY SPORT CLUB",
     authMatchSubtitle: "One club. Every team.",
-    authOpenDirectory: "OPEN TEAM DIRECTORY",
+    authOpenDirectory: "MEMBERS ONLY",
     authSeason: "CLUB SEASON · 2026",
     authRolesLabel: "ACCESS FOR",
-    authSecureAccess: "STAFF ACCESS",
+    authSecureAccess: "CLUB ACCESS",
     authPanelIntro: "Sign in, or create a member account with a real email address or mobile number.",
     authPrivateNote: "Private team tools · Authorized accounts only",
     username: "Username",
     password: "Password",
     loginIdentifier: "Email, phone, or username",
-    loginIdentifierPlaceholder: "name@email.com, +855 12 345 678, or username",
+    loginIdentifierPlaceholder: "name@email.com · +855 12 345 678",
     loginHint: "Use the email address, phone number, or username on your account. Staff accounts are issued by the club owner.",
     logIn: "Log in",
     logOut: "Log out",
@@ -365,6 +365,10 @@ const TRANSLATIONS = {
     registerFailed: "Could not create your account. Please try again.",
     registerWelcome: "Welcome, {name}. Your member account is ready.",
     unverifiedContact: "Contact not yet verified",
+    welcomeKicker: "WELCOME TO THE CLUB",
+    welcomeTitle: "Welcome, {name}",
+    welcomeRole: "Signed in as {role}",
+    enterClub: "Enter the club",
     teamSetup: "TEAM SETUP",
     createTeamTitle: "Create a team",
     teamDescription: "Teams are public in this prototype. Contact details and rosters are visible to signed-in users.",
@@ -651,26 +655,26 @@ const TRANSLATIONS = {
     postFailed: "មិនអាចបង្ហោះព័ត៌មាននេះបានទេ។ សូមពិនិត្យទំហំផ្ទុកក្នុងកម្មវិធីរុករក ហើយព្យាយាមម្តងទៀត។",
     deleteUpdateConfirm: "តើអ្នកចង់លុបព័ត៌មាននេះមែនទេ?",
     teamMembersWillAppear: "សមាជិកក្រុមនឹងបង្ហាញនៅទីនេះ នៅពេលបញ្ចូលបញ្ជីរួច។",
-    loginSection: "សម្រាប់បុគ្គលិកក្រុម និងអ្នកគ្រប់គ្រង",
-    teamLogin: "ចូលគណនីក្រុម",
+    loginSection: "សម្រាប់សមាជិក និងបុគ្គលិក",
+    teamLogin: "ចូលគណនីក្លឹប",
     soundOn: "សំឡេងបើក",
     soundOff: "សំឡេងបិទ",
     soundToggle: "បើក ឬបិទសំឡេងកីឡដ្ឋាន",
-    loginIntro: "អ្នកគ្រប់គ្នាអាចមើលក្រុម និងបញ្ជីសមាជិកបាន។ អ្នកគាំទ្រអាចបង្កើតគណនីសមាជិកដោយអ៊ីមែល ឬលេខទូរស័ព្ទ។ គណនីបុគ្គលិកត្រូវបានផ្តល់ដោយម្ចាស់ក្លឹប។",
+    loginIntro: "ចូលគណនីដើម្បីចូលកាន់ក្នុងក្លឹប។ សមាជិកថ្មីអាចបង្កើតគណនីដោយអ៊ីមែល ឬលេខទូរស័ព្ទពិត។",
     authHeadline: "បង្កើតឡើងសម្រាប់ក្តីស្រឡាញ់ចំពោះបាល់ទាត់។",
     authPlatform: "ប្រព័ន្ធគ្រប់គ្រងក្លឹប",
     authClubName: "ក្លឹប SUNNY SPORT",
     authMatchSubtitle: "ក្លឹបមួយ។ ក្រុមទាំងអស់។",
-    authOpenDirectory: "បញ្ជីក្រុមបើកចំហ",
+    authOpenDirectory: "សម្រាប់សមាជិកតែប៉ុណ្ណោះ",
     authSeason: "រដូវកាលក្លឹប · ២០២៦",
     authRolesLabel: "សិទ្ធិចូលប្រើសម្រាប់",
-    authSecureAccess: "សិទ្ធិបុគ្គលិក",
+    authSecureAccess: "ការចូលក្លឹប",
     authPanelIntro: "ចូលគណនី ឬបង្កើតគណនីសមាជិកដោយប្រើអ៊ីមែល ឬលេខទូរស័ព្ទពិត។",
     authPrivateNote: "ឧបករណ៍ក្រុមឯកជន · សម្រាប់គណនីដែលបានអនុញ្ញាត",
     username: "ឈ្មោះអ្នកប្រើ",
     password: "ពាក្យសម្ងាត់",
     loginIdentifier: "អ៊ីមែល លេខទូរស័ព្ទ ឬឈ្មោះអ្នកប្រើ",
-    loginIdentifierPlaceholder: "name@email.com, +855 12 345 678 ឬឈ្មោះអ្នកប្រើ",
+    loginIdentifierPlaceholder: "name@email.com · +855 12 345 678",
     loginHint: "ប្រើអ៊ីមែល លេខទូរស័ព្ទ ឬឈ្មោះអ្នកប្រើនៅលើគណនីរបស់អ្នក។ គណនីបុគ្គលិកត្រូវបានផ្តល់ដោយម្ចាស់ក្លឹប។",
     logIn: "ចូលគណនី",
     logOut: "ចាកចេញ",
@@ -694,6 +698,10 @@ const TRANSLATIONS = {
     registerFailed: "មិនអាចបង្កើតគណនីបានទេ។ សូមព្យាយាមម្តងទៀត។",
     registerWelcome: "សូមស្វាគមន៍ {name}។ គណនីសមាជិករបស់អ្នករួចរាល់ហើយ។",
     unverifiedContact: "ទំនាក់ទំនងមិនទាន់ផ្ទៀងផ្ទាត់",
+    welcomeKicker: "សូមស្វាគមន៍មកកាន់ក្លឹប",
+    welcomeTitle: "សូមស្វាគមន៍ {name}",
+    welcomeRole: "បានចូលគណនីជា {role}",
+    enterClub: "ចូលក្នុងក្លឹប",
     teamSetup: "រៀបចំក្រុម",
     createTeamTitle: "បង្កើតក្រុម",
     teamDescription: "ព័ត៌មានក្រុមអាចមើលជាសាធារណៈក្នុងគំរូនេះ។ ព័ត៌មានទំនាក់ទំនង និងបញ្ជីសមាជិកអាចមើលឃើញដោយអ្នកប្រើដែលបានចូលគណនី។",
@@ -2349,6 +2357,16 @@ function renderMembers() {
   grid.hidden = isEmpty || visibleMembers.length === 0;
 }
 
+function currentAccessRoleLabel() {
+  if (!activeAccount) return t("publicView");
+  if (isAdmin()) return getSystemRoleLabel(activeAccount.systemRole);
+  const teamRole = activeAccount.teamRoles[currentTeamId];
+  if (teamRole === "Coach") return t("coachRole");
+  if (teamRole === "Captain") return t("captainRole");
+  if (teamRole === "Team Manager") return t("managerRole");
+  return t("viewOnlyAccess");
+}
+
 function render() {
   const team = currentTeam();
   const hasTeam = Boolean(team);
@@ -2356,8 +2374,10 @@ function render() {
   const mainContent = document.querySelector(".main-content");
   mainContent.dataset.view = hasTeam ? "team" : "directory";
   mainContent.style.setProperty("--team-accent", hasTeam ? teamAccentColor(team) : "#d4a03a");
-  document.querySelector("#auth-screen").hidden = false;
-  document.querySelector("#app-shell").hidden = false;
+  const gated = !activeAccount;
+  document.body.classList.toggle("auth-gate", gated);
+  document.querySelector("#auth-screen").hidden = !gated;
+  document.querySelector("#app-shell").hidden = gated;
   setAuthMode(authMode);
   document.querySelector("#auth-signed-in").hidden = !activeAccount;
   document.querySelector("#logout-button").hidden = !activeAccount;
@@ -2374,16 +2394,7 @@ function render() {
     "aria-label",
     displayName || "Public visitor",
   );
-  const activeTeamRole = activeAccount?.teamRoles[currentTeamId];
-  const translatedAccessRole = isAdmin()
-    ? getSystemRoleLabel(activeAccount.systemRole)
-    : activeTeamRole === "Coach"
-      ? t("coachRole")
-      : activeTeamRole === "Captain"
-        ? t("captainRole")
-          : activeTeamRole === "Team Manager"
-            ? t("managerRole")
-          : t("viewOnlyAccess");
+  const translatedAccessRole = currentAccessRoleLabel();
   document.querySelector("#auth-session-label").textContent = activeAccount
     ? `${language === "km" ? "បានចូលគណនីជា" : "Signed in as"} ${displayName} · ${translatedAccessRole}`
     : "";
@@ -2973,6 +2984,54 @@ window.addEventListener("scroll", () => {
 }, { passive: true });
 window.addEventListener("resize", syncStaffLoginFloat);
 
+let welcomeTimer = 0;
+
+function hideWelcome(instant = false) {
+  const screen = document.querySelector("#welcome-screen");
+  clearTimeout(welcomeTimer);
+  welcomeTimer = 0;
+  if (!screen || screen.hidden) return;
+  const release = () => {
+    screen.hidden = true;
+    screen.classList.remove("is-leaving");
+    document.querySelector("#app-shell").inert = false;
+    document.querySelector("#auth-screen").inert = false;
+    document
+      .querySelector("#main-navigation .nav-link")
+      ?.focus({ preventScroll: true });
+  };
+  if (instant) {
+    release();
+    return;
+  }
+  screen.classList.add("is-leaving");
+  window.setTimeout(release, 480);
+}
+
+function showWelcome() {
+  if (!activeAccount) return;
+  const screen = document.querySelector("#welcome-screen");
+  const name = activeAccount.name || activeAccount.username;
+  document.querySelector("#welcome-title").textContent = t("welcomeTitle", { name });
+  document.querySelector("#welcome-subtitle").textContent = t("welcomeRole", {
+    role: currentAccessRoleLabel(),
+  });
+  screen.classList.remove("is-leaving");
+  screen.hidden = false;
+  document.querySelector("#app-shell").inert = true;
+  document.querySelector("#auth-screen").inert = true;
+  document.querySelector("#welcome-enter").focus({ preventScroll: true });
+  clearTimeout(welcomeTimer);
+  welcomeTimer = window.setTimeout(() => hideWelcome(), 5200);
+}
+
+document.querySelector("#welcome-enter").addEventListener("click", () => hideWelcome());
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !document.querySelector("#welcome-screen").hidden) {
+    hideWelcome();
+  }
+});
+
 document.querySelector("#auth-mode-login").addEventListener("click", () => {
   setAuthMode("login");
   document.querySelector("#auth-username").focus();
@@ -3041,8 +3100,10 @@ async function authenticate(event) {
     }
     document.querySelector("#auth-form").reset();
     render();
+    window.scrollTo(0, 0);
     stopStadiumAmbience();
     playWhistle();
+    showWelcome();
   } catch (caught) {
     console.error("Could not complete local account authentication.", caught);
     showAuthError(t("signInFailed"));
@@ -3111,9 +3172,10 @@ document.querySelector("#register-form").addEventListener("submit", (event) => {
     }
     document.querySelector("#register-form").reset();
     render();
+    window.scrollTo(0, 0);
     stopStadiumAmbience();
     playCheer();
-    showToast(t("registerWelcome", { name }));
+    showWelcome();
   } catch (caught) {
     console.error("Could not create the member account.", caught);
     fail("registerFailed");
@@ -3123,9 +3185,12 @@ document.querySelector("#register-form").addEventListener("submit", (event) => {
 });
 
 function logout() {
+  hideWelcome(true);
   activeAccount = null;
   store.activeUserId = "";
+  authMode = "login";
   persistData();
+  window.scrollTo(0, 0);
   render();
 }
 document.querySelector("#logout-button").addEventListener("click", logout);
