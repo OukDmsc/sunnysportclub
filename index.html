@@ -884,19 +884,46 @@
             </div>
             <h1 id="auth-title" data-i18n="teamLogin">Team login</h1>
             <p class="auth-panel-intro" data-i18n="authPanelIntro">
-              Sign in with the username and password assigned to you.
+              Sign in, or create a member account with a real email address or
+              mobile number.
             </p>
+          </div>
+          <div class="auth-mode-switch" role="tablist" aria-label="Login or create account">
+            <button
+              class="auth-mode-button is-active"
+              id="auth-mode-login"
+              type="button"
+              role="tab"
+              aria-selected="true"
+              aria-controls="auth-form"
+              data-i18n="logIn"
+            >
+              Log in
+            </button>
+            <button
+              class="auth-mode-button"
+              id="auth-mode-register"
+              type="button"
+              role="tab"
+              aria-selected="false"
+              aria-controls="register-form"
+              data-i18n="registerTab"
+            >
+              Create account
+            </button>
           </div>
           <form id="auth-form" novalidate>
             <label class="form-field"
-              ><span data-i18n="username">Username</span
+              ><span data-i18n="loginIdentifier">Email, phone, or username</span
               ><input
                 id="auth-username"
                 name="username"
                 type="text"
                 minlength="3"
-                maxlength="24"
+                maxlength="254"
                 autocomplete="username"
+                placeholder="name@email.com, +855 12 345 678, or username"
+                data-i18n-placeholder="loginIdentifierPlaceholder"
                 required
             /></label>
             <label class="form-field"
@@ -910,8 +937,8 @@
                 required
             /></label>
             <p class="auth-hint" id="auth-hint" data-i18n="loginHint">
-              Your Dev Owner/Admin creates your username and password. Contact
-              them if you need an account.
+              Use the email address, phone number, or username on your account.
+              Staff accounts are issued by the club owner.
             </p>
             <p class="form-error" id="auth-error" role="alert" hidden></p>
             <button
@@ -920,6 +947,69 @@
               type="submit"
             >
               <span data-i18n="logIn">Log in</span
+              ><span aria-hidden="true">→</span>
+            </button>
+          </form>
+          <form id="register-form" novalidate hidden>
+            <label class="form-field"
+              ><span data-i18n="fullName">Full name</span
+              ><input
+                id="register-name"
+                name="name"
+                type="text"
+                minlength="2"
+                maxlength="60"
+                autocomplete="name"
+                required
+            /></label>
+            <label class="form-field"
+              ><span data-i18n="emailOrPhone">Email or mobile number</span
+              ><input
+                id="register-contact"
+                name="contact"
+                type="text"
+                maxlength="254"
+                autocomplete="email"
+                spellcheck="false"
+                placeholder="name@email.com or +855 12 345 678"
+                data-i18n-placeholder="contactPlaceholder"
+                required
+            /></label>
+            <p class="auth-hint" data-i18n="contactHint">
+              Enter a real email address or a mobile number with country code,
+              for example +855 12 345 678.
+            </p>
+            <label class="form-field"
+              ><span data-i18n="password">Password</span
+              ><input
+                id="register-password"
+                name="password"
+                type="password"
+                minlength="8"
+                autocomplete="new-password"
+                required
+            /></label>
+            <label class="form-field"
+              ><span data-i18n="confirmPassword">Confirm password</span
+              ><input
+                id="register-password-confirm"
+                name="confirm-password"
+                type="password"
+                minlength="8"
+                autocomplete="new-password"
+                required
+            /></label>
+            <p class="auth-hint" data-i18n="registerRoleNote">
+              New accounts are member accounts. Owner, admin, developer and
+              coach accounts are created directly by the club owner.
+            </p>
+            <p class="form-error" id="register-error" role="alert" hidden></p>
+            <button
+              class="button button-primary auth-submit"
+              id="register-submit"
+              type="submit"
+            >
+              <span data-i18n="createAccount">Create account</span
               ><span aria-hidden="true">→</span>
             </button>
           </form>

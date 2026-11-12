@@ -3108,7 +3108,45 @@ body {
   font-size: 11px;
   line-height: 1.6;
 }
-.auth-card #auth-form {
+.auth-mode-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  margin-bottom: 18px;
+  padding: 4px;
+  border: 1px solid #e1e9e1;
+  border-radius: 9px;
+  background: #f3f7f2;
+}
+.auth-mode-button {
+  min-height: 38px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #6c7a70;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease, box-shadow 160ms ease;
+}
+.auth-mode-button:hover {
+  color: #1d5c3d;
+}
+.auth-mode-button.is-active {
+  background: #fff;
+  color: #145238;
+  box-shadow: 0 2px 8px rgb(28 84 55 / 10%);
+}
+.auth-mode-button:focus-visible {
+  outline: 2px solid #5e9e69;
+  outline-offset: 2px;
+}
+.auth-card #auth-form,
+.auth-card #register-form {
   display: grid;
   gap: 14px;
 }

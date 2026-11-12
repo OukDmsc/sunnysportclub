@@ -22,6 +22,9 @@ This project is a browser-based club management interface built with plain HTML,
 - Add, edit, and remove member records
 - Club profile management with location and contact details
 - Team management and administration controls
+- Self-service member sign-up with a real email address or international phone number
+- Sign in with email, phone number, or username
+- Owner, Admin, Developer, and Coach accounts issued only by the club owner
 - Role-based team creation: Owner, Admin, Developer, or Coach
 - Team Leader and Team Manager access assigned by the team Coach
 - Fast bulk member import (paste up to 50 people at once)

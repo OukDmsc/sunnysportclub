@@ -39,6 +39,13 @@ Put image files in:
 
 Then reference the path from the data file.
 
+## Members and staff accounts
+
+Visitors create their own member accounts from the login screen with a real
+email address or international phone number, so those accounts live in browser
+storage, not in this folder. `accounts.js` is for staff accounts the owner
+issues directly (Owner, Admin, Developer, Coach). Keep it to that purpose.
+
 ## Passwords
 
 `accounts.js` stores passwords as readable text because this is a local,

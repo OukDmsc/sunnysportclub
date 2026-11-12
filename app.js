@@ -327,7 +327,7 @@ const TRANSLATIONS = {
     soundOn: "Sound on",
     soundOff: "Sound off",
     soundToggle: "Toggle stadium sound",
-    loginIntro: "Teams and rosters are open to view. Owners, developers, admins, coaches, and team leaders can sign in for their tools.",
+    loginIntro: "Teams and rosters are open to view. Fans can create a member account with an email address or mobile number; staff accounts are issued by the club owner.",
     authHeadline: "Built for the love of the game.",
     authPlatform: "THE CLUB PLATFORM",
     authClubName: "SUNNY SPORT CLUB",
@@ -336,13 +336,35 @@ const TRANSLATIONS = {
     authSeason: "CLUB SEASON · 2026",
     authRolesLabel: "ACCESS FOR",
     authSecureAccess: "STAFF ACCESS",
-    authPanelIntro: "Sign in with the username and password assigned to you.",
+    authPanelIntro: "Sign in, or create a member account with a real email address or mobile number.",
     authPrivateNote: "Private team tools · Authorized accounts only",
     username: "Username",
     password: "Password",
-    loginHint: "Your Dev Owner creates your username and password. Contact them if you need an account.",
+    loginIdentifier: "Email, phone, or username",
+    loginIdentifierPlaceholder: "name@email.com, +855 12 345 678, or username",
+    loginHint: "Use the email address, phone number, or username on your account. Staff accounts are issued by the club owner.",
     logIn: "Log in",
     logOut: "Log out",
+    registerTab: "Create account",
+    createAccount: "Create account",
+    registerTitle: "Create your account",
+    registerIntro: "Join as a club member with a real email address or mobile number.",
+    fullName: "Full name",
+    emailOrPhone: "Email or mobile number",
+    confirmPassword: "Confirm password",
+    contactPlaceholder: "name@email.com or +855 12 345 678",
+    contactHint: "Enter a real email address or a mobile number with country code, for example +855 12 345 678.",
+    registerRoleNote: "New accounts are member accounts. Owner, admin, developer and coach accounts are created directly by the club owner.",
+    registerInvalidName: "Enter your full name.",
+    registerInvalidEmail: "Enter a valid email address, for example name@email.com.",
+    registerInvalidPhone: "Enter a valid mobile number with country code, for example +855 12 345 678.",
+    registerInvalidContact: "Enter an email address or a mobile number with country code.",
+    registerPasswordShort: "Use a password of at least 8 characters.",
+    registerPasswordMismatch: "The two passwords do not match.",
+    registerContactExists: "An account already uses that email address or phone number.",
+    registerFailed: "Could not create your account. Please try again.",
+    registerWelcome: "Welcome, {name}. Your member account is ready.",
+    unverifiedContact: "Contact not yet verified",
     teamSetup: "TEAM SETUP",
     createTeamTitle: "Create a team",
     teamDescription: "Teams are public in this prototype. Contact details and rosters are visible to signed-in users.",
@@ -351,7 +373,7 @@ const TRANSLATIONS = {
     logoHelp: "Optional image (up to 1 MB)",
     teamContact: "Contact number",
     accountAccess: "ACCOUNT ACCESS",
-    accountDescription: "Set the username and password to give to this user. They can sign in without an email address or phone number.",
+    accountDescription: "Create staff accounts here. Members register themselves with a real email address or phone number.",
     accessForTeam: "Access for this team",
     usernamePasswordInvalid: "Use a 3–24 character username and a password of at least 8 characters.",
     usernameExists: "That username already exists.",
@@ -372,7 +394,7 @@ const TRANSLATIONS = {
     coachRole: "Coach",
     captainRole: "Team Leader / Captain",
     contactNumberLabel: "Contact number",
-    enterCredentials: "Enter the username and password provided by your admin.",
+    enterCredentials: "Enter your email, phone, or username and password.",
     signInIncorrect: "Incorrect username or password.",
     signInDamaged: "This account's sign-in data is damaged. Ask the Dev Owner/Admin to recreate the account.",
     signInFailed: "Could not complete sign-in. Please try again.",
@@ -634,7 +656,7 @@ const TRANSLATIONS = {
     soundOn: "សំឡេងបើក",
     soundOff: "សំឡេងបិទ",
     soundToggle: "បើក ឬបិទសំឡេងកីឡដ្ឋាន",
-    loginIntro: "អ្នកគ្រប់គ្នាអាចមើលក្រុម និងបញ្ជីសមាជិកបាន។ ម្ចាស់ អ្នកអភិវឌ្ឍន៍ អ្នកគ្រប់គ្រង គ្រូបង្វឹក និងប្រធានក្រុមអាចចូលគណនីដើម្បីប្រើឧបករណ៍គ្រប់គ្រង។",
+    loginIntro: "អ្នកគ្រប់គ្នាអាចមើលក្រុម និងបញ្ជីសមាជិកបាន។ អ្នកគាំទ្រអាចបង្កើតគណនីសមាជិកដោយអ៊ីមែល ឬលេខទូរស័ព្ទ។ គណនីបុគ្គលិកត្រូវបានផ្តល់ដោយម្ចាស់ក្លឹប។",
     authHeadline: "បង្កើតឡើងសម្រាប់ក្តីស្រឡាញ់ចំពោះបាល់ទាត់។",
     authPlatform: "ប្រព័ន្ធគ្រប់គ្រងក្លឹប",
     authClubName: "ក្លឹប SUNNY SPORT",
@@ -643,13 +665,35 @@ const TRANSLATIONS = {
     authSeason: "រដូវកាលក្លឹប · ២០២៦",
     authRolesLabel: "សិទ្ធិចូលប្រើសម្រាប់",
     authSecureAccess: "សិទ្ធិបុគ្គលិក",
-    authPanelIntro: "ចូលដោយប្រើឈ្មោះអ្នកប្រើ និងពាក្យសម្ងាត់ដែលបានកំណត់ឱ្យអ្នក។",
+    authPanelIntro: "ចូលគណនី ឬបង្កើតគណនីសមាជិកដោយប្រើអ៊ីមែល ឬលេខទូរស័ព្ទពិត។",
     authPrivateNote: "ឧបករណ៍ក្រុមឯកជន · សម្រាប់គណនីដែលបានអនុញ្ញាត",
     username: "ឈ្មោះអ្នកប្រើ",
     password: "ពាក្យសម្ងាត់",
-    loginHint: "ម្ចាស់/អ្នកអភិវឌ្ឍន៍នឹងបង្កើតឈ្មោះអ្នកប្រើ និងពាក្យសម្ងាត់ឱ្យអ្នក។ សូមទាក់ទងពួកគេ ប្រសិនបើអ្នកត្រូវការគណនី។",
+    loginIdentifier: "អ៊ីមែល លេខទូរស័ព្ទ ឬឈ្មោះអ្នកប្រើ",
+    loginIdentifierPlaceholder: "name@email.com, +855 12 345 678 ឬឈ្មោះអ្នកប្រើ",
+    loginHint: "ប្រើអ៊ីមែល លេខទូរស័ព្ទ ឬឈ្មោះអ្នកប្រើនៅលើគណនីរបស់អ្នក។ គណនីបុគ្គលិកត្រូវបានផ្តល់ដោយម្ចាស់ក្លឹប។",
     logIn: "ចូលគណនី",
     logOut: "ចាកចេញ",
+    registerTab: "បង្កើតគណនី",
+    createAccount: "បង្កើតគណនី",
+    registerTitle: "បង្កើតគណនីរបស់អ្នក",
+    registerIntro: "ចូលរួមជាសមាជិកក្លឹបដោយប្រើអ៊ីមែល ឬលេខទូរស័ព្ទពិត។",
+    fullName: "ឈ្មោះពេញ",
+    emailOrPhone: "អ៊ីមែល ឬលេខទូរស័ព្ទចល័ត",
+    confirmPassword: "បញ្ជាក់ពាក្យសម្ងាត់",
+    contactPlaceholder: "name@email.com ឬ +855 12 345 678",
+    contactHint: "សូមបញ្ចូលអ៊ីមែលពិត ឬលេខទូរស័ព្ទចល័តជាមួយលេខកូដប្រទេស ឧទាហរណ៍ +855 12 345 678។",
+    registerRoleNote: "គណនីថ្មីគឺជាគណនីសមាជិក។ គណនីម្ចាស់ អ្នកគ្រប់គ្រង អ្នកអភិវឌ្ឍន៍ និងគ្រូបង្វឹក ត្រូវបានបង្កើតដោយម្ចាស់ក្លឹបផ្ទាល់។",
+    registerInvalidName: "សូមបញ្ចូលឈ្មោះពេញរបស់អ្នក។",
+    registerInvalidEmail: "សូមបញ្ចូលអ៊ីមែលត្រឹមត្រូវ ឧទាហរណ៍ name@email.com។",
+    registerInvalidPhone: "សូមបញ្ចូលលេខទូរស័ព្ទត្រឹមត្រូវជាមួយលេខកូដប្រទេស ឧទាហរណ៍ +855 12 345 678។",
+    registerInvalidContact: "សូមបញ្ចូលអ៊ីមែល ឬលេខទូរស័ព្ទជាមួយលេខកូដប្រទេស។",
+    registerPasswordShort: "ប្រើពាក្យសម្ងាត់យ៉ាងតិច ៨ តួអក្សរ។",
+    registerPasswordMismatch: "ពាក្យសម្ងាត់ទាំងពីរមិនត្រូវគ្នាទេ។",
+    registerContactExists: "មានគណនីប្រើអ៊ីមែល ឬលេខទូរស័ព្ទនេះរួចហើយ។",
+    registerFailed: "មិនអាចបង្កើតគណនីបានទេ។ សូមព្យាយាមម្តងទៀត។",
+    registerWelcome: "សូមស្វាគមន៍ {name}។ គណនីសមាជិករបស់អ្នករួចរាល់ហើយ។",
+    unverifiedContact: "ទំនាក់ទំនងមិនទាន់ផ្ទៀងផ្ទាត់",
     teamSetup: "រៀបចំក្រុម",
     createTeamTitle: "បង្កើតក្រុម",
     teamDescription: "ព័ត៌មានក្រុមអាចមើលជាសាធារណៈក្នុងគំរូនេះ។ ព័ត៌មានទំនាក់ទំនង និងបញ្ជីសមាជិកអាចមើលឃើញដោយអ្នកប្រើដែលបានចូលគណនី។",
@@ -658,7 +702,7 @@ const TRANSLATIONS = {
     logoHelp: "រូបភាពជាជម្រើស (ទំហំមិនលើស ១ មេកាបៃ)",
     teamContact: "លេខទំនាក់ទំនង",
     accountAccess: "សិទ្ធិចូលប្រើគណនី",
-    accountDescription: "កំណត់ឈ្មោះអ្នកប្រើ និងពាក្យសម្ងាត់សម្រាប់អ្នកប្រើនេះ។ ពួកគេអាចចូលគណនីដោយមិនចាំបាច់ប្រើអ៊ីមែល ឬលេខទូរស័ព្ទ។",
+    accountDescription: "បង្កើតគណនីបុគ្គលិកនៅទីនេះ។ សមាជិកបង្កើតគណនីដោយខ្លួនឯងជាមួយអ៊ីមែល ឬលេខទូរស័ព្ទពិត។",
     accessForTeam: "សិទ្ធិសម្រាប់ក្រុមនេះ",
     usernamePasswordInvalid: "ប្រើឈ្មោះអ្នកប្រើ ៣–២៤ តួអក្សរ និងពាក្យសម្ងាត់យ៉ាងតិច ៨ តួអក្សរ។",
     usernameExists: "ឈ្មោះអ្នកប្រើនេះមានរួចហើយ។",
@@ -679,7 +723,7 @@ const TRANSLATIONS = {
     coachRole: "គ្រូបង្វឹក",
     captainRole: "ប្រធានក្រុម",
     contactNumberLabel: "លេខទំនាក់ទំនង",
-    enterCredentials: "សូមបញ្ចូលឈ្មោះអ្នកប្រើ និងពាក្យសម្ងាត់ដែលអ្នកគ្រប់គ្រងបានផ្តល់ឱ្យ។",
+    enterCredentials: "សូមបញ្ចូលអ៊ីមែល លេខទូរស័ព្ទ ឬឈ្មោះអ្នកប្រើ និងពាក្យសម្ងាត់របស់អ្នក។",
     signInIncorrect: "ឈ្មោះអ្នកប្រើ ឬពាក្យសម្ងាត់មិនត្រឹមត្រូវទេ។",
     signInDamaged: "ទិន្នន័យចូលគណនីនេះខូច។ សូមស្នើម្ចាស់/អ្នកគ្រប់គ្រងបង្កើតគណនីឡើងវិញ។",
     signInFailed: "មិនអាចចូលគណនីបានទេ។ សូមព្យាយាមម្តងទៀត។",
@@ -1161,6 +1205,7 @@ function applyLanguage() {
   document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
     element.setAttribute("placeholder", t(element.dataset.i18nPlaceholder));
   });
+  setAuthMode(authMode);
   document.querySelectorAll("[data-role-i18n]").forEach((element) => {
     element.textContent = translatedRole(element.value || element.textContent);
   });
@@ -1574,6 +1619,10 @@ function loadData() {
               : ["admin", "developer"].includes(user.systemRole)
                 ? user.systemRole
                 : "viewer",
+            name: typeof user.name === "string" ? user.name.slice(0, 60) : "",
+            email: typeof user.email === "string" ? user.email.toLowerCase() : "",
+            phone: typeof user.phone === "string" ? user.phone : "",
+            contactVerified: Boolean(user.contactVerified),
             canPost: Boolean(user.canPost),
             teamCreationRole: user.teamCreationRole === "Coach" ? "Coach" : "",
             teamCreationUsed: Boolean(user.teamCreationUsed),
@@ -2125,7 +2174,11 @@ function renderAccountRoles() {
               })()
             : `<span class="role-lock">${escapeHtml(t("chooseTeam"))}</span>`}
         </div>`;
-    return `<div class="account-role-row"><span><strong>${escapeHtml(user.username)}</strong><small>${escapeHtml(getAccountRoleLabel(user))}</small></span>${roleControls}</div>`;
+    const contact = isAdmin() ? user.email || user.phone || "" : "";
+    const contactNote = contact
+      ? ` · ${contact}${user.contactVerified === false ? ` (${t("unverifiedContact")})` : ""}`
+      : "";
+    return `<div class="account-role-row"><span><strong>${escapeHtml(user.name || user.username)}</strong><small>${escapeHtml(getAccountRoleLabel(user))}${escapeHtml(contactNote)}</small></span>${roleControls}</div>`;
   }).join("") || `<p class="directory-empty">${escapeHtml(t("noAccounts"))}</p>`;
 }
 
@@ -2305,20 +2358,21 @@ function render() {
   mainContent.style.setProperty("--team-accent", hasTeam ? teamAccentColor(team) : "#d4a03a");
   document.querySelector("#auth-screen").hidden = false;
   document.querySelector("#app-shell").hidden = false;
-  document.querySelector("#auth-form").hidden = Boolean(activeAccount);
+  setAuthMode(authMode);
   document.querySelector("#auth-signed-in").hidden = !activeAccount;
   document.querySelector("#logout-button").hidden = !activeAccount;
   document.querySelector("#top-logout-button").hidden = !activeAccount;
-  document.querySelector("#staff-login-float").hidden = Boolean(activeAccount);
-  document.querySelector("#user-name").textContent = activeAccount?.username || "Public visitor";
+  syncStaffLoginFloat();
+  const displayName = activeAccount?.name || activeAccount?.username || "";
+  document.querySelector("#user-name").textContent = displayName || "Public visitor";
   document.querySelector("#user-avatar").textContent =
-    activeAccount ? initials(activeAccount.username) || "?" : "PV";
-  document.querySelector("#welcome-role").textContent = activeAccount?.username || t("publicGreeting");
+    activeAccount ? initials(displayName) || "?" : "PV";
+  document.querySelector("#welcome-role").textContent = displayName || t("publicGreeting");
   document.querySelector("#top-avatar").textContent =
-    activeAccount ? initials(activeAccount.username) || "?" : "PV";
+    activeAccount ? initials(displayName) || "?" : "PV";
   document.querySelector("#top-avatar").setAttribute(
     "aria-label",
-    activeAccount?.username || "Public visitor",
+    displayName || "Public visitor",
   );
   const activeTeamRole = activeAccount?.teamRoles[currentTeamId];
   const translatedAccessRole = isAdmin()
@@ -2331,7 +2385,7 @@ function render() {
             ? t("managerRole")
           : t("viewOnlyAccess");
   document.querySelector("#auth-session-label").textContent = activeAccount
-    ? `${language === "km" ? "បានចូលគណនីជា" : "Signed in as"} ${activeAccount.username} · ${translatedAccessRole}`
+    ? `${language === "km" ? "បានចូលគណនីជា" : "Signed in as"} ${displayName} · ${translatedAccessRole}`
     : "";
   const role = activeAccount ? translatedAccessRole : t("publicView");
   document.querySelector("#user-role").textContent = role;
@@ -2810,30 +2864,139 @@ async function derivePbkdf2Sha256(password, salt, iterations) {
   return derived;
 }
 
+const EMAIL_PATTERN =
+  /^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)+$/i;
+
+function normalizeEmail(value) {
+  const email = value.trim().toLowerCase();
+  if (email.length > 254 || !EMAIL_PATTERN.test(email)) return "";
+  const [localPart, domain] = email.split("@");
+  if (localPart.length > 64 || /^\.|\.\.|\.$/.test(localPart)) return "";
+  if (!/^[a-z]{2,}$/.test(domain.split(".").pop())) return "";
+  return email;
+}
+
+function normalizePhone(value) {
+  const compact = value.trim().replace(/[\s().-]/g, "");
+  if (!/^\+?[1-9]\d{7,14}$/.test(compact)) return "";
+  return compact.startsWith("+") ? compact : `+${compact}`;
+}
+
+function findAccountByIdentifier(identifier) {
+  const value = identifier.trim();
+  if (!value) return null;
+  const normalized = value.toLowerCase();
+  const byUsername = store.users.find((user) => user.username.toLowerCase() === normalized);
+  if (byUsername) return byUsername;
+  if (value.includes("@")) {
+    const email = normalizeEmail(value);
+    return email
+      ? store.users.find((user) => (user.email || "").toLowerCase() === email) || null
+      : null;
+  }
+  const phone = normalizePhone(value);
+  return phone
+    ? store.users.find((user) => user.phone === phone) || null
+    : null;
+}
+
+function contactInUse(type, value, exceptId = "") {
+  return store.users.some((user) => {
+    if (user.id === exceptId) return false;
+    return type === "email"
+      ? (user.email || "").toLowerCase() === value
+      : user.phone === value;
+  });
+}
+
+function usernameFromContact(type, value) {
+  const raw = type === "email" ? value.split("@")[0] : value.replace(/\D/g, "");
+  let base = raw.toLowerCase().replace(/[^a-z0-9._-]/g, "").slice(0, 18) || "member";
+  if (base.length < 3) base = `${base}fan`.slice(0, 18);
+  let candidate = base;
+  let suffix = 1;
+  while (store.users.some((user) => user.username.toLowerCase() === candidate)) {
+    suffix += 1;
+    candidate = `${base.slice(0, 18 - String(suffix).length)}${suffix}`;
+  }
+  return candidate;
+}
+
 function showAuthError(message) {
   const error = document.querySelector("#auth-error");
   error.textContent = message;
   error.hidden = false;
 }
 
+let authMode = "login";
+let authScreenInView = false;
+
+function setAuthMode(mode) {
+  authMode = mode === "register" ? "register" : "login";
+  const registering = authMode === "register";
+  const signedIn = Boolean(activeAccount);
+  const loginButton = document.querySelector("#auth-mode-login");
+  const registerButton = document.querySelector("#auth-mode-register");
+  loginButton.classList.toggle("is-active", !registering);
+  loginButton.setAttribute("aria-selected", String(!registering));
+  registerButton.classList.toggle("is-active", registering);
+  registerButton.setAttribute("aria-selected", String(registering));
+  document.querySelector(".auth-mode-switch").hidden = signedIn;
+  document.querySelector("#auth-form").hidden = signedIn || registering;
+  document.querySelector("#register-form").hidden = signedIn || !registering;
+  document.querySelector("#auth-title").textContent = registering
+    ? t("registerTitle")
+    : t("teamLogin");
+  document.querySelector(".auth-panel-intro").textContent = registering
+    ? t("registerIntro")
+    : t("authPanelIntro");
+  if (!signedIn) {
+    document.querySelector("#auth-error").hidden = true;
+    document.querySelector("#register-error").hidden = true;
+  }
+}
+
+function syncStaffLoginFloat() {
+  const authRect = document.querySelector("#auth-screen").getBoundingClientRect();
+  authScreenInView = authRect.top < window.innerHeight - 60 && authRect.bottom > 60;
+  document.querySelector("#staff-login-float").hidden =
+    Boolean(activeAccount) || authScreenInView;
+}
+
+let staffLoginFloatFrame = 0;
+window.addEventListener("scroll", () => {
+  if (staffLoginFloatFrame) return;
+  staffLoginFloatFrame = requestAnimationFrame(() => {
+    staffLoginFloatFrame = 0;
+    syncStaffLoginFloat();
+  });
+}, { passive: true });
+window.addEventListener("resize", syncStaffLoginFloat);
+
+document.querySelector("#auth-mode-login").addEventListener("click", () => {
+  setAuthMode("login");
+  document.querySelector("#auth-username").focus();
+});
+document.querySelector("#auth-mode-register").addEventListener("click", () => {
+  setAuthMode("register");
+  document.querySelector("#register-name").focus();
+});
+
 async function authenticate(event) {
   event.preventDefault();
-  const username = document.querySelector("#auth-username").value.trim();
-  const normalizedUsername = username.toLowerCase();
+  const identifier = document.querySelector("#auth-username").value.trim();
   const password = document.querySelector("#auth-password").value;
   const error = document.querySelector("#auth-error");
   error.hidden = true;
 
-  if (!username || !password) {
+  if (!identifier || !password) {
     showAuthError(t("enterCredentials"));
     return;
   }
   const submitButton = document.querySelector("#auth-submit");
   submitButton.disabled = true;
   try {
-    const existing = store.users.find(
-      (user) => user.username.toLowerCase() === normalizedUsername,
-    );
+    const existing = findAccountByIdentifier(identifier);
     if (!existing) {
       showAuthError(t("signInIncorrect"));
       return;
@@ -2889,6 +3052,76 @@ async function authenticate(event) {
 }
 
 document.querySelector("#auth-form").addEventListener("submit", authenticate);
+
+document.querySelector("#register-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  if (activeAccount) return;
+  const name = document.querySelector("#register-name").value.trim();
+  const contactValue = document.querySelector("#register-contact").value.trim();
+  const password = document.querySelector("#register-password").value;
+  const confirmation = document.querySelector("#register-password-confirm").value;
+  const error = document.querySelector("#register-error");
+  const fail = (key) => {
+    error.textContent = t(key);
+    error.hidden = false;
+  };
+  error.hidden = true;
+  if (name.length < 2) return fail("registerInvalidName");
+  if (!contactValue) return fail("registerInvalidContact");
+  let contactType = "";
+  let contact = "";
+  if (contactValue.includes("@")) {
+    contact = normalizeEmail(contactValue);
+    if (!contact) return fail("registerInvalidEmail");
+    contactType = "email";
+  } else {
+    contact = normalizePhone(contactValue);
+    if (!contact) return fail("registerInvalidPhone");
+    contactType = "phone";
+  }
+  if (password.length < 8) return fail("registerPasswordShort");
+  if (password !== confirmation) return fail("registerPasswordMismatch");
+  if (contactInUse(contactType, contact)) return fail("registerContactExists");
+  const submitButton = document.querySelector("#register-submit");
+  submitButton.disabled = true;
+  try {
+    const user = {
+      id: createId(),
+      username: usernameFromContact(contactType, contact),
+      name,
+      email: contactType === "email" ? contact : "",
+      phone: contactType === "phone" ? contact : "",
+      password,
+      contactVerified: false,
+      systemRole: "viewer",
+      teamCreationRole: "",
+      teamCreationUsed: false,
+      teamRoles: {},
+      createdAt: new Date().toISOString(),
+    };
+    store.users.push(user);
+    activeAccount = user;
+    const team = currentTeam();
+    data = team ? { club: team.club, members: team.members } : structuredClone(DEFAULT_DATA);
+    if (!persistData()) {
+      store.users = store.users.filter((item) => item.id !== user.id);
+      activeAccount = null;
+      fail("registerFailed");
+      return;
+    }
+    document.querySelector("#register-form").reset();
+    render();
+    stopStadiumAmbience();
+    playCheer();
+    showToast(t("registerWelcome", { name }));
+  } catch (caught) {
+    console.error("Could not create the member account.", caught);
+    fail("registerFailed");
+  } finally {
+    submitButton.disabled = false;
+  }
+});
+
 function logout() {
   activeAccount = null;
   store.activeUserId = "";

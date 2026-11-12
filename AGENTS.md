@@ -32,6 +32,11 @@ step, package manager, framework, or backend.
 8. Keep the existing bilingual strings (`TRANSLATIONS`) intact when editing UI.
 9. The landing ambience uses Web Audio and must only start after a user gesture.
    Keep the `#auth-sound-toggle` mute control and the reduced-motion rules.
+10. Public sign-up must collect a real email address or an international phone
+    number and always creates a `viewer` account. Never add a role picker to the
+    public form: `owner`, `admin`, `developer`, and Coach access are issued from
+    the management panel by the owner. Validate contacts with `normalizeEmail`
+    and `normalizePhone` in `app.js` and reject duplicates.
 
 ## Content shapes
 
