@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#faf8f3" />
     <title>SUNNY SPORT CLUB | Team Manager</title>
+    <link rel="icon" type="image/png" href="assets/logos/sunny-sport-club-logo.png" />
+    <link rel="apple-touch-icon" href="assets/logos/sunny-sport-club-logo.png" />
+    <link rel="manifest" href="manifest.webmanifest" />
     <link rel="stylesheet" href="styles.css" />
     <script src="data/teams.js" defer></script>
     <script src="data/staff.js" defer></script>
@@ -33,7 +36,7 @@
         >
           <img
             class="brand-mark"
-            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%230d4a32' d='M32 2 58 12v18c0 16-11 27-26 32C17 57 6 46 6 30V12z'/%3E%3Cpath fill='%23d4a03a' d='M32 9 51 16v14c0 12-8 21-19 26-11-5-19-14-19-26V16z'/%3E%3Cpath fill='%23faf8f3' d='m32 17 4.5 9 10 1.5-7.2 7 1.7 10L32 40l-9 4.5 1.7-10-7.2-7 10-1.5z'/%3E%3C/svg%3E"
+            src="assets/logos/sunny-sport-club-logo.png"
             alt=""
           />
           <span class="brand-copy"
@@ -250,14 +253,25 @@
                 A quick look at everything happening with your team.
               </p>
             </div>
-            <button
-              class="button button-primary"
-              id="add-member-button"
-              type="button"
-            >
-              <span class="plus-icon" aria-hidden="true">+</span>
-              <span data-i18n="addMember">Add team member</span>
-            </button>
+            <div class="welcome-actions">
+              <button
+                class="button button-primary"
+                id="add-member-button"
+                type="button"
+              >
+                <span class="plus-icon" aria-hidden="true">+</span>
+                <span data-i18n="addMember">Add team member</span>
+              </button>
+              <button
+                class="button button-secondary"
+                id="bulk-add-members-button"
+                type="button"
+                hidden
+              >
+                <span class="plus-icon" aria-hidden="true">+</span>
+                <span data-i18n="addManyMembers">Add many members</span>
+              </button>
+            </div>
           </section>
 
           <section
@@ -388,6 +402,15 @@
               >
                 Add team member
               </button>
+              <button
+                class="button button-secondary button-small"
+                id="management-bulk-add-members-button"
+                type="button"
+                data-i18n="addManyMembers"
+                hidden
+              >
+                Add many members
+              </button>
             </div>
           </section>
 
@@ -435,7 +458,7 @@
               <div class="club-crest" aria-hidden="true">
                 <img
                   class="club-logo-default"
-                  src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%230d4a32' d='M32 2 58 12v18c0 16-11 27-26 32C17 57 6 46 6 30V12z'/%3E%3Cpath fill='%23d4a03a' d='M32 9 51 16v14c0 12-8 21-19 26-11-5-19-14-19-26V16z'/%3E%3Cpath fill='%23faf8f3' d='m32 17 4.5 9 10 1.5-7.2 7 1.7 10L32 40l-9 4.5 1.7-10-7.2-7 10-1.5z'/%3E%3C/svg%3E"
+                  src="assets/logos/sunny-sport-club-logo.png"
                   alt=""
                 />
                 <img id="club-logo" alt="" hidden />
@@ -635,14 +658,23 @@
               <p data-i18n="emptyText">
                 Add your coach, captain, and players to bring the team together.
               </p>
-              <button
-                class="button button-primary button-small"
-                id="empty-add-button"
-                type="button"
-              >
-                <span class="plus-icon" aria-hidden="true">+</span>
-                <span data-i18n="addFirstMember">Add your first member</span>
-              </button>
+              <div class="empty-actions">
+                <button
+                  class="button button-primary button-small"
+                  id="empty-add-button"
+                  type="button"
+                >
+                  <span class="plus-icon" aria-hidden="true">+</span>
+                  <span data-i18n="addFirstMember">Add your first member</span>
+                </button>
+                <button
+                  class="button button-secondary button-small"
+                  id="empty-bulk-add-button"
+                  type="button"
+                >
+                  <span data-i18n="addManyMembers">Add many members</span>
+                </button>
+              </div>
             </div>
             <div class="no-results" id="no-results" hidden>
               <span>⚽</span
@@ -731,7 +763,7 @@
             <div class="auth-brand">
               <img
                 class="brand-mark"
-                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%230d4a32' d='M32 2 58 12v18c0 16-11 27-26 32C17 57 6 46 6 30V12z'/%3E%3Cpath fill='%23d4a03a' d='M32 9 51 16v14c0 12-8 21-19 26-11-5-19-14-19-26V16z'/%3E%3Cpath fill='%23faf8f3' d='m32 17 4.5 9 10 1.5-7.2 7 1.7 10L32 40l-9 4.5 1.7-10-7.2-7 10-1.5z'/%3E%3C/svg%3E"
+                src="assets/logos/sunny-sport-club-logo.png"
                 alt=""
               /><span
                 ><strong>SUNNY SPORT</strong
@@ -766,7 +798,7 @@
               <div class="auth-match-main">
                 <div class="auth-match-crest">
                   <img
-                    src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%230d4a32' d='M32 2 58 12v18c0 16-11 27-26 32C17 57 6 46 6 30V12z'/%3E%3Cpath fill='%23d4a03a' d='M32 9 51 16v14c0 12-8 21-19 26-11-5-19-14-19-26V16z'/%3E%3Cpath fill='%23faf8f3' d='m32 17 4.5 9 10 1.5-7.2 7 1.7 10L32 40l-9 4.5 1.7-10-7.2-7 10-1.5z'/%3E%3C/svg%3E"
+                    src="assets/logos/sunny-sport-club-logo.png"
                     alt=""
                   />
                 </div>
@@ -1177,6 +1209,122 @@
             id="save-member-button"
           >
             Add member
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog
+      class="app-dialog bulk-member-dialog"
+      id="bulk-member-dialog"
+      aria-labelledby="bulk-member-dialog-title"
+    >
+      <form id="bulk-member-form" novalidate>
+        <div class="dialog-heading">
+          <div>
+            <div class="eyebrow">
+              <span class="eyebrow-line"></span>
+              <span data-i18n="squadDetails">SQUAD DETAILS</span>
+            </div>
+            <h2 id="bulk-member-dialog-title" data-i18n="bulkAddTitle">
+              Add many members
+            </h2>
+          </div>
+          <button
+            class="dialog-close"
+            type="button"
+            data-close-dialog
+            aria-label="Close dialog"
+            data-i18n-aria="closeDialog"
+          >
+            ×
+          </button>
+        </div>
+        <p class="dialog-description" data-i18n="bulkAddDescription">
+          Paste up to 50 people, one per line. Role defaults to Player; number
+          and contact are optional.
+        </p>
+        <div class="bulk-tips">
+          <strong data-i18n="bulkColumnsHelp">Columns: Name, Role, Number, Contact</strong>
+          <span data-i18n="bulkPasteTip">Tip: copy rows directly from Excel or Google Sheets.</span>
+          <code>Alex Morgan, Player, 10, +855 12 345 678
+Sokha Chan, Goalkeeper, 1
+Dara Vann</code>
+        </div>
+        <label class="form-field">
+          <span data-i18n="bulkPasteLabel">Members list</span>
+          <textarea
+            id="bulk-members-input"
+            rows="8"
+            spellcheck="false"
+            placeholder="Alex Morgan, Player, 10, +855 12 345 678"
+            data-i18n-placeholder="bulkPasteExample"
+          ></textarea>
+        </label>
+        <div class="form-row bulk-options">
+          <label class="form-field">
+            <span data-i18n="bulkDefaultRole">Default role</span>
+            <select id="bulk-default-role">
+              <option value="Head Coach" data-role-i18n>Head Coach</option>
+              <option value="Assistant Coach" data-role-i18n>
+                Assistant Coach
+              </option>
+              <option value="Coach" data-role-i18n>Coach</option>
+              <option value="Captain" data-role-i18n>Captain</option>
+              <option value="Player" data-role-i18n selected>Player</option>
+              <option value="Goalkeeper" data-role-i18n>Goalkeeper</option>
+              <option value="Defender" data-role-i18n>Defender</option>
+              <option value="Midfielder" data-role-i18n>Midfielder</option>
+              <option value="Forward" data-role-i18n>Forward</option>
+              <option value="Medical Staff" data-role-i18n>
+                Medical staff
+              </option>
+              <option value="Manager" data-role-i18n>Manager</option>
+            </select>
+          </label>
+          <div class="bulk-count-card" aria-live="polite">
+            <strong id="bulk-ready-count">0</strong>
+            <span data-i18n="bulkReadyLabel">ready to add</span>
+          </div>
+        </div>
+        <div class="bulk-preview" id="bulk-preview" hidden>
+          <div class="bulk-preview-heading">
+            <strong data-i18n="bulkPreview">Preview</strong>
+            <span id="bulk-preview-summary"></span>
+          </div>
+          <div class="bulk-preview-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th><span data-i18n="fullName">Full name</span></th>
+                  <th><span data-i18n="teamRole">Team role</span></th>
+                  <th><span data-i18n="jerseyNumber">Jersey number</span></th>
+                  <th><span data-i18n="contactNumber">Contact number</span></th>
+                  <th><span data-i18n="bulkStatus">Status</span></th>
+                </tr>
+              </thead>
+              <tbody id="bulk-preview-body"></tbody>
+            </table>
+          </div>
+        </div>
+        <p class="form-error" id="bulk-member-error" role="alert" hidden></p>
+        <div class="dialog-actions">
+          <button
+            class="button button-secondary"
+            type="button"
+            data-close-dialog
+            data-i18n="cancel"
+          >
+            Cancel
+          </button>
+          <button
+            class="button button-primary"
+            type="submit"
+            id="bulk-add-submit"
+            data-i18n="bulkAddSubmitDefault"
+            disabled
+          >
+            Add members
           </button>
         </div>
       </form>

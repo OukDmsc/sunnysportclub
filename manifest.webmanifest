@@ -1,0 +1,17 @@
+{
+  "name": "Sunny Sport Club",
+  "short_name": "Sunny FC",
+  "description": "Sunny Sport Club team and staff manager.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#faf8f3",
+  "theme_color": "#0d4a32",
+  "icons": [
+    {
+      "src": "assets/logos/sunny-sport-club-logo.png",
+      "sizes": "960x960",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

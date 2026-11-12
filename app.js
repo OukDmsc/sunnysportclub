@@ -41,6 +41,21 @@ const VALID_ROLES = new Set([
   "Medical Staff",
   "Manager",
 ]);
+const ROLE_TRANSLATION_KEYS = {
+  "Head Coach": "roleHeadCoach",
+  "Assistant Coach": "roleAssistantCoach",
+  Coach: "roleCoach",
+  Captain: "roleCaptain",
+  Player: "rolePlayer",
+  Goalkeeper: "roleGoalkeeper",
+  Defender: "roleDefender",
+  Midfielder: "roleMidfielder",
+  Forward: "roleForward",
+  "Medical Staff": "roleMedical",
+  Manager: "roleManager",
+};
+const BULK_MEMBER_LIMIT = 50;
+const DEFAULT_CLUB_LOGO = "assets/logos/sunny-sport-club-logo.png";
 const TEAM_MANAGEMENT_ROLES = new Set(["Coach", "Captain", "Team Manager"]);
 const TEAM_CATEGORY_COLORS = {
   football: "#0d4a32",
@@ -146,6 +161,36 @@ const TRANSLATIONS = {
     cancel: "Cancel",
     addMemberSubmit: "Add member",
     saveChanges: "Save changes",
+    addManyMembers: "Add many members",
+    bulkAddTitle: "Add many members",
+    bulkAddDescription:
+      "Paste up to 50 people, one per line. Role defaults to Player; number and contact are optional.",
+    bulkColumnsHelp: "Columns: Name, Role, Number, Contact",
+    bulkPasteTip: "Tip: copy rows directly from Excel or Google Sheets.",
+    bulkPasteLabel: "Members list",
+    bulkPasteExample: "Alex Morgan, Player, 10, +855 12 345 678",
+    bulkDefaultRole: "Default role",
+    bulkReadyLabel: "ready to add",
+    bulkPreview: "Preview",
+    bulkStatus: "Status",
+    bulkStatusReady: "Ready",
+    bulkStatusInvalid: "Skip",
+    bulkAddSubmitDefault: "Add members",
+    bulkAddSubmit: "Add {count} members",
+    bulkAddSubmitOne: "Add 1 member",
+    bulkPreviewSummary: "{ready} ready, {skipped} skipped",
+    bulkNoRows: "Paste at least one person to continue.",
+    bulkNoValidRows: "No valid rows yet. Check the preview for details.",
+    bulkLimit: "You can add up to 50 people at once.",
+    bulkOverLimit: "Only the first 50 people will be added.",
+    bulkMissingName: "Name is required.",
+    bulkInvalidNumber: "Number must be between 0 and 99.",
+    bulkDuplicate: "Already on this team.",
+    bulkInvalidRole: "Unknown role.",
+    bulkSkippedNote: "Rows marked Skip will not be added.",
+    bulkAdded: "Added {count} team members.",
+    bulkAddedOne: "Added 1 team member.",
+    bulkLine: "Line {line}",
     clubProfile: "CLUB PROFILE",
     clubDetails: "Club details",
     clubDescription: "Keep your team’s location and contact information up to date.",
@@ -418,6 +463,36 @@ const TRANSLATIONS = {
     cancel: "បោះបង់",
     addMemberSubmit: "បន្ថែមសមាជិក",
     saveChanges: "រក្សាទុកការកែប្រែ",
+    addManyMembers: "បន្ថែមសមាជិកច្រើន",
+    bulkAddTitle: "បន្ថែមសមាជិកច្រើន",
+    bulkAddDescription:
+      "បិទភ្ជាប់មនុស្សរហូតដល់ 50 នាក់ ម្នាក់ក្នុងមួយបន្ទាត់។ តួនាទីលំនាំដើមគឺ Player ហើយលេខអាវ និងទំនាក់ទំនងមិនបាច់ក៏បាន។",
+    bulkColumnsHelp: "ជួរឈរ៖ ឈ្មោះ, តួនាទី, លេខអាវ, ទំនាក់ទំនង",
+    bulkPasteTip: "គន្លឹះ៖ ចម្លងជួរពី Excel ឬ Google Sheets ដោយផ្ទាល់។",
+    bulkPasteLabel: "បញ្ជីសមាជិក",
+    bulkPasteExample: "ឧ. សុខ ដារ៉ា, Player, 10, +855 12 345 678",
+    bulkDefaultRole: "តួនាទីលំនាំដើម",
+    bulkReadyLabel: "រួចរាល់សម្រាប់បន្ថែម",
+    bulkPreview: "មើលជាមុន",
+    bulkStatus: "ស្ថានភាព",
+    bulkStatusReady: "រួចរាល់",
+    bulkStatusInvalid: "រំលង",
+    bulkAddSubmitDefault: "បន្ថែមសមាជិក",
+    bulkAddSubmit: "បន្ថែមសមាជិក {count} នាក់",
+    bulkAddSubmitOne: "បន្ថែមសមាជិក 1 នាក់",
+    bulkPreviewSummary: "{ready} រួចរាល់, {skipped} រំលង",
+    bulkNoRows: "សូមបិទភ្ជាប់យ៉ាងហោចណាស់មនុស្សម្នាក់ដើម្បីបន្ត។",
+    bulkNoValidRows: "មិនទាន់មានជួរត្រឹមត្រូវទេ។ សូមពិនិត្យមើលការមើលជាមុន។",
+    bulkLimit: "អ្នកអាចបន្ថែមមនុស្សបានរហូតដល់ 50 នាក់ក្នុងពេលតែមួយ។",
+    bulkOverLimit: "មនុស្ស 50 នាក់ដំបូងប៉ុណ្ណោះនឹងត្រូវបានបន្ថែម។",
+    bulkMissingName: "ត្រូវការឈ្មោះ។",
+    bulkInvalidNumber: "លេខអាវត្រូវនៅចន្លោះ 0 ដល់ 99។",
+    bulkDuplicate: "មាននៅក្នុងក្រុមនេះរួចហើយ។",
+    bulkInvalidRole: "មិនស្គាល់តួនាទី។",
+    bulkSkippedNote: "ជួរដែលសម្គាល់ថា រំលង នឹងមិនត្រូវបានបន្ថែមទេ។",
+    bulkAdded: "បានបន្ថែមសមាជិកក្រុម {count} នាក់។",
+    bulkAddedOne: "បានបន្ថែមសមាជិកក្រុម 1 នាក់។",
+    bulkLine: "បន្ទាត់ {line}",
     clubProfile: "ប្រវត្តិរូបក្លឹប",
     clubDetails: "ព័ត៌មានក្លឹប",
     clubDescription: "សូមធ្វើបច្ចុប្បន្នភាពទីតាំង និងព័ត៌មានទំនាក់ទំនងរបស់ក្រុម។",
@@ -628,6 +703,12 @@ const MEDIA_DATABASE = "sunny-sport-club-media-v1";
 const POST_MEDIA_MAX_BYTES = 25 * 1024 * 1024;
 const TEAM_LOGO_MAX_BYTES = 1024 * 1024;
 let mediaDatabasePromise;
+let bulkPreviewState = {
+  rows: [],
+  valid: [],
+  invalid: [],
+  overflow: false,
+};
 
 const memberDialog = document.querySelector("#member-dialog");
 const clubDialog = document.querySelector("#club-dialog");
@@ -635,6 +716,8 @@ const teamDialog = document.querySelector("#team-dialog");
 const accountDialog = document.querySelector("#account-dialog");
 const appearanceDialog = document.querySelector("#appearance-dialog");
 const memberForm = document.querySelector("#member-form");
+const bulkMemberDialog = document.querySelector("#bulk-member-dialog");
+const bulkMemberForm = document.querySelector("#bulk-member-form");
 const clubForm = document.querySelector("#club-form");
 const teamForm = document.querySelector("#team-form");
 const accountForm = document.querySelector("#account-form");
@@ -1047,20 +1130,7 @@ function teamAccentTextColor(team) {
 }
 
 function translatedRole(role) {
-  const roleKeys = {
-    "Head Coach": "roleHeadCoach",
-    "Assistant Coach": "roleAssistantCoach",
-    Coach: "roleCoach",
-    Captain: "roleCaptain",
-    Player: "rolePlayer",
-    Goalkeeper: "roleGoalkeeper",
-    Defender: "roleDefender",
-    Midfielder: "roleMidfielder",
-    Forward: "roleForward",
-    "Medical Staff": "roleMedical",
-    Manager: "roleManager",
-  };
-  return t(roleKeys[role] || role);
+  return t(ROLE_TRANSLATION_KEYS[role] || role);
 }
 
 function applyLanguage() {
@@ -1122,6 +1192,7 @@ function applyLanguage() {
   document.querySelector("#member-photo").setAttribute("aria-label", t("uploadPhoto"));
   const photoPreview = document.querySelector("#photo-preview img");
   if (photoPreview) photoPreview.alt = t("selectedPhotoAlt");
+  if (document.querySelector("#bulk-members-input")) renderBulkMemberPreview();
   applyWorkspaceBackground();
   render();
 }
@@ -1851,7 +1922,7 @@ function renderTeams() {
     const memberCountLabel = t(team.members.length === 1 ? "teamMemberSingular" : "teamMemberPlural");
     const logo = team.club.logo
       ? `<img class="team-card-logo" src="${escapeHtml(team.club.logo)}" alt="">`
-      : '<span class="team-card-logo-fallback" aria-hidden="true">⚽</span>';
+      : `<img class="team-card-logo" src="${DEFAULT_CLUB_LOGO}" alt="">`;
     return `<article class="team-card${team.id === directoryHighlightId ? " team-card-highlight" : ""}" data-team-card="${escapeHtml(team.id)}" style="--team-accent:${escapeHtml(teamAccentColor(team))};--team-accent-ink:${escapeHtml(teamAccentTextColor(team))};--card-index:${store.teams.indexOf(team)}">
       <button class="team-card-open" type="button" data-team-open="${escapeHtml(team.id)}" aria-label="${escapeHtml(t("viewTeamNamed", { name: team.club.name }))}">
         <span class="team-card-accent" aria-hidden="true"></span>
@@ -1895,10 +1966,10 @@ function renderSpotlight() {
   const logo = document.querySelector("#spotlight-logo");
   logo.innerHTML = team.club.logo
     ? `<img src="${escapeHtml(team.club.logo)}" alt="${escapeHtml(team.club.name)} logo">`
-    : '<span aria-hidden="true">⚽</span>';
+    : `<img src="${DEFAULT_CLUB_LOGO}" alt="">`;
   document.querySelector("#spotlight-summary-logo").innerHTML = team.club.logo
     ? `<img src="${escapeHtml(team.club.logo)}" alt="">`
-    : "⚽";
+    : `<img src="${DEFAULT_CLUB_LOGO}" alt="">`;
   document.querySelector("#spotlight-name").textContent = team.club.name;
   document.querySelector("#spotlight-summary-name").textContent = team.club.name;
   const details = team.club.location || "";
@@ -2253,7 +2324,10 @@ function render() {
   document.querySelector("#management-create-team-button").hidden = !canCreateTeam();
   document.querySelector("#management-edit-team-button").hidden = !canManageTeamNow;
   document.querySelector("#management-add-member-button").hidden = !canManageTeamNow;
+  document.querySelector("#management-bulk-add-members-button").hidden = !canManageTeamNow;
   document.querySelector("#add-member-button").hidden = !canManageTeamNow;
+  document.querySelector("#bulk-add-members-button").hidden = !canManageTeamNow;
+  document.querySelector("#empty-bulk-add-button").hidden = !canManageTeamNow;
   document.querySelector("#edit-club-button").hidden = !canManageTeamNow;
   document.querySelector("#contact-edit-button").hidden = !canManageTeamNow;
   document.querySelector("#back-to-teams").hidden = !hasTeam;
@@ -2326,6 +2400,227 @@ function openMemberDialog(member) {
   updatePhotoPreview(draftPhoto);
   memberDialog.showModal();
   document.querySelector("#member-name").focus();
+}
+
+function normalizeBulkRole(value, fallbackRole) {
+  const candidate = String(value || "").trim().toLowerCase();
+  if (!candidate) return fallbackRole;
+  const aliases = {
+    gk: "Goalkeeper",
+    goalie: "Goalkeeper",
+    keeper: "Goalkeeper",
+    def: "Defender",
+    defence: "Defender",
+    defense: "Defender",
+    mid: "Midfielder",
+    midfield: "Midfielder",
+    fwd: "Forward",
+    striker: "Forward",
+    attack: "Forward",
+    hc: "Head Coach",
+    "head coach": "Head Coach",
+    assistant: "Assistant Coach",
+    "assistant coach": "Assistant Coach",
+    coach: "Coach",
+    captain: "Captain",
+    player: "Player",
+    medical: "Medical Staff",
+    medic: "Medical Staff",
+    staff: "Medical Staff",
+    manager: "Manager",
+    "team manager": "Manager",
+  };
+  if (aliases[candidate]) return aliases[candidate];
+  for (const role of VALID_ROLES) {
+    if (role.toLowerCase() === candidate) return role;
+  }
+  for (const locale of Object.keys(TRANSLATIONS)) {
+    for (const [role, key] of Object.entries(ROLE_TRANSLATION_KEYS)) {
+      const label = TRANSLATIONS[locale]?.[key];
+      if (label && label.toLowerCase() === candidate) return role;
+    }
+  }
+  return "";
+}
+
+function splitBulkCells(line) {
+  const trimmed = line.trim();
+  if (trimmed.includes("\t")) {
+    return trimmed
+      .split("\t")
+      .map((cell) => cell.trim().replace(/^"(.*)"$/, "$1"));
+  }
+  const separator = trimmed.includes(",")
+    ? ","
+    : trimmed.includes(";")
+      ? ";"
+      : "";
+  if (!separator) return [trimmed];
+  const cells = [];
+  let current = "";
+  let quoted = false;
+  for (let index = 0; index < trimmed.length; index += 1) {
+    const character = trimmed[index];
+    if (character === '"') {
+      if (quoted && trimmed[index + 1] === '"') {
+        current += '"';
+        index += 1;
+      } else {
+        quoted = !quoted;
+      }
+    } else if (character === separator && !quoted) {
+      cells.push(current.trim());
+      current = "";
+    } else {
+      current += character;
+    }
+  }
+  cells.push(current.trim());
+  return cells;
+}
+
+function parseBulkMemberLines(text, defaultRole) {
+  const rows = [];
+  const seen = new Set(
+    data.members
+      .map((member) => member.name.trim().toLowerCase())
+      .filter(Boolean),
+  );
+  const lines = String(text || "").replace(/\r/g, "").split("\n");
+  let firstDataRow = true;
+  let overflow = false;
+
+  for (let index = 0; index < lines.length; index += 1) {
+    const trimmed = lines[index].trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    if (rows.length >= BULK_MEMBER_LIMIT) {
+      overflow = true;
+      break;
+    }
+    const cells = splitBulkCells(trimmed);
+    if (firstDataRow) {
+      firstDataRow = false;
+      const header = (cells[0] || "").toLowerCase();
+      if (
+        ["name", "full name", "fullname", "ឈ្មោះ", "ឈ្មោះពេញ"].includes(header)
+      ) {
+        continue;
+      }
+    }
+
+    let name = (cells[0] || "").replace(/\s+/g, " ").trim();
+    let roleText = (cells[1] || "").trim();
+    let numberText = (cells[2] || "").trim();
+    const contact = (cells[3] || "").trim();
+
+    if (roleText && /^#?\d{1,2}$/.test(roleText) && !numberText) {
+      numberText = roleText;
+      roleText = "";
+    }
+
+    const role = normalizeBulkRole(roleText, defaultRole);
+    const number = numberText.replace(/^#/, "").trim();
+    let error = "";
+    if (!name) error = "bulkMissingName";
+    else if (name.length > 60) name = name.slice(0, 60);
+    if (!error && number && (!/^\d{1,2}$/.test(number) || Number(number) > 99)) {
+      error = "bulkInvalidNumber";
+    }
+    if (!error && !role) error = "bulkInvalidRole";
+    if (!error && seen.has(name.toLowerCase())) error = "bulkDuplicate";
+    if (!error) seen.add(name.toLowerCase());
+
+    rows.push({
+      line: index + 1,
+      name,
+      role,
+      number,
+      contact: contact.slice(0, 30),
+      displayRole: role || roleText,
+      error,
+    });
+  }
+
+  return {
+    rows,
+    valid: rows.filter((row) => !row.error),
+    invalid: rows.filter((row) => row.error),
+    overflow,
+  };
+}
+
+function renderBulkMemberPreview() {
+  const input = document.querySelector("#bulk-members-input");
+  const defaultRole =
+    document.querySelector("#bulk-default-role").value || "Player";
+  const parsed = parseBulkMemberLines(input.value, defaultRole);
+  bulkPreviewState = parsed;
+  const preview = document.querySelector("#bulk-preview");
+  const body = document.querySelector("#bulk-preview-body");
+  const error = document.querySelector("#bulk-member-error");
+  const submit = document.querySelector("#bulk-add-submit");
+  const summary = document.querySelector("#bulk-preview-summary");
+
+  document.querySelector("#bulk-ready-count").textContent = localizeDigits(
+    parsed.valid.length,
+  );
+  preview.hidden = parsed.rows.length === 0;
+  summary.textContent =
+    parsed.rows.length === 0
+      ? ""
+      : t("bulkPreviewSummary", {
+          ready: localizeDigits(parsed.valid.length),
+          skipped: localizeDigits(parsed.invalid.length),
+        });
+
+  body.innerHTML = parsed.rows
+    .map((row) => {
+      const status = row.error
+        ? `${t("bulkLine", { line: localizeDigits(row.line) })} · ${t(row.error)}`
+        : t("bulkStatusReady");
+      return `<tr class="${row.error ? "bulk-row-invalid" : ""}">
+        <td>${escapeHtml(row.name || "—")}</td>
+        <td>${escapeHtml(
+          row.displayRole ? translatedRole(row.role || row.displayRole) : "—",
+        )}</td>
+        <td>${escapeHtml(row.number ? localizeDigits(row.number) : "—")}</td>
+        <td>${escapeHtml(row.contact || "—")}</td>
+        <td><span class="bulk-status ${
+          row.error ? "bulk-status-invalid" : "bulk-status-ready"
+        }">${escapeHtml(status)}</span></td>
+      </tr>`;
+    })
+    .join("");
+
+  submit.textContent =
+    parsed.valid.length > 0
+      ? parsed.valid.length === 1
+        ? t("bulkAddSubmitOne")
+        : t("bulkAddSubmit", {
+            count: localizeDigits(parsed.valid.length),
+          })
+      : t("bulkAddSubmitDefault");
+  submit.disabled = parsed.valid.length === 0;
+
+  error.hidden = true;
+  if (parsed.overflow) {
+    error.textContent = t("bulkOverLimit");
+    error.hidden = false;
+  } else if (parsed.invalid.length > 0) {
+    error.textContent = t("bulkSkippedNote");
+    error.hidden = false;
+  }
+}
+
+function openBulkMemberDialog() {
+  if (!canManageCurrentTeam()) return;
+  document.querySelector("#bulk-member-form").reset();
+  document.querySelector("#bulk-default-role").value = "Player";
+  document.querySelector("#bulk-members-input").value = "";
+  bulkPreviewState = { rows: [], valid: [], invalid: [], overflow: false };
+  renderBulkMemberPreview();
+  bulkMemberDialog.showModal();
+  document.querySelector("#bulk-members-input").focus();
 }
 
 function openClubDialog() {
@@ -2664,6 +2959,9 @@ document.querySelector("#management-edit-team-button").addEventListener("click",
 document.querySelector("#management-add-member-button").addEventListener("click", () => {
   openMemberDialog();
 });
+document
+  .querySelector("#management-bulk-add-members-button")
+  .addEventListener("click", openBulkMemberDialog);
 teamForm.addEventListener("submit", (event) => {
   event.preventDefault();
   if (!canCreateTeam()) return;
@@ -2849,6 +3147,10 @@ document.querySelector("#add-member-button").addEventListener("click", () => {
 document.querySelector("#empty-add-button").addEventListener("click", () => {
   openMemberDialog();
 });
+document.querySelector("#empty-bulk-add-button").addEventListener("click", openBulkMemberDialog);
+document
+  .querySelector("#bulk-add-members-button")
+  .addEventListener("click", openBulkMemberDialog);
 document.querySelector("#edit-club-button").addEventListener("click", openClubDialog);
 document.querySelector("#contact-edit-button").addEventListener("click", openClubDialog);
 document.querySelector("#spotlight-previous").addEventListener("click", () => {
@@ -3029,7 +3331,7 @@ document.querySelectorAll("[data-close-dialog]").forEach((button) => {
   button.addEventListener("click", () => button.closest("dialog").close());
 });
 
-for (const dialog of [memberDialog, clubDialog, teamDialog, accountDialog, appearanceDialog]) {
+for (const dialog of [memberDialog, bulkMemberDialog, clubDialog, teamDialog, accountDialog, appearanceDialog]) {
   dialog.addEventListener("click", (event) => {
     if (event.target === dialog) dialog.close();
   });
@@ -3116,6 +3418,54 @@ memberForm.addEventListener("submit", (event) => {
   memberDialog.close();
   showToast(t(previous ? "memberUpdated" : "memberAdded"));
 });
+
+bulkMemberForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  if (!canManageCurrentTeam()) return;
+  const parsed = parseBulkMemberLines(
+    document.querySelector("#bulk-members-input").value,
+    document.querySelector("#bulk-default-role").value || "Player",
+  );
+  bulkPreviewState = parsed;
+  const error = document.querySelector("#bulk-member-error");
+
+  if (!parsed.valid.length) {
+    error.textContent = parsed.rows.length
+      ? t("bulkNoValidRows")
+      : t("bulkNoRows");
+    error.hidden = false;
+    return;
+  }
+
+  const previousMembers = data.members;
+  const additions = parsed.valid.map((row) => ({
+    id: createId(),
+    name: row.name,
+    role: row.role,
+    number: row.number,
+    contact: row.contact,
+    photo: "",
+  }));
+  data = { ...data, members: [...previousMembers, ...additions] };
+  if (!persistData()) {
+    data = { ...data, members: previousMembers };
+    return;
+  }
+  render();
+  bulkMemberDialog.close();
+  showToast(
+    additions.length === 1
+      ? t("bulkAddedOne")
+      : t("bulkAdded", { count: localizeDigits(additions.length) }),
+  );
+});
+
+document
+  .querySelector("#bulk-members-input")
+  .addEventListener("input", renderBulkMemberPreview);
+document
+  .querySelector("#bulk-default-role")
+  .addEventListener("change", renderBulkMemberPreview);
 
 clubForm.addEventListener("submit", (event) => {
   event.preventDefault();
