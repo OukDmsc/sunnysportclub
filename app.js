@@ -263,11 +263,10 @@ const TRANSLATIONS = {
     editTeamNamed: "Edit team {name}",
     manageTeam: "Manage team",
     teamRoleLimit: "An account can manage only one team. Remove its management role from the other team first.",
-    createTeamAsCoach: "Coach — create one team",
-    createTeamAsCaptain: "Team Leader — create one team",
+    createTeamAsCoach: "Coach — can create one team",
     coachForThisTeam: "Coach for this team",
     leaderForThisTeam: "Team Leader for this team",
-    directoryEmpty: "No teams are saved in this browser yet. This app stores teams locally, so they won't appear automatically on another device or site address. A Dev Owner can create the first team here.",
+    directoryEmpty: "No teams are saved in this browser yet. This app stores teams locally, so they won't appear automatically on another device or site address. An Owner, Admin, Developer, or Coach can create the first team here.",
     administration: "ADMINISTRATION",
     teamAccess: "Team access",
     teamAccessDescription: "As this team's coach, assign or remove management access for trusted existing accounts. A manager can edit only this team; they cannot create accounts or manage other teams.",
@@ -275,15 +274,18 @@ const TRANSLATIONS = {
     assignManagerRole: "Team manager for this team",
     accountManager: "Team manager",
     createAccount: "Create account",
-    accountsDescription: "Viewers can browse all teams but have read-only access. Coaches and team leaders can each create one team. A coach can grant existing accounts team-manager access to their team. Admins have full access after the Dev Owner promotes them.",
+    accountsDescription: "Owner, Admin, and Developer accounts have full control and can create teams. A Coach can create one team, then assign a Team Leader or Team Manager to help run it. Viewers can browse all teams with read-only access.",
     account: "Account",
     fullSystemAccess: "Full system access",
     devOwnerRole: "Dev Owner",
+    developerRole: "Developer",
     adminSystemRole: "Admin",
     systemRole: "System role",
     viewerRole: "Viewer",
     adminPromoted: "Admin access granted.",
+    developerPromoted: "Developer access granted.",
     adminDemoted: "Admin access removed.",
+    roleNotAllowed: "Coaches can assign only Viewer, Team Leader, or Team Manager roles.",
     assignTeamRole: "Select a team to assign a role",
     viewOnly: "View only",
     teamLeaderCaptain: "Team Leader / Captain",
@@ -565,11 +567,10 @@ const TRANSLATIONS = {
     editTeamNamed: "កែប្រែក្រុម {name}",
     manageTeam: "គ្រប់គ្រងក្រុម",
     teamRoleLimit: "គណនីមួយអាចគ្រប់គ្រងបានតែមួយក្រុមប៉ុណ្ណោះ។ សូមដកសិទ្ធិគ្រប់គ្រងចេញពីក្រុមផ្សេងជាមុនសិន។",
-    createTeamAsCoach: "គ្រូបង្វឹក — បង្កើតក្រុមមួយ",
-    createTeamAsCaptain: "ប្រធានក្រុម — បង្កើតក្រុមមួយ",
+    createTeamAsCoach: "គ្រូបង្វឹក — អាចបង្កើតក្រុមមួយ",
     coachForThisTeam: "គ្រូបង្វឹកក្រុមនេះ",
     leaderForThisTeam: "ប្រធានក្រុមនេះ",
-    directoryEmpty: "មិនទាន់មានក្រុមដែលបានរក្សាទុកក្នុងកម្មវិធីរុករកនេះទេ។ កម្មវិធីរក្សាទុកក្រុមនៅលើកម្មវិធីរុករកនេះប៉ុណ្ណោះ ដូច្នេះក្រុមនឹងមិនបង្ហាញដោយស្វ័យប្រវត្តិនៅលើឧបករណ៍ ឬអាសយដ្ឋានគេហទំព័រផ្សេងទេ។ ម្ចាស់/អ្នកអភិវឌ្ឍន៍អាចបង្កើតក្រុមដំបូងនៅទីនេះ។",
+    directoryEmpty: "មិនទាន់មានក្រុមដែលបានរក្សាទុកក្នុងកម្មវិធីរុករកនេះទេ។ កម្មវិធីរក្សាទុកក្រុមនៅលើកម្មវិធីរុករកនេះប៉ុណ្ណោះ ដូច្នេះក្រុមនឹងមិនបង្ហាញដោយស្វ័យប្រវត្តិនៅលើឧបករណ៍ ឬអាសយដ្ឋានគេហទំព័រផ្សេងទេ។ ម្ចាស់ អ្នកគ្រប់គ្រង អ្នកអភិវឌ្ឍន៍ ឬគ្រូបង្វឹកអាចបង្កើតក្រុមដំបូងនៅទីនេះ។",
     administration: "ការគ្រប់គ្រង",
     teamAccess: "សិទ្ធិចូលប្រើក្រុម",
     teamAccessDescription: "ក្នុងនាមជាគ្រូបង្វឹកក្រុមនេះ អ្នកអាចផ្តល់ ឬដកសិទ្ធិគ្រប់គ្រងពីគណនីដែលមានស្រាប់ និងទុកចិត្តបាន។ អ្នកគ្រប់គ្រងអាចកែប្រែក្រុមនេះប៉ុណ្ណោះ ហើយមិនអាចបង្កើតគណនី ឬគ្រប់គ្រងក្រុមផ្សេងបានទេ។",
@@ -577,15 +578,18 @@ const TRANSLATIONS = {
     assignManagerRole: "អ្នកគ្រប់គ្រងក្រុមនេះ",
     accountManager: "អ្នកគ្រប់គ្រងក្រុម",
     createAccount: "បង្កើតគណនី",
-    accountsDescription: "អ្នកមើលអាចមើលគ្រប់ក្រុមបាន ប៉ុន្តែមិនអាចកែប្រែបានទេ។ គ្រូបង្វឹក និងប្រធានក្រុមអាចបង្កើតបានម្នាក់មួយក្រុម។ គ្រូបង្វឹកអាចផ្តល់សិទ្ធិគ្រប់គ្រងក្រុមដល់គណនីដែលមានស្រាប់។ អ្នកគ្រប់គ្រងមានសិទ្ធិពេញលេញ បន្ទាប់ពីម្ចាស់/អ្នកអភិវឌ្ឍន៍ដំឡើងសិទ្ធិ។",
+    accountsDescription: "គណនីម្ចាស់ អ្នកគ្រប់គ្រង និងអ្នកអភិវឌ្ឍន៍មានសិទ្ធិពេញលេញ និងអាចបង្កើតក្រុមបាន។ គ្រូបង្វឹកអាចបង្កើតបានមួយក្រុម បន្ទាប់មកផ្តល់តួនាទីប្រធានក្រុម ឬអ្នកគ្រប់គ្រងក្រុម ដើម្បីជួយគ្រប់គ្រង។ អ្នកមើលអាចមើលគ្រប់ក្រុមបាន ប៉ុន្តែមិនអាចកែប្រែបានទេ។",
     account: "គណនី",
     fullSystemAccess: "សិទ្ធិគ្រប់គ្រងប្រព័ន្ធទាំងមូល",
     devOwnerRole: "ម្ចាស់/អ្នកអភិវឌ្ឍន៍",
+    developerRole: "អ្នកអភិវឌ្ឍន៍",
     adminSystemRole: "អ្នកគ្រប់គ្រង",
     systemRole: "តួនាទីប្រព័ន្ធ",
     viewerRole: "អ្នកមើល",
     adminPromoted: "បានផ្តល់សិទ្ធិអ្នកគ្រប់គ្រង។",
+    developerPromoted: "បានផ្តល់សិទ្ធិអ្នកអភិវឌ្ឍន៍។",
     adminDemoted: "បានដកសិទ្ធិអ្នកគ្រប់គ្រង។",
+    roleNotAllowed: "គ្រូបង្វឹកអាចផ្តល់បានតែតួនាទីអ្នកមើល ប្រធានក្រុម ឬអ្នកគ្រប់គ្រងក្រុមប៉ុណ្ណោះ។",
     assignTeamRole: "ជ្រើសរើសក្រុមដើម្បីកំណត់តួនាទី",
     viewOnly: "មើលតែប៉ុណ្ណោះ",
     teamLeaderCaptain: "ប្រធានក្រុម",
@@ -1294,7 +1298,7 @@ function readContentConfig() {
           `data-account-${contentSlug(username, String(index + 1))}`,
         username,
         password: account.password,
-        systemRole: ["owner", "admin", "viewer"].includes(account.systemRole)
+        systemRole: ["owner", "admin", "developer", "viewer"].includes(account.systemRole)
           ? account.systemRole
           : "viewer",
         teamRoles,
@@ -1557,13 +1561,11 @@ function loadData() {
               : { passwordSalt: user.passwordSalt, passwordHash: user.passwordHash }),
             systemRole: user.username.toLowerCase() === "ddomm7" || user.systemRole === "owner"
               ? "owner"
-              : user.systemRole === "admin"
-                ? "admin"
+              : ["admin", "developer"].includes(user.systemRole)
+                ? user.systemRole
                 : "viewer",
             canPost: Boolean(user.canPost),
-            teamCreationRole: ["Coach", "Captain"].includes(user.teamCreationRole)
-              ? user.teamCreationRole
-              : "",
+            teamCreationRole: user.teamCreationRole === "Coach" ? "Coach" : "",
             teamCreationUsed: Boolean(user.teamCreationUsed),
             teamRoles: user.teamRoles && typeof user.teamRoles === "object"
               ? user.teamRoles
@@ -1764,7 +1766,9 @@ function isOwner() {
 }
 
 function isAdmin() {
-  return Boolean(activeAccount && ["owner", "admin"].includes(activeAccount.systemRole));
+  return Boolean(
+    activeAccount && ["owner", "admin", "developer"].includes(activeAccount.systemRole),
+  );
 }
 
 function canManageCurrentTeam() {
@@ -1794,7 +1798,7 @@ function canAccessManagement() {
   return Boolean(
     activeAccount &&
       (isAdmin() ||
-        ["Coach", "Captain"].includes(activeAccount.teamCreationRole) ||
+        activeAccount.teamCreationRole === "Coach" ||
         Object.values(activeAccount.teamRoles).some((role) => TEAM_MANAGEMENT_ROLES.has(role))),
   );
 }
@@ -1803,14 +1807,14 @@ function canCreateTeam() {
   return Boolean(
     activeAccount &&
       (isAdmin() ||
-        (["Coach", "Captain"].includes(activeAccount.teamCreationRole) &&
+        (activeAccount.teamCreationRole === "Coach" &&
           !activeAccount.teamCreationUsed &&
           !getAssignedManagementTeamId(activeAccount))),
   );
 }
 
 function getAccountRoleLabel(user) {
-  if (user.systemRole === "owner" || user.systemRole === "admin") {
+  if (["owner", "admin", "developer"].includes(user.systemRole)) {
     return getSystemRoleLabel(user.systemRole);
   }
   const assignedTeamId = getAssignedManagementTeamId(user);
@@ -1819,7 +1823,6 @@ function getAccountRoleLabel(user) {
     return t(role === "Coach" ? "coachRole" : role === "Captain" ? "captainRole" : "managerRole");
   }
   if (user.teamCreationRole === "Coach") return t("coachRole");
-  if (user.teamCreationRole === "Captain") return t("captainRole");
   return getSystemRoleLabel(user.systemRole);
 }
 
@@ -1830,6 +1833,7 @@ function canPublishPosts() {
 function getSystemRoleLabel(role) {
   if (role === "owner") return t("devOwnerRole");
   if (role === "admin") return t("adminSystemRole");
+  if (role === "developer") return t("developerRole");
   return t("viewerRole");
 }
 
@@ -2076,35 +2080,37 @@ function renderAccountRoles() {
     isAdmin() ? t("administration") : t("teamAccess");
   document.querySelector("#access-panel-description").textContent =
     isAdmin() ? t("accountsDescription") : t("teamAccessDescription");
-  document.querySelector("#create-account-button").hidden = !isAdmin();
+  document.querySelector("#create-account-button").hidden = !isAdmin() && !isTeamCoach;
   if (!isAdmin() && !isTeamCoach) return;
   document.querySelector("#account-roles").innerHTML = store.users.map((user) => {
-    const value = user.systemRole === "admin"
-      ? "admin"
+    const hasSystemAccess = ["owner", "admin", "developer"].includes(user.systemRole);
+    const value = hasSystemAccess
+      ? user.systemRole
       : team
         ? user.teamRoles[team.id] || "Viewer"
         : "Viewer";
-    const roleControls = user.systemRole === "owner"
+    const roleControls = hasSystemAccess
       ? `<span class="role-lock">${escapeHtml(t("fullSystemAccess"))}</span>`
-      : user.systemRole === "admin"
-        ? `<span class="role-lock">${escapeHtml(t("fullSystemAccess"))}</span>`
-        : isTeamCoach && user.id === activeAccount.id
-          ? `<span class="role-lock">${escapeHtml(getAccountRoleLabel(user))}</span>`
-          : `<div class="account-role-controls">
+      : isTeamCoach && user.id === activeAccount.id
+        ? `<span class="role-lock">${escapeHtml(getAccountRoleLabel(user))}</span>`
+        : `<div class="account-role-controls">
           ${isAdmin() && isOwner() ? `<label class="system-role-control"><span>${escapeHtml(t("systemRole"))}</span><select data-system-role="${escapeHtml(user.id)}" aria-label="${escapeHtml(t("deleteAccountRole", { username: user.username }))}">
             <option value="viewer"${user.systemRole === "viewer" ? " selected" : ""}>${escapeHtml(t("viewerRole"))}</option>
             <option value="admin"${user.systemRole === "admin" ? " selected" : ""}>${escapeHtml(t("adminSystemRole"))}</option>
+            <option value="developer"${user.systemRole === "developer" ? " selected" : ""}>${escapeHtml(t("developerRole"))}</option>
           </select></label>` : ""}
           ${team
             ? (() => {
                 const assignedTeamId = getAssignedManagementTeamId(user);
                 const roleAssignmentDisabled = assignedTeamId && assignedTeamId !== team.id;
                 const managerOption = `<option value="Team Manager"${value === "Team Manager" ? " selected" : ""}${roleAssignmentDisabled ? " disabled" : ""}>${escapeHtml(t("managerRole"))}</option>`;
-                const adminOptions = `<option value="Coach"${value === "Coach" ? " selected" : ""}${roleAssignmentDisabled && value !== "Coach" ? " disabled" : ""}>${escapeHtml(t("coachRole"))}</option>
-                  <option value="Captain"${value === "Captain" ? " selected" : ""}${roleAssignmentDisabled && value !== "Captain" ? " disabled" : ""}>${escapeHtml(t("captainRole"))}</option>`;
+                const coachOption = isAdmin()
+                  ? `<option value="Coach"${value === "Coach" ? " selected" : ""}${roleAssignmentDisabled && value !== "Coach" ? " disabled" : ""}>${escapeHtml(t("coachRole"))}</option>`
+                  : "";
+                const leaderOption = `<option value="Captain"${value === "Captain" ? " selected" : ""}${roleAssignmentDisabled && value !== "Captain" ? " disabled" : ""}>${escapeHtml(t("captainRole"))}</option>`;
                 return `<select data-account-role="${escapeHtml(user.id)}" aria-label="${escapeHtml(t("deleteAccountRole", { username: user.username }))}">
                   <option value="Viewer"${value === "Viewer" ? " selected" : ""}>${escapeHtml(t("viewOnly"))}</option>
-                  ${isAdmin() ? `${adminOptions}${managerOption}` : managerOption}
+                  ${coachOption}${leaderOption}${managerOption}
                 </select>`;
               })()
             : `<span class="role-lock">${escapeHtml(t("chooseTeam"))}</span>`}
@@ -2881,24 +2887,33 @@ document.querySelector("#logout-button").addEventListener("click", logout);
 document.querySelector("#top-logout-button").addEventListener("click", logout);
 document.querySelector("#bottom-logout-button").addEventListener("click", logout);
 document.querySelector("#create-account-button").addEventListener("click", () => {
-  if (!isAdmin()) return;
+  if (!isAdmin() && !canManageTeamAccess()) return;
   accountForm.reset();
   document.querySelector("#account-error").hidden = true;
   for (const option of document.querySelector("#new-account-role").options) {
-    option.disabled = !currentTeam() &&
-      ["Team Manager", "Coach", "Captain"].includes(option.value);
+    if (!isAdmin() && ["Coach", "create-team-coach"].includes(option.value)) {
+      option.disabled = true;
+    } else {
+      option.disabled = !currentTeam() &&
+        ["Team Manager", "Coach", "Captain"].includes(option.value);
+    }
   }
   accountDialog.showModal();
   document.querySelector("#new-account-username").focus();
 });
 accountForm.addEventListener("submit", async (event) => {
   event.preventDefault();
-  if (!isAdmin()) return;
+  if (!isAdmin() && !canManageTeamAccess()) return;
   const username = document.querySelector("#new-account-username").value.trim();
   const password = document.querySelector("#new-account-password").value;
   const role = document.querySelector("#new-account-role").value;
   const error = document.querySelector("#account-error");
   error.hidden = true;
+  if (!isAdmin() && !["Viewer", "Team Manager", "Captain"].includes(role)) {
+    error.textContent = t("roleNotAllowed");
+    error.hidden = false;
+    return;
+  }
   if (TEAM_MANAGEMENT_ROLES.has(role) && !currentTeam()) {
     error.textContent = t("chooseTeam");
     error.hidden = false;
@@ -2919,11 +2934,7 @@ accountForm.addEventListener("submit", async (event) => {
     username,
     password,
     systemRole: "viewer",
-    teamCreationRole: role === "create-team-coach"
-      ? "Coach"
-      : role === "create-team-captain"
-        ? "Captain"
-        : "",
+    teamCreationRole: isAdmin() && role === "create-team-coach" ? "Coach" : "",
     teamCreationUsed: false,
     teamRoles: {},
   };
@@ -3002,7 +3013,7 @@ teamForm.addEventListener("submit", (event) => {
   const previousCreationRole = activeAccount.teamCreationRole;
   const previousCreationUsed = activeAccount.teamCreationUsed;
   store.teams.push(team);
-  if (!isAdmin() && ["Coach", "Captain"].includes(activeAccount.teamCreationRole)) {
+  if (!isAdmin() && activeAccount.teamCreationRole === "Coach") {
     activeAccount.teamRoles[team.id] = activeAccount.teamCreationRole;
     activeAccount.teamCreationRole = "";
     activeAccount.teamCreationUsed = true;
@@ -3091,14 +3102,23 @@ document.querySelector("#account-roles").addEventListener("change", (event) => {
     const user = store.users.find((item) => item.id === systemRoleSelect.dataset.systemRole);
     if (!user || user.systemRole === "owner") return;
     const previousRole = user.systemRole;
-    user.systemRole = systemRoleSelect.value === "admin" ? "admin" : "viewer";
+    const nextRole = ["admin", "developer", "viewer"].includes(systemRoleSelect.value)
+      ? systemRoleSelect.value
+      : "viewer";
+    user.systemRole = nextRole;
     if (!persistData()) {
       user.systemRole = previousRole;
       systemRoleSelect.value = previousRole;
       return;
     }
     render();
-    showToast(t(user.systemRole === "admin" ? "adminPromoted" : "adminDemoted"));
+    showToast(
+      t(nextRole === "admin"
+        ? "adminPromoted"
+        : nextRole === "developer"
+          ? "developerPromoted"
+          : "adminDemoted"),
+    );
     return;
   }
   const select = event.target.closest("[data-account-role]");
@@ -3107,7 +3127,7 @@ document.querySelector("#account-roles").addEventListener("change", (event) => {
   if (!user || user.systemRole !== "viewer" || (!isAdmin() && user.id === activeAccount.id)) return;
   const allowedRoles = isAdmin()
     ? new Set(["Viewer", "Coach", "Captain", "Team Manager"])
-    : new Set(["Viewer", "Team Manager"]);
+    : new Set(["Viewer", "Captain", "Team Manager"]);
   if (!allowedRoles.has(select.value)) {
     render();
     return;

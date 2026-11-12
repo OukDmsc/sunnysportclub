@@ -62,7 +62,7 @@ window.SUNNY_DATA.staff = [{
 window.SUNNY_DATA.accounts = [{
   username: "coach.alex",
   password: "ChangeMe123",
-  systemRole: "viewer", // viewer | admin | owner
+  systemRole: "viewer", // viewer | admin | developer | owner
   teamRoles: { "senior-football": "Coach" },
 }];
 ```
