@@ -38,6 +38,16 @@ module.exports = async (req, res) => {
     const target = profileOf(targetUser);
     if (target.systemRole === "owner") return fail(res, 403, "not_allowed");
 
+    if (body.password !== undefined) {
+      if (!isAdminAccount(caller)) return fail(res, 403, "not_allowed");
+      const password = String(body.password);
+      if (password.length < 8 || password.length > 128) {
+        return fail(res, 400, "weak_password");
+      }
+      const updated = await updateUser(cfg, id, { password });
+      return json(res, 200, { account: profileOf(updated) });
+    }
+
     if (body.systemRole !== undefined) {
       if (caller.systemRole !== "owner") return fail(res, 403, "not_allowed");
       if (target.id === caller.id) return fail(res, 403, "not_allowed");

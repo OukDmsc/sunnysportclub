@@ -74,6 +74,60 @@ const DEFAULT_WORKSPACE_BACKGROUND = {
   color: "#faf8f3",
   image: "",
 };
+const CONTACT_INFO =
+  globalThis.SUNNY_CONTACTS && typeof globalThis.SUNNY_CONTACTS === "object"
+    ? globalThis.SUNNY_CONTACTS
+    : { phones: [], telegrams: [], facebooks: [], email: "", tiktok: "", location: { label: "", url: "" } };
+const STADIUM_INFO = {
+  currency: "USD",
+  open: "07:30",
+  close: "20:00",
+  slotMinutes: 30,
+  minMinutes: 60,
+  maxMinutes: 180,
+  advanceDays: 60,
+  weekday: {
+    label: "Monday–Friday",
+    rates: [
+      { from: "07:30", to: "17:00", price: 10 },
+      { from: "17:00", to: "20:00", price: 15 },
+    ],
+  },
+  weekend: {
+    label: "Saturday–Sunday",
+    rates: [
+      { from: "07:30", to: "17:00", price: 15 },
+      { from: "17:00", to: "20:00", price: 20 },
+    ],
+  },
+  ...(globalThis.SUNNY_STADIUM && typeof globalThis.SUNNY_STADIUM === "object"
+    ? globalThis.SUNNY_STADIUM
+    : {}),
+};
+const PRODUCT_CATALOG = Array.isArray(globalThis.SUNNY_PRODUCTS)
+  ? globalThis.SUNNY_PRODUCTS.filter(
+      (product) =>
+        product &&
+        typeof product.id === "string" &&
+        typeof product.name === "string" &&
+        Number.isFinite(Number(product.price)),
+    )
+  : [];
+const APP_ROUTES = {
+  "#booking": "booking",
+  "#shop": "shop",
+  "#account": "account",
+};
+let bookingDate = todayISO();
+let bookingStart = "";
+let bookingMinutes = Number(STADIUM_INFO.minMinutes) || 60;
+let lastBookingId = "";
+let shopCategory = "all";
+let assistantOpen = false;
+let assistantBusy = false;
+let assistantHistory = [];
+let authRequested = false;
+
 const TRANSLATIONS = {
   en: {
     clubHome: "Sunny Sport Club home",
@@ -327,12 +381,12 @@ const TRANSLATIONS = {
     soundOn: "Sound on",
     soundOff: "Sound off",
     soundToggle: "Toggle stadium sound",
-    loginIntro: "Sign in to enter the club workspace. New members can create an account with a real email address or mobile number.",
+    loginIntro: "Browse teams and club services without signing in. Club staff can sign in to manage their tools.",
     authHeadline: "Built for the love of the game.",
     authPlatform: "THE CLUB PLATFORM",
     authClubName: "SUNNY SPORT CLUB",
     authMatchSubtitle: "One club. Every team.",
-    authOpenDirectory: "MEMBERS ONLY",
+    authOpenDirectory: "OPEN TEAM DIRECTORY",
     authSeason: "CLUB SEASON · 2026",
     authRolesLabel: "ACCESS FOR",
     authSecureAccess: "CLUB ACCESS",
@@ -354,7 +408,8 @@ const TRANSLATIONS = {
     confirmPassword: "Confirm password",
     contactPlaceholder: "name@email.com or +855 12 345 678",
     contactHint: "Enter a real email address or a mobile number with country code, for example +855 12 345 678.",
-    registerRoleNote: "New accounts are member accounts. Owner, admin, developer and coach accounts are created directly by the club owner.",
+    registerRoleNote: "New registrations are member accounts. Club management access is assigned by authorized club staff.",
+    authReturnPublic: "Back to the club",
     registerInvalidName: "Enter your full name.",
     registerInvalidEmail: "Enter a valid email address, for example name@email.com.",
     registerInvalidPhone: "Enter a valid mobile number with country code, for example +855 12 345 678.",
@@ -408,6 +463,141 @@ const TRANSLATIONS = {
     publicGreeting: "football fan",
     viewOnlyAccess: "View-only access",
     updateMediaCleanupWarning: "The update was removed, but its local media could not be deleted.",
+    homeTab: "Home",
+    bookTab: "Booking",
+    shopTab: "Shop",
+    accountTab: "Account",
+    appNavigation: "App navigation",
+    contactEyebrow: "CONTACT THE CLUB",
+    contactTitle: "We are here to help",
+    contactIntro: "Call, message, or visit. Our team replies fast on Telegram.",
+    contactCall: "Call the club",
+    contactCallHint: "Tap a number to call",
+    contactEmail: "Email",
+    contactEmailHint: "For documents and invoices",
+    contactLocation: "Location",
+    contactLocationHint: "Open in Google Maps",
+    contactOpenMaps: "Open maps",
+    contactHours: "Open hours",
+    contactPhone: "Phone",
+    contactTelegram: "Telegram",
+    contactFacebook: "Facebook",
+    contactTiktok: "TikTok",
+    contactScan: "Scan to chat",
+    contactOwner: "Owner",
+    contactAdmin: "Admin",
+    contactComingSoon: "Coming soon",
+    contactSocialHint: "Tap to open",
+    contactMessage: "Message us",
+    bookingEyebrow: "STADIUM BOOKING",
+    bookingTitle: "Book the pitch",
+    bookingIntro: "Pick a date and time. We confirm your slot on Telegram.",
+    bookingDate: "Date",
+    bookingStart: "Start time",
+    bookingDuration: "Duration",
+    bookingName: "Your name",
+    bookingPhone: "Phone or Telegram",
+    bookingNote: "Note (optional)",
+    bookingNotePlaceholder: "Team name, number of players...",
+    bookingPrice: "Estimated price",
+    bookingSubmit: "Request booking",
+    bookingMyBookings: "Your bookings",
+    bookingEmpty: "No bookings yet.",
+    bookingOpenHours: "Open daily 7:30 AM – 8:00 PM",
+    bookingHoursNote: "Evening rate applies from 5:00 PM.",
+    bookingRates: "Rates",
+    bookingLocation: "Sunny Sport Club stadium",
+    bookingLocalNote: "Bookings are saved on this device and sent to the club on Telegram.",
+    bookingCreated: "Booking saved. Send it to the club on Telegram to confirm.",
+    bookingBooked: "Booked",
+    bookingCancel: "Cancel",
+    bookingCancelled: "Booking cancelled.",
+    bookingChooseTime: "Choose a start time to see the price.",
+    bookingConflict: "That time overlaps another booking.",
+    bookingContactRequired: "Add your name and a phone number or Telegram handle.",
+    bookingFailed: "Could not save the booking. Please try again.",
+    bookingPast: "Choose a time later today or another date.",
+    bookingPerHour: "/hour",
+    bookingSendTelegram: "Send on Telegram",
+    bookingValidation: "Choose a valid date and time.",
+    bookingOneHour: "1 hour",
+    bookingOneAndHalf: "1.5 hours",
+    bookingTwoHours: "2 hours",
+    bookingThreeHours: "3 hours",
+    accountBookings: "Stadium bookings: {count}",
+    shopCategoryBookstore: "Bookstore",
+    shopCategoryDrinks: "Drinks",
+    shopCategorySnacks: "Snacks",
+    shopCategoryMerchandise: "Merchandise",
+    resetPasswordIntro: "Set a new password for {name}. Share it privately with the member.",
+    resetPasswordFailed: "Could not update the password. Please try again.",
+    shopEyebrow: "CLUB SHOP",
+    shopTitle: "Club shop",
+    shopIntro: "Bookstore, drinks and club gear — online ordering is coming.",
+    shopNote: "Products are shown for preview. Message us on Telegram to reserve today.",
+    shopPreview: "Preview",
+    shopNeedHelp: "Need something now?",
+    shopAll: "All",
+    shopAvailable: "Available",
+    shopComingSoon: "Coming soon",
+    shopEmpty: "No products in this category yet.",
+    shopReserve: "Ask to reserve",
+    accountEyebrow: "MY ACCOUNT",
+    accountTitle: "My account",
+    accountIntro: "Manage your profile, security and stadium bookings.",
+    accountSecurity: "Account recovery",
+    recoverySetupTitle: "Recovery code",
+    recoverySetupIntro: "Set a private code so you can reset your password if you forget it.",
+    recoverySetButton: "Save recovery code",
+    recoveryCodeExists: "A recovery code is active on this account.",
+    recoveryCodeSaved: "Recovery code saved.",
+    recoveryMissing: "Set a recovery code to unlock password reset.",
+    recoveryCodeMissing: "Enter your recovery code.",
+    recoveryCodeInvalid: "That recovery code is not correct.",
+    forgotPassword: "Forgot password?",
+    recoveryTitle: "Recover your account",
+    recoveryIntro: "Enter your username, email or phone, your recovery code, and a new password.",
+    recoveryIdentifier: "Username, email or phone",
+    recoveryCode: "Recovery code",
+    recoveryCodeHint: "Your private recovery code",
+    recoveryNewPassword: "New password",
+    recoveryConfirm: "Confirm new password",
+    recoverySubmit: "Reset password",
+    recoverySuccess: "Password updated. Sign in with your new password.",
+    recoveryInvalid: "The details do not match. Check your code and try again.",
+    recoveryOnlineOnly: "Online password recovery is unavailable in file mode. Contact the owner or an admin on Telegram or by phone.",
+    recoveryUnavailable: "Recovery is unavailable right now. Contact the club on Telegram.",
+    resetPassword: "Reset password",
+    resetPasswordTitle: "Reset a member password",
+    resetPasswordNew: "New password",
+    resetPasswordSubmit: "Update password",
+    resetPasswordDone: "Password updated.",
+    resetPasswordInvalid: "Use at least 8 characters.",
+    assistantName: "Sunny AI Concierge",
+    assistantOnline: "Online now",
+    assistantAsk: "Ask Sunny",
+    assistantAuthIntro: "Ask about teams, stadium booking, the shop, account recovery, or how to reach the club.",
+    assistantClose: "Close assistant",
+    assistantSend: "Send message",
+    assistantPlaceholder: "Ask me anything...",
+    assistantHuman: "Talk to a human",
+    assistantInput: "Message Sunny",
+    assistantGreeting: "Hi! I'm Sunny, your club concierge. I can help with stadium booking, the shop, accounts and recovery, teams, or contacting the club.",
+    assistantBooking: "Open the Booking tab to pick a date and time. Weekdays are $10/hour from 7:30 AM to 5 PM and $15/hour from 5 PM to 8 PM. Weekends are $15/hour and $20/hour. The pitch closes at 8 PM.",
+    assistantShop: "The Shop tab previews bookstore items, drinks and club gear. Online ordering is coming — use the Telegram link to reserve today.",
+    assistantRecovery: "If you forgot your password, tap “Forgot password?” on the sign-in screen. You need the recovery code you saved in My Account. An owner or admin can also reset it.",
+    assistantRoles: "The club owner, developers and admins manage access. Team roles are Coach, Team Captain and Team Manager. Ask the owner or an admin if you need access or a role change.",
+    assistantContact: "You can reach the club by phone, Telegram, Facebook or the map. Open the contact section at the bottom of the home page.",
+    assistantTeams: "Browse the public team directory from Home and open any team to see its public roster. Authorized staff can sign in to manage teams.",
+    assistantAccount: "Open the Account tab to see your role, set a recovery code, or sign out.",
+    assistantFallback: "I don't have an answer for that yet. Message the owner or an admin on Telegram and they will help you right away.",
+    assistantNeedSignIn: "Please sign in first, then I can open that page for you.",
+    assistantOpen: "Opening {page}...",
+    rolesTitle: "Roles & access",
+    assistantBookPage: "Booking",
+    assistantShopPage: "Shop",
+    assistantAccountPage: "Account",
+    assistantRecoveryPage: "password recovery",
   },
   km: {
     clubHome: "ទំព័រដើមក្លឹប SUNNY SPORT",
@@ -661,12 +851,12 @@ const TRANSLATIONS = {
     soundOn: "សំឡេងបើក",
     soundOff: "សំឡេងបិទ",
     soundToggle: "បើក ឬបិទសំឡេងកីឡដ្ឋាន",
-    loginIntro: "ចូលគណនីដើម្បីចូលកាន់ក្នុងក្លឹប។ សមាជិកថ្មីអាចបង្កើតគណនីដោយអ៊ីមែល ឬលេខទូរស័ព្ទពិត។",
+    loginIntro: "ស្វែងរកក្រុម និងសេវាកម្មក្លឹបដោយមិនចាំបាច់ចូលគណនី។ បុគ្គលិកក្លឹបអាចចូលដើម្បីគ្រប់គ្រងឧបករណ៍របស់ពួកគេ។",
     authHeadline: "បង្កើតឡើងសម្រាប់ក្តីស្រឡាញ់ចំពោះបាល់ទាត់។",
     authPlatform: "ប្រព័ន្ធគ្រប់គ្រងក្លឹប",
     authClubName: "ក្លឹប SUNNY SPORT",
     authMatchSubtitle: "ក្លឹបមួយ។ ក្រុមទាំងអស់។",
-    authOpenDirectory: "សម្រាប់សមាជិកតែប៉ុណ្ណោះ",
+    authOpenDirectory: "បើកបញ្ជីក្រុម",
     authSeason: "រដូវកាលក្លឹប · ២០២៦",
     authRolesLabel: "សិទ្ធិចូលប្រើសម្រាប់",
     authSecureAccess: "ការចូលក្លឹប",
@@ -688,7 +878,8 @@ const TRANSLATIONS = {
     confirmPassword: "បញ្ជាក់ពាក្យសម្ងាត់",
     contactPlaceholder: "name@email.com ឬ +855 12 345 678",
     contactHint: "សូមបញ្ចូលអ៊ីមែលពិត ឬលេខទូរស័ព្ទចល័តជាមួយលេខកូដប្រទេស ឧទាហរណ៍ +855 12 345 678។",
-    registerRoleNote: "គណនីថ្មីគឺជាគណនីសមាជិក។ គណនីម្ចាស់ អ្នកគ្រប់គ្រង អ្នកអភិវឌ្ឍន៍ និងគ្រូបង្វឹក ត្រូវបានបង្កើតដោយម្ចាស់ក្លឹបផ្ទាល់។",
+    registerRoleNote: "គណនីដែលចុះឈ្មោះថ្មីគឺជាគណនីសមាជិក។ សិទ្ធិគ្រប់គ្រងក្លឹបត្រូវបានកំណត់ដោយបុគ្គលិកដែលមានសិទ្ធិ។",
+    authReturnPublic: "ត្រឡប់ទៅក្លឹប",
     registerInvalidName: "សូមបញ្ចូលឈ្មោះពេញរបស់អ្នក។",
     registerInvalidEmail: "សូមបញ្ចូលអ៊ីមែលត្រឹមត្រូវ ឧទាហរណ៍ name@email.com។",
     registerInvalidPhone: "សូមបញ្ចូលលេខទូរស័ព្ទត្រឹមត្រូវជាមួយលេខកូដប្រទេស ឧទាហរណ៍ +855 12 345 678។",
@@ -742,6 +933,141 @@ const TRANSLATIONS = {
     publicGreeting: "អ្នកគាំទ្របាល់ទាត់",
     viewOnlyAccess: "សិទ្ធិមើលតែប៉ុណ្ណោះ",
     updateMediaCleanupWarning: "បានលុបព័ត៌មាន ប៉ុន្តែមិនអាចលុបឯកសារមេឌៀចេញពីកម្មវិធីរុករកបានទេ។",
+    homeTab: "ទំព័រដើម",
+    bookTab: "កក់ទីលាន",
+    shopTab: "ហាង",
+    accountTab: "គណនី",
+    appNavigation: "ម៉ឺនុយកម្មវិធី",
+    contactEyebrow: "ទំនាក់ទំនងក្លឹប",
+    contactTitle: "យើងខ្ញុំរីករាយជួយ",
+    contactIntro: "ទូរស័ព្ទ ផ្ញើសារ ឬមកកាន់ទីតាំង។ ក្រុមការងារឆ្លើយតបលឿនតាម Telegram។",
+    contactCall: "ទូរស័ព្ទទៅក្លឹប",
+    contactCallHint: "ចុចលេខដើម្បីហៅ",
+    contactEmail: "អ៊ីមែល",
+    contactEmailHint: "សម្រាប់ឯកសារ និងវិក្កយបត្រ",
+    contactLocation: "ទីតាំង",
+    contactLocationHint: "បើកក្នុង Google Maps",
+    contactOpenMaps: "បើកផែនទី",
+    contactHours: "ម៉ោងបើក",
+    contactPhone: "ទូរស័ព្ទ",
+    contactTelegram: "Telegram",
+    contactFacebook: "Facebook",
+    contactTiktok: "TikTok",
+    contactScan: "ស្កេនដើម្បីជជែក",
+    contactOwner: "ម្ចាស់",
+    contactAdmin: "អ្នកគ្រប់គ្រង",
+    contactComingSoon: "នឹងមកដល់ឆាប់ៗ",
+    contactSocialHint: "ចុចដើម្បីបើក",
+    contactMessage: "ផ្ញើសារមកយើង",
+    bookingEyebrow: "ការកក់ទីលាន",
+    bookingTitle: "កក់ទីលានបាល់ទាត់",
+    bookingIntro: "ជ្រើសរើសកាលបរិច្ឆេទ និងម៉ោង។ យើងបញ្ជាក់តាម Telegram។",
+    bookingDate: "កាលបរិច្ឆេទ",
+    bookingStart: "ម៉ោងចាប់ផ្តើម",
+    bookingDuration: "រយៈពេល",
+    bookingName: "ឈ្មោះអ្នក",
+    bookingPhone: "ទូរស័ព្ទ ឬ Telegram",
+    bookingNote: "កំណត់ចំណាំ (ស្រេចចិត្ត)",
+    bookingNotePlaceholder: "ឈ្មោះក្រុម ចំនួនអ្នកលេង...",
+    bookingPrice: "តម្លៃប៉ាន់ស្មាន",
+    bookingSubmit: "ស្នើកក់",
+    bookingMyBookings: "ការកក់របស់អ្នក",
+    bookingEmpty: "មិនទាន់មានការកក់ទេ។",
+    bookingOpenHours: "បើករៀងរាល់ថ្ងៃ 7:30 – 20:00",
+    bookingHoursNote: "តម្លៃល្ងាចចាប់ពីម៉ោង 17:00។",
+    bookingRates: "តម្លៃ",
+    bookingLocation: "ទីលាន Sunny Sport Club",
+    bookingLocalNote: "ការកក់ត្រូវបានរក្សាទុកលើឧបករណ៍នេះ ហើយផ្ញើទៅក្លឹបតាម Telegram។",
+    bookingCreated: "បានរក្សាទុកការកក់។ សូមផ្ញើទៅក្លឹបតាម Telegram ដើម្បីបញ្ជាក់។",
+    bookingBooked: "បានកក់",
+    bookingCancel: "បោះបង់",
+    bookingCancelled: "បានបោះបង់ការកក់។",
+    bookingChooseTime: "ជ្រើសរើសម៉ោងចាប់ផ្តើមដើម្បីមើលតម្លៃ។",
+    bookingConflict: "ម៉ោងនេះត្រួតគ្នានឹងការកក់ផ្សេង។",
+    bookingContactRequired: "សូមបញ្ចូលឈ្មោះ និងលេខទូរស័ព្ទ ឬ Telegram។",
+    bookingFailed: "មិនអាចរក្សាទុកការកក់បានទេ។ សូមព្យាយាមម្តងទៀត។",
+    bookingPast: "សូមជ្រើសរើសម៉ោងក្រោយពេលនេះ ឬថ្ងៃផ្សេង។",
+    bookingPerHour: "/ម៉ោង",
+    bookingSendTelegram: "ផ្ញើតាម Telegram",
+    bookingValidation: "សូមជ្រើសរើសកាលបរិច្ឆេទ និងម៉ោងត្រឹមត្រូវ។",
+    bookingOneHour: "1 ម៉ោង",
+    bookingOneAndHalf: "1.5 ម៉ោង",
+    bookingTwoHours: "2 ម៉ោង",
+    bookingThreeHours: "3 ម៉ោង",
+    accountBookings: "ការកក់ទីលាន: {count}",
+    shopCategoryBookstore: "សៀវភៅ",
+    shopCategoryDrinks: "ភេសជ្ជៈ",
+    shopCategorySnacks: "អាហារសម្រន់",
+    shopCategoryMerchandise: "សម្ភារៈក្លឹប",
+    resetPasswordIntro: "កំណត់ពាក្យសម្ងាត់ថ្មីសម្រាប់ {name}។ សូមចែករំលែកជាឯកជនជាមួយសមាជិក។",
+    resetPasswordFailed: "មិនអាចធ្វើបច្ចុប្បន្នភាពពាក្យសម្ងាត់បានទេ។ សូមព្យាយាមម្តងទៀត។",
+    shopEyebrow: "ហាងក្លឹប",
+    shopTitle: "ហាងក្លឹប",
+    shopIntro: "សៀវភៅ ភេសជ្ជៈ និងសម្ភារៈក្លឹប — ការបញ្ជាទិញអនឡាញនឹងមកដល់ឆាប់ៗ។",
+    shopNote: "ទំនិញត្រូវបានបង្ហាញជាការមើលជាមុន។ សូមផ្ញើសារតាម Telegram ដើម្បីកក់ថ្ងៃនេះ។",
+    shopPreview: "មើលជាមុន",
+    shopNeedHelp: "ត្រូវការអ្វីមួយឥឡូវ?",
+    shopAll: "ទាំងអស់",
+    shopAvailable: "មានលក់",
+    shopComingSoon: "នឹងមកដល់ឆាប់ៗ",
+    shopEmpty: "មិនទាន់មានទំនិញក្នុងប្រភេទនេះទេ។",
+    shopReserve: "សួរកក់",
+    accountEyebrow: "គណនីរបស់ខ្ញុំ",
+    accountTitle: "គណនីរបស់ខ្ញុំ",
+    accountIntro: "គ្រប់គ្រងប្រវត្តិរូប សុវត្ថិភាព និងការកក់ទីលានរបស់អ្នក។",
+    accountSecurity: "ការសង្គ្រោះគណនី",
+    recoverySetupTitle: "កូដសង្គ្រោះ",
+    recoverySetupIntro: "កំណត់កូដឯកជន ដើម្បីកំណត់ពាក្យសម្ងាត់ឡើងវិញប្រសិនបើអ្នកបំភ្លេច។",
+    recoverySetButton: "រក្សាទុកកូដសង្គ្រោះ",
+    recoveryCodeExists: "កូដសង្គ្រោះកំពុងសកម្មលើគណនីនេះ។",
+    recoveryCodeSaved: "បានរក្សាទុកកូដសង្គ្រោះ។",
+    recoveryMissing: "កំណត់កូដសង្គ្រោះដើម្បីបើកការកំណត់ពាក្យសម្ងាត់ឡើងវិញ។",
+    recoveryCodeMissing: "សូមបញ្ចូលកូដសង្គ្រោះរបស់អ្នក។",
+    recoveryCodeInvalid: "កូដសង្គ្រោះនេះមិនត្រឹមត្រូវទេ។",
+    forgotPassword: "បំភ្លេចពាក្យសម្ងាត់?",
+    recoveryTitle: "សង្គ្រោះគណនីរបស់អ្នក",
+    recoveryIntro: "បញ្ចូលឈ្មោះអ្នកប្រើ អ៊ីមែល ឬទូរស័ព្ទ កូដសង្គ្រោះ និងពាក្យសម្ងាត់ថ្មី។",
+    recoveryIdentifier: "ឈ្មោះអ្នកប្រើ អ៊ីមែល ឬទូរស័ព្ទ",
+    recoveryCode: "កូដសង្គ្រោះ",
+    recoveryCodeHint: "កូដសង្គ្រោះឯកជនរបស់អ្នក",
+    recoveryNewPassword: "ពាក្យសម្ងាត់ថ្មី",
+    recoveryConfirm: "បញ្ជាក់ពាក្យសម្ងាត់ថ្មី",
+    recoverySubmit: "កំណត់ពាក្យសម្ងាត់ឡើងវិញ",
+    recoverySuccess: "បានធ្វើបច្ចុប្បន្នភាពពាក្យសម្ងាត់។ សូមចូលដោយពាក្យសម្ងាត់ថ្មី។",
+    recoveryInvalid: "ព័ត៌មានមិនត្រូវគ្នាទេ។ សូមពិនិត្យកូដ ហើយព្យាយាមម្តងទៀត។",
+    recoveryOnlineOnly: "ការសង្គ្រោះតាមអ៊ីនធឺណិតមិនដំណើរការក្នុងរបៀបឯកសារទេ។ សូមទាក់ទងម្ចាស់ ឬអ្នកគ្រប់គ្រងតាម Telegram ឬទូរស័ព្ទ។",
+    recoveryUnavailable: "មិនអាចសង្គ្រោះបានទេឥឡូវ។ សូមទាក់ទងក្លឹបតាម Telegram។",
+    resetPassword: "កំណត់ពាក្យសម្ងាត់ឡើងវិញ",
+    resetPasswordTitle: "កំណត់ពាក្យសម្ងាត់សមាជិកឡើងវិញ",
+    resetPasswordNew: "ពាក្យសម្ងាត់ថ្មី",
+    resetPasswordSubmit: "ធ្វើបច្ចុប្បន្នភាពពាក្យសម្ងាត់",
+    resetPasswordDone: "បានធ្វើបច្ចុប្បន្នភាពពាក្យសម្ងាត់។",
+    resetPasswordInvalid: "សូមប្រើយ៉ាងតិច 8 តួអក្សរ។",
+    assistantName: "Sunny AI Concierge",
+    assistantOnline: "កំពុងអនឡាញ",
+    assistantAsk: "សួរ Sunny",
+    assistantAuthIntro: "សួរអំពីក្រុម ការកក់ទីលាន ហាង ការសង្គ្រោះគណនី ឬវិធីទាក់ទងក្លឹប។",
+    assistantClose: "បិទជំនួយការ",
+    assistantSend: "ផ្ញើសារ",
+    assistantPlaceholder: "សួរខ្ញុំអ្វីក៏បាន...",
+    assistantHuman: "និយាយជាមួយមនុស្ស",
+    assistantInput: "សារទៅ Sunny",
+    assistantGreeting: "សួស្តី! ខ្ញុំគឺ Sunny ជំនួយការក្លឹបរបស់អ្នក។ ខ្ញុំអាចជួយអំពីការកក់ទីលាន ហាង គណនី ការសង្គ្រោះ ក្រុម ឬការទាក់ទងក្លឹប។",
+    assistantBooking: "បើកផ្ទាំងកក់ទីលាន ដើម្បីជ្រើសរើសកាលបរិច្ឆេទ និងម៉ោង។ ថ្ងៃធ្វើការ 10 ដុល្លារ/ម៉ោង ពី 7:30 ដល់ 17:00 និង 15 ដុល្លារ/ម៉ោង ពី 17:00 ដល់ 20:00។ ចុងសប្តាហ៍ 15 និង 20 ដុល្លារ/ម៉ោង។ ទីលានបិទម៉ោង 20:00។",
+    assistantShop: "ផ្ទាំងហាងបង្ហាញសៀវភៅ ភេសជ្ជៈ និងសម្ភារៈក្លឹប។ ការបញ្ជាទិញអនឡាញនឹងមកដល់ — សូមប្រើតំណ Telegram ដើម្បីកក់ថ្ងៃនេះ។",
+    assistantRecovery: "ប្រសិនបើអ្នកបំភ្លេចពាក្យសម្ងាត់ សូមចុច “បំភ្លេចពាក្យសម្ងាត់?” នៅផ្ទាំងចូល។ អ្នកត្រូវការកូដសង្គ្រោះដែលបានរក្សាទុកក្នុងគណនីរបស់ខ្ញុំ។ ម្ចាស់ ឬអ្នកគ្រប់គ្រងក៏អាចកំណត់វាឡើងវិញបាន។",
+    assistantRoles: "ម្ចាស់ក្លឹប អ្នកអភិវឌ្ឍន៍ និងអ្នកគ្រប់គ្រង គ្រប់គ្រងសិទ្ធិចូលប្រើ។ តួនាទីក្នុងក្រុមមាន គ្រូបង្វឹក ប្រធានក្រុម និងអ្នកគ្រប់គ្រងក្រុម។ សូមសួរម្ចាស់ ឬអ្នកគ្រប់គ្រង ប្រសិនបើអ្នកត្រូវការសិទ្ធិ ឬការផ្លាស់ប្តូរតួនាទី។",
+    assistantContact: "អ្នកអាចទាក់ទងក្លឹបតាមទូរស័ព្ទ Telegram Facebook ឬផែនទី។ បើកផ្នែកទំនាក់ទំនងនៅខាងក្រោមទំព័រដើម។",
+    assistantTeams: "ស្វែងរកបញ្ជីក្រុមសាធារណៈពីផ្ទាំងដើម ហើយបើកក្រុមណាមួយដើម្បីមើលបញ្ជីសមាជិកសាធារណៈ។ បុគ្គលិកដែលមានសិទ្ធិអាចចូលដើម្បីគ្រប់គ្រងក្រុម។",
+    assistantAccount: "បើកផ្ទាំងគណនី ដើម្បីមើលតួនាទី កំណត់កូដសង្គ្រោះ ឬចាកចេញ។",
+    assistantFallback: "ខ្ញុំមិនទាន់មានចម្លើយសម្រាប់រឿងនេះទេ។ សូមផ្ញើសារទៅម្ចាស់ ឬអ្នកគ្រប់គ្រងតាម Telegram ហើយពួកគេនឹងជួយអ្នកភ្លាមៗ។",
+    assistantNeedSignIn: "សូមចូលជាមុនសិន បន្ទាប់មកខ្ញុំអាចបើកទំព័រនោះឱ្យអ្នក។",
+    assistantOpen: "កំពុងបើក {page}...",
+    rolesTitle: "តួនាទី និងសិទ្ធិ",
+    assistantBookPage: "ការកក់ទីលាន",
+    assistantShopPage: "ហាង",
+    assistantAccountPage: "គណនី",
+    assistantRecoveryPage: "ការសង្គ្រោះពាក្យសម្ងាត់",
   },
 };
 const imageInput = document.querySelector("#member-photo");
@@ -839,11 +1165,31 @@ document.querySelector("#main-navigation").addEventListener("click", (event) => 
 window.addEventListener("hashchange", renderRouteFromHash);
 document.querySelector("#staff-login-float").addEventListener("click", (event) => {
   event.preventDefault();
-  document.querySelector("#auth-screen").scrollIntoView({ behavior: "smooth" });
-  window.setTimeout(() => {
-    document.querySelector(activeAccount ? "#bottom-logout-button" : "#auth-username")?.focus();
-  }, 350);
+  authRequested = !activeAccount;
+  render();
+  window.requestAnimationFrame(() => {
+    document
+      .querySelector(activeAccount ? "#bottom-logout-button" : "#auth-username")
+      ?.focus();
+  });
 });
+function returnToPublicClub(event) {
+  event.preventDefault();
+  authRequested = false;
+  authMode = "login";
+  if (window.location.hash !== "#teams") {
+    window.location.hash = "#teams";
+    return;
+  }
+  render();
+  document.querySelector("#staff-login-float").focus();
+}
+document
+  .querySelector("#auth-return-public")
+  .addEventListener("click", returnToPublicClub);
+document
+  .querySelector("#auth-open-directory")
+  .addEventListener("click", returnToPublicClub);
 document.addEventListener("keydown", (event) => {
   const isNavigationOpen = document.querySelector("#app-shell").classList.contains("sidebar-open");
   if (event.key === "Escape") {
@@ -1541,6 +1887,7 @@ function loadData() {
       users: BOOTSTRAP_USERS.map((user) => ({ ...user, teamRoles: {} })),
       teams: [],
       posts: [],
+      bookings: [],
       activeUserId: "",
       selectedTeamId: "",
       contentManaged: emptyManaged,
@@ -1695,6 +2042,34 @@ function loadData() {
         typeof parsed.activeUserId === "string" ? parsed.activeUserId : "";
       result.selectedTeamId =
         typeof parsed.selectedTeamId === "string" ? parsed.selectedTeamId : "";
+      result.bookings = Array.isArray(parsed.bookings)
+        ? parsed.bookings
+            .filter(
+              (booking) =>
+                booking &&
+                typeof booking.id === "string" &&
+                /^\d{4}-\d{2}-\d{2}$/.test(booking.date || "") &&
+                /^\d{2}:\d{2}$/.test(booking.start || "") &&
+                /^\d{2}:\d{2}$/.test(booking.end || "") &&
+                typeof booking.name === "string",
+            )
+            .map((booking) => ({
+              id: booking.id,
+              date: booking.date,
+              start: booking.start,
+              end: booking.end,
+              minutes: Number(booking.minutes) || 60,
+              name: booking.name.slice(0, 60),
+              phone: typeof booking.phone === "string" ? booking.phone.slice(0, 24) : "",
+              note: typeof booking.note === "string" ? booking.note.slice(0, 160) : "",
+              price: Number(booking.price) || 0,
+              ownerId: typeof booking.ownerId === "string" ? booking.ownerId : "",
+              createdAt:
+                typeof booking.createdAt === "string"
+                  ? booking.createdAt
+                  : new Date(0).toISOString(),
+            }))
+        : [];
       result.contentManaged = parsed.contentManaged &&
         typeof parsed.contentManaged === "object"
         ? {
@@ -1718,6 +2093,7 @@ function loadData() {
       users: BOOTSTRAP_USERS.map((user) => ({ ...user, teamRoles: {} })),
       teams: [],
       posts: [],
+      bookings: [],
       activeUserId: "",
       selectedTeamId: "",
       contentManaged: emptyManaged,
@@ -1736,6 +2112,7 @@ function persistData() {
     const nextStore = {
       ...store,
       posts: store.posts || [],
+      bookings: store.bookings || [],
       teams: currentTeamId
         ? store.teams.map((team) =>
         team.id === currentTeamId
@@ -1948,6 +2325,12 @@ function renderRouteFromHash() {
   const route = window.location.hash || "#teams";
   if (route === lastRenderedRoute) return;
   lastRenderedRoute = route;
+  if (!activeAccount && route !== "#account") authRequested = false;
+  if (APP_ROUTES[route]) {
+    renderWithPageTransition();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    return;
+  }
   const match = window.location.hash.match(/^#team\/([^/]+)(?:\/(roster|overview))?$/);
   if (!match) {
     currentTeamId = "";
@@ -2143,7 +2526,7 @@ async function renderPosts() {
 function renderAccountRoles() {
   const panel = document.querySelector("#admin-section");
   const isTeamCoach = !isAdmin() && canManageTeamAccess();
-  panel.hidden = !isAdmin() && !isTeamCoach;
+  panel.hidden = Boolean(appPageFromHash()) || (!isAdmin() && !isTeamCoach);
   const team = currentTeam();
   document.querySelector("#access-panel-label").textContent =
     isAdmin() ? t("administration") : t("teamAccess");
@@ -2158,6 +2541,10 @@ function renderAccountRoles() {
       : team
         ? user.teamRoles[team.id] || "Viewer"
         : "Viewer";
+    const resetControl =
+      isAdmin() && user.systemRole !== "owner" && user.id !== activeAccount?.id
+        ? `<button type="button" class="link-button role-reset" data-reset-password="${escapeHtml(user.id)}">${escapeHtml(t("resetPassword"))}</button>`
+        : "";
     const roleControls = hasSystemAccess
       ? `<span class="role-lock">${escapeHtml(t("fullSystemAccess"))}</span>`
       : isTeamCoach && user.id === activeAccount.id
@@ -2183,6 +2570,7 @@ function renderAccountRoles() {
                 </select>`;
               })()
             : `<span class="role-lock">${escapeHtml(t("chooseTeam"))}</span>`}
+          ${resetControl}
         </div>`;
     const contact = isAdmin() ? user.email || user.phone || "" : "";
     const contactNote = contact
@@ -2369,14 +2757,930 @@ function currentAccessRoleLabel() {
   return t("viewOnlyAccess");
 }
 
+function appPageFromHash() {
+  return APP_ROUTES[window.location.hash] || "";
+}
+
+function localDateISO(date) {
+  const value = date instanceof Date ? date : new Date(date);
+  const month = String(value.getMonth() + 1).padStart(2, "0");
+  const day = String(value.getDate()).padStart(2, "0");
+  return `${value.getFullYear()}-${month}-${day}`;
+}
+
+function todayISO() {
+  return localDateISO(new Date());
+}
+
+function addDaysISO(dateString, days) {
+  const value = new Date(`${dateString}T12:00:00`);
+  value.setDate(value.getDate() + days);
+  return localDateISO(value);
+}
+
+function parseClock(value) {
+  const match = String(value || "").match(/^(\d{1,2}):(\d{2})$/);
+  if (!match) return NaN;
+  const hours = Number(match[1]);
+  const minutes = Number(match[2]);
+  if (hours > 23 || minutes > 59) return NaN;
+  return hours * 60 + minutes;
+}
+
+function clockFromMinutes(totalMinutes) {
+  const value = ((Math.round(totalMinutes) % 1440) + 1440) % 1440;
+  return `${String(Math.floor(value / 60)).padStart(2, "0")}:${String(value % 60).padStart(2, "0")}`;
+}
+
+function formatClock(totalMinutes) {
+  const value = clockFromMinutes(totalMinutes);
+  const [hours, minutes] = value.split(":").map(Number);
+  const date = new Date(2000, 0, 1, hours, minutes);
+  return new Intl.DateTimeFormat(language === "km" ? "km-KH" : "en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(date);
+}
+
+function formatMoney(amount) {
+  const value = Number(amount) || 0;
+  return `$${value.toFixed(2)}`;
+}
+
+function formatBookingDate(dateString) {
+  const date = new Date(`${dateString}T12:00:00`);
+  if (Number.isNaN(date.getTime())) return dateString;
+  return new Intl.DateTimeFormat(language === "km" ? "km-KH" : "en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  }).format(date);
+}
+
+function isWeekendDate(dateString) {
+  const day = new Date(`${dateString}T12:00:00`).getDay();
+  return day === 0 || day === 6;
+}
+
+function stadiumDay(dateString) {
+  return isWeekendDate(dateString) ? STADIUM_INFO.weekend : STADIUM_INFO.weekday;
+}
+
+function stadiumRate(dateString, minutes) {
+  const day = stadiumDay(dateString);
+  const rates = Array.isArray(day.rates) ? day.rates : [];
+  const match = rates.find(
+    (rate) =>
+      minutes >= parseClock(rate.from) && minutes < parseClock(rate.to),
+  );
+  return Number((match || rates[rates.length - 1] || { price: 0 }).price) || 0;
+}
+
+function bookingEndClock(start, minutes) {
+  return clockFromMinutes(parseClock(start) + Number(minutes || 0));
+}
+
+function bookingPrice(dateString, start, minutes) {
+  const step = Number(STADIUM_INFO.slotMinutes) || 30;
+  let cursor = parseClock(start);
+  const end = cursor + Number(minutes || 0);
+  if (!Number.isFinite(cursor) || !Number.isFinite(end) || end <= cursor) return 0;
+  let total = 0;
+  while (cursor < end) {
+    const segment = Math.min(step, end - cursor);
+    total += (stadiumRate(dateString, cursor) * segment) / 60;
+    cursor += segment;
+  }
+  return Math.round(total * 100) / 100;
+}
+
+function bookingOverlaps(dateString, start, minutes, ignoreId = "") {
+  const startMinutes = parseClock(start);
+  const endMinutes = startMinutes + Number(minutes || 0);
+  return (store.bookings || []).some((booking) => {
+    if (booking.id === ignoreId || booking.date !== dateString) return false;
+    const otherStart = parseClock(booking.start);
+    const otherEnd = parseClock(booking.end);
+    return startMinutes < otherEnd && endMinutes > otherStart;
+  });
+}
+
+function bookingSlotList(dateString, minutes) {
+  const open = parseClock(STADIUM_INFO.open);
+  const close = parseClock(STADIUM_INFO.close);
+  const step = Number(STADIUM_INFO.slotMinutes) || 30;
+  const duration = Number(minutes) || Number(STADIUM_INFO.minMinutes) || 60;
+  const today = todayISO();
+  const current = today === dateString ? new Date() : null;
+  const nowMinutes = current ? current.getHours() * 60 + current.getMinutes() : -1;
+  const slots = [];
+  for (let start = open; start + duration <= close; start += step) {
+    slots.push({
+      value: clockFromMinutes(start),
+      end: clockFromMinutes(start + duration),
+      price: bookingPrice(dateString, clockFromMinutes(start), duration),
+      available:
+        !(today === dateString && start <= nowMinutes) &&
+        !bookingOverlaps(dateString, clockFromMinutes(start), duration),
+    });
+  }
+  return slots;
+}
+
+function bookingDurationLabel(minutes) {
+  if (minutes === 90) return t("bookingOneAndHalf");
+  if (minutes === 120) return t("bookingTwoHours");
+  if (minutes === 180) return t("bookingThreeHours");
+  return t("bookingOneHour");
+}
+
+function bookingOwnerId() {
+  return activeAccount?.id || "";
+}
+
+function ownBookings() {
+  const ownerId = bookingOwnerId();
+  return (store.bookings || [])
+    .filter((booking) => !booking.ownerId || booking.ownerId === ownerId)
+    .sort((left, right) =>
+      `${left.date} ${left.start}`.localeCompare(`${right.date} ${right.start}`),
+    );
+}
+
+function bookingTelegramUrl(booking) {
+  const telegram = primaryTelegram();
+  const lines = [
+    "Stadium booking request",
+    `Date: ${booking.date}`,
+    `Time: ${formatClock(parseClock(booking.start))} – ${formatClock(parseClock(booking.end))}`,
+    `Name: ${booking.name}`,
+    `Phone: ${booking.phone}`,
+    booking.note ? `Note: ${booking.note}` : "",
+    `Total: ${formatMoney(booking.price)}`,
+  ].filter(Boolean);
+  const handle = telegram?.handle || "Oukdomm7";
+  return `https://t.me/${encodeURIComponent(handle)}?text=${encodeURIComponent(lines.join("\n"))}`;
+}
+
+function primaryTelegram() {
+  const list = Array.isArray(CONTACT_INFO.telegrams) ? CONTACT_INFO.telegrams : [];
+  return list.find((item) => item.role === "owner") || list[0] || null;
+}
+
+function primaryPhone() {
+  return Array.isArray(CONTACT_INFO.phones) ? CONTACT_INFO.phones[0] || null : null;
+}
+
+function applyContactLinks() {
+  const telegram = primaryTelegram();
+  const phone = primaryPhone();
+  const links = {
+    "#auth-telegram-link": telegram?.url || "#",
+    "#contact-telegram-button": telegram?.url || "#",
+    "#assistant-human-link": telegram?.url || "#",
+    "#recovery-telegram-link": telegram?.url || "#",
+    "#shop-telegram-link": telegram?.url || "#",
+  };
+  for (const [selector, href] of Object.entries(links)) {
+    const element = document.querySelector(selector);
+    if (element) element.href = href;
+  }
+  for (const selector of ["#auth-phone-link", "#recovery-phone-link"]) {
+    const element = document.querySelector(selector);
+    if (element) element.href = phone?.tel ? `tel:${phone.tel}` : "#";
+  }
+}
+
+function contactIcon(name) {
+  const icons = {
+    phone:
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.2 3.8 10 3l1.8 4.4-2 1.6a12 12 0 0 0 5.2 5.2l1.6-2L21 14l-.8 2.8a2.2 2.2 0 0 1-2.4 1.6C11.3 17.7 6.3 12.7 5.6 6.2A2.2 2.2 0 0 1 7.2 3.8Z"/></svg>',
+    email:
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="2.5"/><path d="m4.5 7 7.5 6 7.5-6"/></svg>',
+    location:
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s6-5.2 6-10a6 6 0 1 0-12 0c0 4.8 6 10 6 10Z"/><circle cx="12" cy="11" r="2.2"/></svg>',
+    telegram:
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3.5 11 17-7-6.8 15.2-2.3-5.4L3.5 11Z"/><path d="m11.4 13.8 3.5-3.6"/></svg>',
+    facebook:
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 8.5H17V5h-2.5C12 5 10.5 6.6 10.5 9.2V11H8v3.5h2.5V21H14v-6.5h2.7l.5-3.5H14V9.3c0-.5.2-.8.5-.8Z"/></svg>',
+    tiktok:
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4v10.2a3.4 3.4 0 1 1-3-3.4v3.1a1.2 1.2 0 1 0 .9 1.1V4h2.7a4.2 4.2 0 0 0 3.9 3.3v3A7 7 0 0 1 14 8.7"/></svg>',
+    clock:
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>',
+  };
+  return icons[name] || "";
+}
+
+function renderContactHub(container) {
+  if (!container) return;
+  const phones = Array.isArray(CONTACT_INFO.phones) ? CONTACT_INFO.phones : [];
+  const telegrams = Array.isArray(CONTACT_INFO.telegrams) ? CONTACT_INFO.telegrams : [];
+  const facebooks = Array.isArray(CONTACT_INFO.facebooks) ? CONTACT_INFO.facebooks : [];
+  const location = CONTACT_INFO.location || {};
+  const phoneRows = phones
+    .map(
+      (phone) => `<a class="contact-row" href="tel:${escapeHtml(phone.tel)}">
+        <span>${escapeHtml(phone.label)}</span><span aria-hidden="true">↗</span>
+      </a>`,
+    )
+    .join("");
+  const facebookRows = facebooks
+    .map(
+      (page) => `<a class="contact-pill" href="${escapeHtml(page.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(page.label)}</a>`,
+    )
+    .join("");
+  const telegramCards = telegrams
+    .map(
+      (telegram) => `<article class="contact-qr-card">
+        <a class="contact-qr-image" href="${escapeHtml(telegram.qr || telegram.url)}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHtml(telegram.label)} QR">
+          ${telegram.qr ? `<img src="${escapeHtml(telegram.qr)}" alt="${escapeHtml(telegram.label)} QR code" loading="lazy">` : ""}
+        </a>
+        <div>
+          <strong>${escapeHtml(telegram.label)}</strong>
+          <small>${escapeHtml(telegram.role === "owner" ? t("contactOwner") : t("contactAdmin"))}</small>
+          <a class="contact-pill" href="${escapeHtml(telegram.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(t("contactMessage"))}</a>
+        </div>
+      </article>`,
+    )
+    .join("");
+  const tiktok = String(CONTACT_INFO.tiktok || "");
+  container.innerHTML = `
+    <div class="contact-grid">
+      <article class="contact-group tilt-card">
+        <div class="contact-group-head"><span class="contact-icon">${contactIcon("phone")}</span><div><span>${escapeHtml(t("contactPhone"))}</span><small>${escapeHtml(t("contactCallHint"))}</small></div></div>
+        ${phoneRows || `<span class="contact-muted">${escapeHtml(t("contactComingSoon"))}</span>`}
+      </article>
+      <article class="contact-group tilt-card">
+        <div class="contact-group-head"><span class="contact-icon">${contactIcon("email")}</span><div><span>${escapeHtml(t("contactEmail"))}</span><small>${escapeHtml(t("contactEmailHint"))}</small></div></div>
+        ${CONTACT_INFO.email ? `<a class="contact-row" href="mailto:${escapeHtml(CONTACT_INFO.email)}"><span>${escapeHtml(CONTACT_INFO.email)}</span><span aria-hidden="true">↗</span></a>` : `<span class="contact-muted">${escapeHtml(t("contactComingSoon"))}</span>`}
+      </article>
+      <article class="contact-group tilt-card">
+        <div class="contact-group-head"><span class="contact-icon">${contactIcon("location")}</span><div><span>${escapeHtml(t("contactLocation"))}</span><small>${escapeHtml(t("contactLocationHint"))}</small></div></div>
+        ${location.url ? `<a class="contact-row" href="${escapeHtml(location.url)}" target="_blank" rel="noopener noreferrer"><span>${escapeHtml(location.label || t("contactOpenMaps"))}</span><span aria-hidden="true">↗</span></a>` : `<span class="contact-muted">${escapeHtml(t("contactComingSoon"))}</span>`}
+      </article>
+      <article class="contact-group tilt-card">
+        <div class="contact-group-head"><span class="contact-icon">${contactIcon("facebook")}</span><div><span>${escapeHtml(t("contactFacebook"))}</span><small>${escapeHtml(t("contactSocialHint"))}</small></div></div>
+        <div class="contact-pill-row">${facebookRows || `<span class="contact-muted">${escapeHtml(t("contactComingSoon"))}</span>`}</div>
+      </article>
+      <article class="contact-group tilt-card">
+        <div class="contact-group-head"><span class="contact-icon">${contactIcon("tiktok")}</span><div><span>${escapeHtml(t("contactTiktok"))}</span><small>${escapeHtml(t("contactSocialHint"))}</small></div></div>
+        ${tiktok ? `<a class="contact-row" href="${escapeHtml(tiktok)}" target="_blank" rel="noopener noreferrer"><span>TikTok</span><span aria-hidden="true">↗</span></a>` : `<span class="contact-muted">${escapeHtml(t("contactComingSoon"))}</span>`}
+      </article>
+      <article class="contact-group tilt-card contact-hours">
+        <div class="contact-group-head"><span class="contact-icon">${contactIcon("clock")}</span><div><span>${escapeHtml(t("contactHours"))}</span><small>${escapeHtml(t("bookingHoursNote"))}</small></div></div>
+        <span class="contact-row"><span>${escapeHtml(t("bookingOpenHours"))}</span></span>
+      </article>
+    </div>
+    <div class="contact-qr-section">
+      <div class="contact-qr-heading">
+        <span class="contact-icon">${contactIcon("telegram")}</span>
+        <div><strong>${escapeHtml(t("contactTelegram"))}</strong><small>${escapeHtml(t("contactScan"))}</small></div>
+      </div>
+      <div class="contact-qr-grid">${telegramCards || `<span class="contact-muted">${escapeHtml(t("contactComingSoon"))}</span>`}</div>
+    </div>`;
+}
+
+function renderContactHubs() {
+  renderContactHub(document.querySelector("#contact-hub"));
+  renderContactHub(document.querySelector("#account-contact-hub"));
+  applyContactLinks();
+}
+
+function renderBookingPage() {
+  if (!store.bookings) store.bookings = [];
+  const dateInput = document.querySelector("#booking-date");
+  const startSelect = document.querySelector("#booking-start");
+  const durationSelect = document.querySelector("#booking-duration");
+  if (!dateInput || !startSelect || !durationSelect) return;
+  const today = todayISO();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(bookingDate) || bookingDate < today) {
+    bookingDate = today;
+  }
+  dateInput.min = today;
+  dateInput.max = addDaysISO(today, Number(STADIUM_INFO.advanceDays) || 60);
+  dateInput.value = bookingDate;
+
+  const minMinutes = Number(STADIUM_INFO.minMinutes) || 60;
+  const maxMinutes = Number(STADIUM_INFO.maxMinutes) || 180;
+  const step = Number(STADIUM_INFO.slotMinutes) || 30;
+  const durations = [];
+  for (let minutes = minMinutes; minutes <= maxMinutes; minutes += step) {
+    durations.push(minutes);
+  }
+  if (!durations.includes(bookingMinutes)) bookingMinutes = durations[0] || 60;
+  durationSelect.innerHTML = durations
+    .map(
+      (minutes) =>
+        `<option value="${minutes}"${minutes === bookingMinutes ? " selected" : ""}>${escapeHtml(bookingDurationLabel(minutes))}</option>`,
+    )
+    .join("");
+
+  const slots = bookingSlotList(bookingDate, bookingMinutes);
+  if (!slots.some((slot) => slot.value === bookingStart && slot.available)) {
+    bookingStart = slots.find((slot) => slot.available)?.value || "";
+  }
+  startSelect.innerHTML =
+    `<option value="">${escapeHtml(t("bookingChooseTime"))}</option>` +
+    slots
+      .map(
+        (slot) =>
+          `<option value="${slot.value}"${slot.value === bookingStart ? " selected" : ""}${slot.available ? "" : " disabled"}>${escapeHtml(formatClock(parseClock(slot.value)))} · ${escapeHtml(formatMoney(slot.price))}${slot.available ? "" : ` · ${escapeHtml(t("bookingBooked"))}`}</option>`,
+      )
+      .join("");
+
+  const nameInput = document.querySelector("#booking-name");
+  const phoneInput = document.querySelector("#booking-phone");
+  if (nameInput && !nameInput.value) nameInput.value = activeAccount?.name || "";
+  if (phoneInput && !phoneInput.value) phoneInput.value = activeAccount?.phone || "";
+
+  const price =
+    bookingStart && !bookingOverlaps(bookingDate, bookingStart, bookingMinutes)
+      ? bookingPrice(bookingDate, bookingStart, bookingMinutes)
+      : 0;
+  document.querySelector("#booking-price").textContent = formatMoney(price);
+  document.querySelector("#booking-price-detail").textContent = bookingStart
+    ? `${formatBookingDate(bookingDate)} · ${formatClock(parseClock(bookingStart))} – ${formatClock(parseClock(bookingStart) + bookingMinutes)} · ${bookingDurationLabel(bookingMinutes)}`
+    : t("bookingChooseTime");
+
+  document.querySelector("#booking-rates").innerHTML = [STADIUM_INFO.weekday, STADIUM_INFO.weekend]
+    .map(
+      (day) => `<div class="booking-rate-group">
+        <strong>${escapeHtml(day.label)}</strong>
+        ${(day.rates || [])
+          .map(
+            (rate) =>
+              `<span><span>${escapeHtml(formatClock(parseClock(rate.from)))} – ${escapeHtml(formatClock(parseClock(rate.to)))}</span><b>${escapeHtml(formatMoney(rate.price))} <small>${escapeHtml(t("bookingPerHour"))}</small></b></span>`,
+          )
+          .join("")}
+      </div>`,
+    )
+    .join("");
+
+  const list = document.querySelector("#booking-list");
+  const bookings = ownBookings();
+  list.innerHTML = bookings.length
+    ? bookings
+        .map(
+          (booking) => `<article class="booking-item">
+            <div>
+              <strong>${escapeHtml(formatBookingDate(booking.date))}</strong>
+              <span>${escapeHtml(formatClock(parseClock(booking.start)))} – ${escapeHtml(formatClock(parseClock(booking.end)))} · ${escapeHtml(booking.name)}</span>
+            </div>
+            <div class="booking-item-side">
+              <b>${escapeHtml(formatMoney(booking.price))}</b>
+              <button type="button" class="booking-cancel" data-cancel-booking="${escapeHtml(booking.id)}">${escapeHtml(t("bookingCancel"))}</button>
+            </div>
+          </article>`,
+        )
+        .join("")
+    : `<p class="booking-empty">${escapeHtml(t("bookingEmpty"))}</p>`;
+
+  const success = document.querySelector("#booking-success");
+  const latest = bookings.find((booking) => booking.id === lastBookingId);
+  success.hidden = !latest;
+  if (latest) {
+    success.innerHTML = `<div class="booking-success-inner">
+      <span class="booking-success-mark" aria-hidden="true">✓</span>
+      <div>
+        <strong>${escapeHtml(t("bookingCreated"))}</strong>
+        <p>${escapeHtml(formatBookingDate(latest.date))} · ${escapeHtml(formatClock(parseClock(latest.start)))} – ${escapeHtml(formatClock(parseClock(latest.end)))} · ${escapeHtml(formatMoney(latest.price))}</p>
+      </div>
+      <a class="button button-primary button-small" href="${escapeHtml(bookingTelegramUrl(latest))}" target="_blank" rel="noopener noreferrer">${escapeHtml(t("bookingSendTelegram"))}</a>
+      <button type="button" class="link-button" id="booking-success-dismiss">${escapeHtml(t("done"))}</button>
+    </div>`;
+  }
+}
+
+function submitBooking(event) {
+  event.preventDefault();
+  const error = document.querySelector("#booking-error");
+  const fail = (message) => {
+    error.textContent = message;
+    error.hidden = false;
+  };
+  error.hidden = true;
+  const date = document.querySelector("#booking-date").value;
+  const start = document.querySelector("#booking-start").value;
+  const minutes = Number(document.querySelector("#booking-duration").value) || 60;
+  const name = document.querySelector("#booking-name").value.trim();
+  const phone = document.querySelector("#booking-phone").value.trim();
+  const note = document.querySelector("#booking-note").value.trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !start) return fail(t("bookingValidation"));
+  if (date === todayISO() && parseClock(start) <= new Date().getHours() * 60 + new Date().getMinutes()) {
+    return fail(t("bookingPast"));
+  }
+  if (!name || phone.length < 5) return fail(t("bookingContactRequired"));
+  if (bookingOverlaps(date, start, minutes)) return fail(t("bookingConflict"));
+  const end = clockFromMinutes(parseClock(start) + minutes);
+  const booking = {
+    id: createId(),
+    date,
+    start,
+    end,
+    minutes,
+    name,
+    phone,
+    note,
+    price: bookingPrice(date, start, minutes),
+    ownerId: bookingOwnerId(),
+    createdAt: new Date().toISOString(),
+  };
+  const previous = store.bookings;
+  store.bookings = [...(store.bookings || []), booking];
+  if (!persistData()) {
+    store.bookings = previous;
+    return fail(t("bookingFailed"));
+  }
+  bookingDate = date;
+  bookingStart = start;
+  bookingMinutes = minutes;
+  lastBookingId = booking.id;
+  document.querySelector("#booking-note").value = "";
+  renderBookingPage();
+  showToast(t("bookingCreated"));
+  playCheer();
+}
+
+function cancelBooking(bookingId) {
+  const booking = (store.bookings || []).find((item) => item.id === bookingId);
+  if (!booking) return;
+  const previous = store.bookings;
+  store.bookings = store.bookings.filter((item) => item.id !== booking.id);
+  if (!persistData()) {
+    store.bookings = previous;
+    return;
+  }
+  if (lastBookingId === booking.id) lastBookingId = "";
+  renderBookingPage();
+  showToast(t("bookingCancelled"));
+}
+
+function shopCategoryLabel(category) {
+  const keys = {
+    bookstore: "shopCategoryBookstore",
+    drinks: "shopCategoryDrinks",
+    snacks: "shopCategorySnacks",
+    merchandise: "shopCategoryMerchandise",
+  };
+  return keys[category] ? t(keys[category]) : category;
+}
+
+function renderShop() {
+  const grid = document.querySelector("#product-grid");
+  const filter = document.querySelector("#shop-filter");
+  if (!grid || !filter) return;
+  const categories = [...new Set(PRODUCT_CATALOG.map((product) => product.category))];
+  if (shopCategory !== "all" && !categories.includes(shopCategory)) shopCategory = "all";
+  filter.innerHTML =
+    `<button type="button" class="shop-chip${shopCategory === "all" ? " is-active" : ""}" data-shop-category="all">${escapeHtml(t("shopAll"))}</button>` +
+    categories
+      .map(
+        (category) =>
+          `<button type="button" class="shop-chip${shopCategory === category ? " is-active" : ""}" data-shop-category="${escapeHtml(category)}">${escapeHtml(shopCategoryLabel(category))}</button>`,
+      )
+      .join("");
+  const visible = PRODUCT_CATALOG.filter(
+    (product) => shopCategory === "all" || product.category === shopCategory,
+  );
+  grid.innerHTML = visible.length
+    ? visible
+        .map((product) => {
+          const name =
+            language === "km" && product.nameKm ? product.nameKm : product.name;
+          const description =
+            language === "km" && product.descriptionKm
+              ? product.descriptionKm
+              : product.description;
+          const telegram = primaryTelegram();
+          const message = `Hello! I would like to ask about: ${product.name} (${formatMoney(product.price)} / ${product.unit}).`;
+          const link = telegram?.handle
+            ? `https://t.me/${encodeURIComponent(telegram.handle)}?text=${encodeURIComponent(message)}`
+            : telegram?.url || "#";
+          return `<article class="product-card tilt-card">
+            <span class="product-badge">${escapeHtml(product.available ? t("shopAvailable") : t("shopComingSoon"))}</span>
+            <div class="product-art" aria-hidden="true"><span>${escapeHtml(product.emoji || "✦")}</span></div>
+            <div class="product-copy">
+              <span class="product-category">${escapeHtml(shopCategoryLabel(product.category))}</span>
+              <h3>${escapeHtml(name)}</h3>
+              <p>${escapeHtml(description || "")}</p>
+            </div>
+            <div class="product-foot">
+              <strong>${escapeHtml(formatMoney(product.price))} <small>/ ${escapeHtml(product.unit)}</small></strong>
+              <a href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(t("shopReserve"))} <span aria-hidden="true">↗</span></a>
+            </div>
+          </article>`;
+        })
+        .join("")
+    : `<p class="booking-empty">${escapeHtml(t("shopEmpty"))}</p>`;
+  applyContactLinks();
+}
+
+function renderAccountPage() {
+  const name = activeAccount?.name || activeAccount?.username || t("publicGreeting");
+  document.querySelector("#account-avatar").textContent = initials(name) || "?";
+  document.querySelector("#account-name").textContent = name;
+  document.querySelector("#account-role").textContent = currentAccessRoleLabel();
+  document.querySelector("#account-contact").textContent =
+    activeAccount?.email || activeAccount?.phone || activeAccount?.username || "";
+  const bookingCount = ownBookings().length;
+  document.querySelector("#account-meta").innerHTML = `
+    <span>@${escapeHtml(activeAccount?.username || "")}</span>
+    <span>${escapeHtml(t("accountBookings", { count: localizeDigits(bookingCount) }))}</span>
+    <span class="${activeAccount?.hasRecovery ? "is-ok" : "is-warn"}">${escapeHtml(activeAccount?.hasRecovery ? t("recoveryCodeExists") : t("recoveryCodeMissing"))}</span>`;
+  const status = document.querySelector("#recovery-status");
+  status.textContent = activeAccount?.hasRecovery
+    ? t("recoveryCodeExists")
+    : t("recoveryCodeMissing");
+  status.classList.toggle("is-ok", Boolean(activeAccount?.hasRecovery));
+  status.classList.toggle("is-warn", !activeAccount?.hasRecovery);
+}
+
+async function setRecoveryCode(event) {
+  event.preventDefault();
+  const input = document.querySelector("#recovery-code-input");
+  const error = document.querySelector("#recovery-code-error");
+  const success = document.querySelector("#recovery-code-success");
+  const code = input.value.trim();
+  error.hidden = true;
+  success.hidden = true;
+  if (code.length < 8) {
+    error.textContent = t("recoveryCodeInvalid");
+    error.hidden = false;
+    return;
+  }
+  if (!sessionToken) {
+    error.textContent = t("recoveryOnlineOnly");
+    error.hidden = false;
+    return;
+  }
+  const result = await authRequest("/recovery", { method: "POST", body: { code } });
+  if (result.ok && result.payload?.account) {
+    mergeRemoteAccountFields(result.payload.account);
+    activeAccount =
+      store.users.find((user) => user.id === result.payload.account.id) || activeAccount;
+    persistData();
+    input.value = "";
+    success.textContent = t("recoveryCodeSaved");
+    success.hidden = false;
+    renderAccountPage();
+    return;
+  }
+  error.textContent = t(remoteErrorKey(result, "recoveryUnavailable"));
+  error.hidden = false;
+}
+
+function openRecoveryDialog(prefill = "") {
+  const dialog = document.querySelector("#recovery-dialog");
+  document.querySelector("#recovery-form").reset();
+  document.querySelector("#recovery-error").hidden = true;
+  document.querySelector("#recovery-success").hidden = true;
+  document.querySelector("#recovery-identifier").value = prefill || "";
+  applyContactLinks();
+  dialog.showModal();
+  document.querySelector(prefill ? "#recovery-code" : "#recovery-identifier").focus();
+}
+
+async function submitRecovery(event) {
+  event.preventDefault();
+  const identifier = document.querySelector("#recovery-identifier").value.trim();
+  const code = document.querySelector("#recovery-code").value.trim();
+  const password = document.querySelector("#recovery-new-password").value;
+  const confirmation = document.querySelector("#recovery-confirm").value;
+  const error = document.querySelector("#recovery-error");
+  const success = document.querySelector("#recovery-success");
+  const submit = document.querySelector("#recovery-submit");
+  const fail = (message) => {
+    error.textContent = message;
+    error.hidden = false;
+    success.hidden = true;
+  };
+  error.hidden = true;
+  success.hidden = true;
+  if (!identifier || !code) return fail(t("recoveryInvalid"));
+  if (password.length < 8) return fail(t("registerPasswordShort"));
+  if (password !== confirmation) return fail(t("registerPasswordMismatch"));
+  submit.disabled = true;
+  try {
+    const result = await authRequest("/recover", {
+      method: "POST",
+      body: { identifier, code, password },
+    });
+    if (result.ok) {
+      success.textContent = t("recoverySuccess");
+      success.hidden = false;
+      document.querySelector("#auth-username").value = identifier;
+      setAuthMode("login");
+      showToast(t("recoverySuccess"));
+      window.setTimeout(() => document.querySelector("#recovery-dialog").close(), 1400);
+      return;
+    }
+    if (result.status === 429) return fail(t("authRateLimited"));
+    if (result.status === 400 || result.status === 401) return fail(t("recoveryInvalid"));
+    if (window.location.protocol === "file:" || result.network) {
+      return fail(t("recoveryOnlineOnly"));
+    }
+    fail(t("recoveryUnavailable"));
+  } finally {
+    submit.disabled = false;
+  }
+}
+
+function openResetPasswordDialog(userId) {
+  const user = store.users.find((item) => item.id === userId);
+  if (!user || !isAdmin()) return;
+  const dialog = document.querySelector("#reset-password-dialog");
+  document.querySelector("#reset-password-id").value = user.id;
+  document.querySelector("#reset-password-value").value = "";
+  document.querySelector("#reset-password-error").hidden = true;
+  document.querySelector("#reset-password-description").textContent = t(
+    "resetPasswordIntro",
+    { name: user.name || user.username },
+  );
+  dialog.showModal();
+  document.querySelector("#reset-password-value").focus();
+}
+
+async function submitPasswordReset(event) {
+  event.preventDefault();
+  const id = document.querySelector("#reset-password-id").value;
+  const password = document.querySelector("#reset-password-value").value;
+  const error = document.querySelector("#reset-password-error");
+  if (password.length < 8) {
+    error.textContent = t("resetPasswordInvalid");
+    error.hidden = false;
+    return;
+  }
+  error.hidden = true;
+  const result = await authRequest(`/accounts/${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    body: { password },
+  });
+  if (result.ok) {
+    document.querySelector("#reset-password-dialog").close();
+    showToast(t("resetPasswordDone"));
+    return;
+  }
+  error.textContent = t(remoteErrorKey(result, "resetPasswordFailed"));
+  error.hidden = false;
+}
+
+function bindTiltCards() {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  document.querySelectorAll(".tilt-card").forEach((card) => {
+    if (card.dataset.tiltBound) return;
+    card.dataset.tiltBound = "true";
+    card.addEventListener("pointermove", (event) => {
+      const rect = card.getBoundingClientRect();
+      const dx = (event.clientX - rect.left) / rect.width - 0.5;
+      const dy = (event.clientY - rect.top) / rect.height - 0.5;
+      card.style.setProperty("--tilt-x", `${(-dy * 5).toFixed(2)}deg`);
+      card.style.setProperty("--tilt-y", `${(dx * 6).toFixed(2)}deg`);
+      card.classList.add("is-tilting");
+    });
+    card.addEventListener("pointerleave", () => {
+      card.style.setProperty("--tilt-x", "0deg");
+      card.style.setProperty("--tilt-y", "0deg");
+      card.classList.remove("is-tilting");
+    });
+  });
+}
+
+const ASSISTANT_RULES = [
+  {
+    key: "assistantBooking",
+    page: "booking",
+    words: ["book", "booking", "stadium", "pitch", "field", "price", "pricing", "hour", "schedule", "កក់", "ទីលាន", "ម៉ោង", "តម្លៃ"],
+  },
+  {
+    key: "assistantShop",
+    page: "shop",
+    words: ["shop", "store", "bookstore", "book", "drink", "water", "snack", "product", "merch", "buy", "shirt", "ហាង", "សៀវភៅ", "ភេសជ្ជៈ", "ទិញ", "សម្ភារៈ"],
+  },
+  {
+    key: "assistantRecovery",
+    page: "recovery",
+    words: ["password", "forgot", "recover", "recovery", "reset", "login", "sign in", "signin", "locked", "ពាក្យសម្ងាត់", "បំភ្លេច", "សង្គ្រោះ"],
+  },
+  {
+    key: "assistantRoles",
+    words: ["role", "roles", "owner", "admin", "developer", "coach", "captain", "manager", "permission", "access", "តួនាទី", "ម្ចាស់", "គ្រូបង្វឹក", "អ្នកគ្រប់គ្រង"],
+  },
+  {
+    key: "assistantContact",
+    links: true,
+    words: ["contact", "phone", "telegram", "facebook", "tiktok", "map", "location", "email", "call", "address", "ទំនាក់ទំនង", "ទូរស័ព្ទ", "អ៊ីមែល", "ផែនទី", "អាសយដ្ឋាន"],
+  },
+  {
+    key: "assistantTeams",
+    page: "teams",
+    words: ["team", "teams", "roster", "member", "members", "player", "players", "squad", "create", "ក្រុម", "កីឡាករ", "សមាជិក"],
+  },
+  {
+    key: "assistantAccount",
+    page: "account",
+    words: ["account", "profile", "logout", "sign out", "គណនី", "ប្រវត្តិរូប"],
+  },
+  {
+    key: "assistantGreeting",
+    words: ["hello", "hi", "hey", "sunny", "សួស្តី", "ជំនួយ"],
+  },
+];
+
+const ASSISTANT_CHIPS = [
+  { key: "bookingTitle", topic: "booking" },
+  { key: "shopTitle", topic: "shop" },
+  { key: "recoveryTitle", topic: "recovery" },
+  { key: "rolesTitle", topic: "roles" },
+  { key: "contactTitle", topic: "contact" },
+];
+
+function assistantPageLabel(page) {
+  const labels = {
+    booking: "assistantBookPage",
+    shop: "assistantShopPage",
+    account: "assistantAccountPage",
+    recovery: "assistantRecoveryPage",
+    teams: "teams",
+  };
+  return t(labels[page] || "overview");
+}
+
+function renderAssistantChips() {
+  const container = document.querySelector("#assistant-chips");
+  if (!container) return;
+  container.replaceChildren();
+  for (const chip of ASSISTANT_CHIPS) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "assistant-chip";
+    button.dataset.assistantTopic = chip.topic;
+    button.textContent = t(chip.key);
+    container.append(button);
+  }
+}
+
+function renderAssistantMessages() {
+  const log = document.querySelector("#assistant-messages");
+  if (!log) return;
+  log.replaceChildren();
+  for (const message of assistantHistory) {
+    const bubble = document.createElement("article");
+    bubble.className = `assistant-message assistant-message-${message.role}`;
+    const copy = document.createElement("p");
+    copy.textContent = message.text;
+    bubble.append(copy);
+    if (message.links) {
+      const links = document.createElement("div");
+      links.className = "assistant-links";
+      const phone = primaryPhone();
+      const entries = [
+        ...(Array.isArray(CONTACT_INFO.telegrams)
+          ? CONTACT_INFO.telegrams.map((telegram) => ({
+              href: telegram.url,
+              label: `${telegram.label} · ${t(telegram.role === "owner" ? "contactOwner" : "contactAdmin")}`,
+            }))
+          : []),
+        phone ? { href: `tel:${phone.tel}`, label: phone.label } : null,
+        CONTACT_INFO.email ? { href: `mailto:${CONTACT_INFO.email}`, label: t("contactEmail") } : null,
+      ].filter(Boolean);
+      for (const entry of entries) {
+        const link = document.createElement("a");
+        link.href = entry.href;
+        link.textContent = entry.label;
+        if (!entry.href.startsWith("tel:") && !entry.href.startsWith("mailto:")) {
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+        }
+        links.append(link);
+      }
+      bubble.append(links);
+    }
+    if (message.page) {
+      const action = document.createElement("button");
+      action.type = "button";
+      action.className = "assistant-action";
+      action.dataset.assistantPage = message.page;
+      action.textContent = `${t("assistantOpen", { page: assistantPageLabel(message.page) })}`;
+      bubble.append(action);
+    }
+    log.append(bubble);
+  }
+  log.scrollTop = log.scrollHeight;
+}
+
+function addAssistantMessage(role, text, options = {}) {
+  assistantHistory.push({
+    role,
+    text,
+    links: Boolean(options.links),
+    page: options.page || "",
+  });
+  renderAssistantMessages();
+}
+
+function assistantSignInRequired() {
+  addAssistantMessage("bot", t("assistantNeedSignIn"), {});
+  authRequested = true;
+  render();
+  window.requestAnimationFrame(() => document.querySelector("#auth-username")?.focus());
+}
+
+function assistantNavigate(page) {
+  if (page === "recovery") {
+    authRequested = true;
+    authMode = "login";
+    render();
+    window.requestAnimationFrame(() => openRecoveryDialog());
+    return;
+  }
+  if (page === "teams") {
+    const wasGated = authRequested;
+    authRequested = false;
+    if (window.location.hash === "#teams" && wasGated) render();
+    window.location.hash = "#teams";
+    return;
+  }
+  if (page === "booking" || page === "shop") {
+    const wasGated = authRequested;
+    authRequested = false;
+    if (window.location.hash === `#${page}` && wasGated) render();
+    window.location.hash = `#${page}`;
+    return;
+  }
+  if (!activeAccount) {
+    if (page === "account") window.location.hash = "#account";
+    assistantSignInRequired();
+    return;
+  }
+  window.location.hash = `#${page}`;
+}
+
+function assistantHasWord(text, word) {
+  if (/^[a-z0-9 ]+$/i.test(word)) {
+    return new RegExp(`(^|[^a-z0-9])${word}([^a-z0-9]|$)`, "i").test(text);
+  }
+  return text.includes(word);
+}
+
+function assistantAnswer(raw) {
+  const text = String(raw || "").trim();
+  if (!text) return;
+  addAssistantMessage("user", text);
+  document.querySelector("#assistant-input").value = "";
+  const log = document.querySelector("#assistant-messages");
+  const typing = document.createElement("article");
+  typing.className = "assistant-message assistant-message-bot assistant-typing";
+  typing.innerHTML = "<span></span><span></span><span></span>";
+  log.append(typing);
+  log.scrollTop = log.scrollHeight;
+  const lowered = text.toLowerCase();
+  window.setTimeout(() => {
+    typing.remove();
+    const rule = ASSISTANT_RULES.find((item) =>
+      item.words.some((word) => assistantHasWord(lowered, word)),
+    );
+    if (!rule) {
+      addAssistantMessage("bot", t("assistantFallback"), { links: true });
+      return;
+    }
+    addAssistantMessage("bot", t(rule.key), {
+      links: Boolean(rule.links),
+      page: rule.page || "",
+    });
+  }, 420);
+}
+
+function setAssistantOpen(open) {
+  const panel = document.querySelector("#assistant-panel");
+  const launcher = document.querySelector("#assistant-launcher");
+  assistantOpen = Boolean(open);
+  panel.hidden = !assistantOpen;
+  launcher.setAttribute("aria-expanded", String(assistantOpen));
+  launcher.hidden = assistantOpen;
+  document.body.classList.toggle("assistant-open", assistantOpen);
+  if (!assistantOpen) {
+    launcher.focus();
+    return;
+  }
+  if (!assistantHistory.length) {
+    addAssistantMessage("bot", t("assistantGreeting"), {});
+  }
+  renderAssistantChips();
+  window.requestAnimationFrame(() => {
+    document.querySelector("#assistant-input").focus();
+  });
+}
 function render() {
+  const appPage = appPageFromHash();
+  const hasAppPage = Boolean(appPage);
   const team = currentTeam();
   const hasTeam = Boolean(team);
   const canManageTeamNow = canManageCurrentTeam();
   const mainContent = document.querySelector(".main-content");
-  mainContent.dataset.view = hasTeam ? "team" : "directory";
+  mainContent.dataset.view = appPage || (hasTeam ? "team" : "directory");
   mainContent.style.setProperty("--team-accent", hasTeam ? teamAccentColor(team) : "#d4a03a");
-  const gated = !activeAccount;
+  if (!activeAccount && appPage === "account") authRequested = true;
+  const gated = !activeAccount && authRequested;
   document.body.classList.toggle("auth-gate", gated);
   document.querySelector("#auth-screen").hidden = !gated;
   document.querySelector("#app-shell").hidden = gated;
@@ -2402,7 +3706,7 @@ function render() {
     : "";
   const role = activeAccount ? translatedAccessRole : t("publicView");
   document.querySelector("#user-role").textContent = role;
-  document.querySelector("#management-hub").hidden = !canAccessManagement();
+  document.querySelector("#management-hub").hidden = !canAccessManagement() || hasAppPage;
   document.querySelector("#management-current-team").textContent = team?.club.name || "";
   document.querySelector("#management-create-team-button").hidden = !canCreateTeam();
   document.querySelector("#management-edit-team-button").hidden = !canManageTeamNow;
@@ -2413,22 +3717,45 @@ function render() {
   document.querySelector("#empty-bulk-add-button").hidden = !canManageTeamNow;
   document.querySelector("#edit-club-button").hidden = !canManageTeamNow;
   document.querySelector("#contact-edit-button").hidden = !canManageTeamNow;
-  document.querySelector("#back-to-teams").hidden = !hasTeam;
-  document.querySelector("#team-directory-page").hidden = hasTeam;
+  document.querySelector("#back-to-teams").hidden = !hasTeam || hasAppPage;
+  document.querySelector("#team-directory-page").hidden = hasTeam || hasAppPage;
   document.querySelector(".welcome-row").hidden = true;
-  document.querySelector(".club-banner").hidden = !hasTeam;
-  document.querySelector("#team-contact-card").hidden = !hasTeam;
-  document.querySelector(".stats-grid").hidden = !hasTeam;
-  document.querySelector("#roster").hidden = !hasTeam;
-  document.querySelector(".social-feed-section").hidden = !hasTeam;
+  document.querySelector(".club-banner").hidden = !hasTeam || hasAppPage;
+  document.querySelector("#team-contact-card").hidden = !hasTeam || hasAppPage;
+  document.querySelector(".stats-grid").hidden = !hasTeam || hasAppPage;
+  document.querySelector("#roster").hidden = !hasTeam || hasAppPage;
+  document.querySelector(".social-feed-section").hidden = !hasTeam || hasAppPage;
+  document.querySelector("#contact-hub-section").hidden = hasAppPage;
+  document.querySelector("#booking-page").hidden = appPage !== "booking";
+  document.querySelector("#shop-page").hidden = appPage !== "shop";
+  document.querySelector("#account-page").hidden = appPage !== "account";
   document.querySelectorAll("#main-navigation .nav-link").forEach((link) => {
-    const active = hasTeam
-      ? link.getAttribute("href") === "#roster"
-      : link.getAttribute("href") === "#overview";
+    const href = link.getAttribute("href");
+    const active = hasAppPage
+      ? href === `#${appPage}`
+      : hasTeam
+        ? href === "#roster"
+        : href === "#overview";
     link.classList.toggle("active", active);
     if (active) link.setAttribute("aria-current", "page");
     else link.removeAttribute("aria-current");
   });
+  document.querySelectorAll(".bottom-nav-link").forEach((link) => {
+    const tab = link.dataset.appTab;
+    const active = hasAppPage ? tab === appPage : tab === "home";
+    link.classList.toggle("is-active", active);
+    if (active) link.setAttribute("aria-current", "page");
+    else link.removeAttribute("aria-current");
+  });
+  document.querySelector("#breadcrumb-current").textContent = hasAppPage
+    ? t(
+        appPage === "booking"
+          ? "bookingTitle"
+          : appPage === "shop"
+            ? "shopTitle"
+            : "accountTitle",
+      )
+    : t("overview");
   document.querySelector("#add-member-button").disabled = !canManageTeamNow;
   renderTeams();
   renderAccountRoles();
@@ -2436,6 +3763,12 @@ function render() {
   if (hasTeam) renderClub();
   else renderStats();
   renderMembers();
+  renderContactHubs();
+  if (appPage === "booking") renderBookingPage();
+  else if (appPage === "shop") renderShop();
+  else if (appPage === "account") renderAccountPage();
+  renderAssistantChips();
+  bindTiltCards();
 }
 
 function showToast(message) {
@@ -3068,6 +4401,7 @@ async function verifyLocalAccount(account, password) {
 function finishRemoteSignIn(account, token, celebration) {
   saveSessionToken(token);
   applyRemoteAccount(account);
+  authRequested = false;
   const team = currentTeam();
   data = team ? { club: team.club, members: team.members } : structuredClone(DEFAULT_DATA);
   if (!persistData()) {
@@ -3312,6 +4646,7 @@ async function authenticate(event) {
       delete existing.passwordHash;
     }
     activeAccount = existing;
+    authRequested = false;
 
     const team = currentTeam();
     data = team ? { club: team.club, members: team.members } : structuredClone(DEFAULT_DATA);
@@ -3401,6 +4736,7 @@ document.querySelector("#register-form").addEventListener("submit", async (event
     };
     store.users.push(user);
     activeAccount = user;
+    authRequested = false;
     const team = currentTeam();
     data = team ? { club: team.club, members: team.members } : structuredClone(DEFAULT_DATA);
     if (!persistData()) {
@@ -3427,6 +4763,7 @@ function logout() {
   hideWelcome(true);
   saveSessionToken("");
   activeAccount = null;
+  authRequested = false;
   store.activeUserId = "";
   authMode = "login";
   persistData();
@@ -4337,9 +5674,97 @@ document.querySelector("#roster-grid").addEventListener("click", (event) => {
   }
 });
 
+document.querySelector("#account-roles").addEventListener("click", (event) => {
+  const trigger = event.target.closest("[data-reset-password]");
+  if (!trigger) return;
+  openResetPasswordDialog(trigger.dataset.resetPassword);
+});
+
+document.querySelector("#booking-date").addEventListener("change", (event) => {
+  bookingDate = event.target.value;
+  bookingStart = "";
+  renderBookingPage();
+});
+document.querySelector("#booking-start").addEventListener("change", (event) => {
+  bookingStart = event.target.value;
+  renderBookingPage();
+});
+document.querySelector("#booking-duration").addEventListener("change", (event) => {
+  bookingMinutes = Number(event.target.value) || bookingMinutes;
+  bookingStart = "";
+  renderBookingPage();
+});
+document.querySelector("#booking-form").addEventListener("submit", submitBooking);
+document.querySelector("#booking-list").addEventListener("click", (event) => {
+  const trigger = event.target.closest("[data-cancel-booking]");
+  if (trigger) cancelBooking(trigger.dataset.cancelBooking);
+});
+document.querySelector("#booking-success").addEventListener("click", (event) => {
+  if (!event.target.closest("#booking-success-dismiss")) return;
+  lastBookingId = "";
+  renderBookingPage();
+});
+
+document.querySelector("#shop-filter").addEventListener("click", (event) => {
+  const chip = event.target.closest("[data-shop-category]");
+  if (!chip) return;
+  shopCategory = chip.dataset.shopCategory;
+  renderShop();
+});
+
+document.querySelector("#recovery-code-form").addEventListener("submit", setRecoveryCode);
+document.querySelector("#account-forgot-button").addEventListener("click", () => {
+  openRecoveryDialog(activeAccount?.username || "");
+});
+document.querySelector("#forgot-password-button").addEventListener("click", () => {
+  openRecoveryDialog(document.querySelector("#auth-username")?.value.trim() || "");
+});
+document.querySelector("#recovery-form").addEventListener("submit", submitRecovery);
+document.querySelector("#reset-password-form").addEventListener("submit", submitPasswordReset);
+document.querySelector("#account-logout").addEventListener("click", logout);
+
+document.querySelector("#assistant-launcher").addEventListener("click", () => {
+  setAssistantOpen(true);
+});
+document.querySelector("#auth-assistant-button").addEventListener("click", () => {
+  setAssistantOpen(true);
+});
+document.querySelector("#assistant-close").addEventListener("click", () => {
+  setAssistantOpen(false);
+});
+document.querySelector("#assistant-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  const input = document.querySelector("#assistant-input");
+  assistantAnswer(input.value);
+});
+document.querySelector("#assistant-chips").addEventListener("click", (event) => {
+  const chip = event.target.closest("[data-assistant-topic]");
+  if (!chip) return;
+  const topic = chip.dataset.assistantTopic;
+  const rule = {
+    booking: "assistantBooking",
+    shop: "assistantShop",
+    recovery: "assistantRecovery",
+    roles: "assistantRoles",
+    contact: "assistantContact",
+  }[topic];
+  if (!rule) return;
+  const prompt = { booking: "booking", shop: "shop", recovery: "password", roles: "roles", contact: "contact" }[topic];
+  assistantAnswer(prompt);
+});
+document.querySelector("#assistant-messages").addEventListener("click", (event) => {
+  const trigger = event.target.closest("[data-assistant-page]");
+  if (!trigger) return;
+  assistantNavigate(trigger.dataset.assistantPage);
+});
+document.querySelector("#assistant-panel").addEventListener("keydown", (event) => {
+  if (event.key === "Escape") setAssistantOpen(false);
+});
+
 activeAccount = null;
 currentTeamId = "";
 data = structuredClone(DEFAULT_DATA);
 applyLanguage();
+renderAssistantChips();
 renderRouteFromHash();
 restoreRemoteSession();

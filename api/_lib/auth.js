@@ -91,11 +91,40 @@ function normalizeUsername(value) {
   return USERNAME_PATTERN.test(username) ? username : "";
 }
 
-function usernameFromContact(contactType, contact) {
-  const raw = contactType === "email" ? contact.split("@")[0] : contact.replace(/\D/g, "");
+function usernameFromContact(contactType, contact) {  const raw = contactType === "email" ? contact.split("@")[0] : contact.replace(/\D/g, "");
   let base = raw.toLowerCase().replace(/[^a-z0-9._-]/g, "").slice(0, 18) || "member";
   if (base.length < 3) base = `${base}fan`.slice(0, 18);
   return base;
+}
+
+async function hashRecoveryCode(code) {
+  const salt = crypto.randomBytes(16).toString("hex");
+  const derived = await new Promise((resolve, reject) => {
+    crypto.scrypt(String(code), salt, 32, (error, key) => {
+      if (error) reject(error);
+      else resolve(key);
+    });
+  });
+  return `scrypt$${salt}$${derived.toString("hex")}`;
+}
+
+async function verifyRecoveryCode(code, stored) {
+  const [scheme, salt, hash] = String(stored || "").split("$");
+  if (scheme !== "scrypt" || !salt || !hash) return false;
+  const expected = Buffer.from(hash, "hex");
+  if (expected.length !== 32) return false;
+  let derived;
+  try {
+    derived = await new Promise((resolve, reject) => {
+      crypto.scrypt(String(code), salt, 32, (error, key) => {
+        if (error) reject(error);
+        else resolve(key);
+      });
+    });
+  } catch {
+    return false;
+  }
+  return derived.length === expected.length && crypto.timingSafeEqual(derived, expected);
 }
 
 function isReservedEmail(email) {
@@ -194,6 +223,7 @@ function profileOf(user) {
     teamCreationRole: app.teamCreationRole === "Coach" ? "Coach" : "",
     teamCreationUsed: Boolean(app.teamCreationUsed),
     contactVerified: Boolean(app.contactVerified),
+    hasRecovery: Boolean(app.recoveryHash),
     createdAt: user.created_at || "",
   };
 }
@@ -211,6 +241,7 @@ function publicAccount(user, { withContact = false } = {}) {
     teamCreationRole: profile.teamCreationRole,
     teamCreationUsed: profile.teamCreationUsed,
     contactVerified: profile.contactVerified,
+    hasRecovery: profile.hasRecovery,
   };
 }
 
@@ -298,6 +329,10 @@ async function updateUser(cfg, id, patch) {
   }
   if (patch.appMetadata) {
     body.app_metadata = { ...appMetadataOf(current), ...patch.appMetadata };
+  }
+  if (patch.password) {
+    if (String(patch.password).length < 8) throw new Error("weak_password");
+    body.password = String(patch.password);
   }
   const result = await authRequest(cfg, `/admin/users/${encodeURIComponent(id)}`, {
     method: "PUT",
@@ -432,6 +467,8 @@ module.exports = {
   normalizePhone,
   normalizeUsername,
   usernameFromContact,
+  hashRecoveryCode,
+  verifyRecoveryCode,
   isReservedEmail,
   credentialEmail,
   listUsers,

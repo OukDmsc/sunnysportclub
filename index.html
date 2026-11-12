@@ -4,6 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#faf8f3" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>SUNNY SPORT CLUB | Team Manager</title>
     <link rel="icon" type="image/png" href="assets/logos/sunny-sport-club-logo.png" />
     <link rel="apple-touch-icon" href="assets/logos/sunny-sport-club-logo.png" />
@@ -12,6 +15,9 @@
     <script src="data/teams.js" defer></script>
     <script src="data/staff.js" defer></script>
     <script src="data/accounts.js" defer></script>
+    <script src="data/contacts.js" defer></script>
+    <script src="data/stadium.js" defer></script>
+    <script src="data/products.js" defer></script>
     <script src="app.js" defer></script>
   </head>
   <body class="auth-gate">
@@ -71,6 +77,28 @@
             <span data-i18n="teamRoster">Team roster</span>
             <span class="nav-count" id="nav-count">0</span>
           </a>
+          <a class="nav-link" href="#booking">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="3.5" y="5" width="17" height="15" rx="3" />
+              <path d="M8 3.5V7m8-3.5V7M3.5 10.5h17" />
+              <circle cx="12" cy="15" r="1.4" fill="currentColor" stroke="none" />
+            </svg>
+            <span data-i18n="bookTab">Book</span>
+          </a>
+          <a class="nav-link" href="#shop">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5.2 8.5h13.6l-1.1 11H6.3l-1.1-11Z" />
+              <path d="M9 8.5V7a3 3 0 0 1 6 0v1.5" />
+            </svg>
+            <span data-i18n="shopTab">Shop</span>
+          </a>
+          <a class="nav-link" href="#account">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="8.5" r="3.7" />
+              <path d="M4.5 20a7.5 7.5 0 0 1 15 0" />
+            </svg>
+            <span data-i18n="accountTab">Account</span>
+          </a>
         </nav>
         <div class="sidebar-bottom">
           <div class="sidebar-note">
@@ -124,7 +152,7 @@
           <div class="breadcrumb">
             <span data-i18n="workspace">Workspace</span
             ><span class="breadcrumb-slash">/</span
-            ><strong data-i18n="overview">Overview</strong>
+            ><strong id="breadcrumb-current" data-i18n="overview">Overview</strong>
           </div>
           <div class="topbar-right">
             <span class="season-pill"
@@ -741,6 +769,267 @@
             </p>
           </section>
 
+          <section class="contact-hub-section" id="contact-hub-section">
+            <div class="section-heading">
+              <div>
+                <div class="eyebrow">
+                  <span class="eyebrow-line"></span>
+                  <span data-i18n="contactEyebrow">CONTACT &amp; SUPPORT</span>
+                </div>
+                <h2 data-i18n="contactTitle">Contact the club</h2>
+              </div>
+              <a
+                class="button button-secondary button-small"
+                id="contact-telegram-button"
+                href="https://t.me/Oukdomm7"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Telegram <span aria-hidden="true">↗</span></a
+              >
+            </div>
+            <p class="contact-intro" data-i18n="contactIntro">
+              Call, message or find us. A club team member is ready to help.
+            </p>
+            <div class="contact-hub" id="contact-hub"></div>
+          </section>
+
+          <section class="app-page booking-page" id="booking-page" hidden>
+            <header class="app-page-header">
+              <div class="eyebrow">
+                <span class="eyebrow-line"></span>
+                <span data-i18n="bookingEyebrow">STADIUM BOOKING</span>
+              </div>
+              <h1 data-i18n="bookingTitle">Book the stadium</h1>
+              <p data-i18n="bookingIntro">
+                Choose your date and time. The price updates automatically.
+              </p>
+              <div class="app-page-badges">
+                <span class="app-badge">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="12" r="8.5" />
+                    <path d="M12 7.5V12l3 2" />
+                  </svg>
+                  <span data-i18n="bookingOpenHours"
+                    >Open daily · 7:30 AM – 8:00 PM</span
+                  >
+                </span>
+                <span class="app-badge">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 21s6-5.2 6-10a6 6 0 1 0-12 0c0 4.8 6 10 6 10Z" />
+                    <circle cx="12" cy="11" r="2.2" />
+                  </svg>
+                  <span data-i18n="bookingLocation">Sunny Sport Club stadium</span>
+                </span>
+              </div>
+            </header>
+            <div class="booking-layout">
+              <form class="booking-card tilt-card" id="booking-form" novalidate>
+                <div class="booking-form-grid">
+                  <label class="form-field"
+                    ><span data-i18n="bookingDate">Date</span
+                    ><input id="booking-date" type="date" required
+                  /></label>
+                  <label class="form-field"
+                    ><span data-i18n="bookingStart">Start time</span
+                    ><select id="booking-start" required></select
+                  ></label>
+                  <label class="form-field"
+                    ><span data-i18n="bookingDuration">Duration</span
+                    ><select id="booking-duration"></select
+                  ></label>
+                  <label class="form-field"
+                    ><span data-i18n="bookingName">Name</span
+                    ><input
+                      id="booking-name"
+                      type="text"
+                      maxlength="60"
+                      autocomplete="name"
+                      required
+                  /></label>
+                  <label class="form-field"
+                    ><span data-i18n="bookingPhone">Phone</span
+                    ><input
+                      id="booking-phone"
+                      type="tel"
+                      maxlength="24"
+                      autocomplete="tel"
+                      placeholder="096 685 3140"
+                      required
+                  /></label>
+                  <label class="form-field"
+                    ><span data-i18n="bookingNote">Note (optional)</span
+                    ><input
+                      id="booking-note"
+                      type="text"
+                      maxlength="160"
+                      data-i18n-placeholder="bookingNotePlaceholder"
+                      placeholder="Team name, number of players..."
+                  /></label>
+                </div>
+                <div class="booking-summary">
+                  <div>
+                    <span data-i18n="bookingPrice">Estimated total</span>
+                    <strong id="booking-price">$0.00</strong>
+                    <small id="booking-price-detail"></small>
+                  </div>
+                  <button
+                    class="button button-primary booking-submit"
+                    id="booking-submit"
+                    type="submit"
+                  >
+                    <span data-i18n="bookingSubmit">Confirm booking</span>
+                    <span aria-hidden="true">→</span>
+                  </button>
+                </div>
+                <p class="booking-error form-error" id="booking-error" hidden></p>
+                <p class="booking-local-note" data-i18n="bookingLocalNote">
+                  Bookings are saved on this device. Send the confirmation on
+                  Telegram so the club can hold your slot.
+                </p>
+              </form>
+              <aside class="booking-side">
+                <div class="booking-rate-card tilt-card">
+                  <h2 data-i18n="bookingRates">Pricing</h2>
+                  <div id="booking-rates"></div>
+                  <p class="booking-hours-note" data-i18n="bookingHoursNote">
+                    Evening pricing starts at 5:00 PM. Last booking ends at
+                    closing time.
+                  </p>
+                </div>
+                <div class="booking-list-card">
+                  <h2 data-i18n="bookingMyBookings">My bookings</h2>
+                  <div id="booking-list"></div>
+                </div>
+              </aside>
+            </div>
+            <div class="booking-success" id="booking-success" hidden></div>
+          </section>
+
+          <section class="app-page shop-page" id="shop-page" hidden>
+            <header class="app-page-header">
+              <div class="eyebrow">
+                <span class="eyebrow-line"></span>
+                <span data-i18n="shopEyebrow">PRODUCTS</span>
+              </div>
+              <h1 data-i18n="shopTitle">Club shop</h1>
+              <p data-i18n="shopIntro">
+                Books, drinks, snacks and club merchandise — a preview of what
+                is coming.
+              </p>
+              <span class="app-badge shop-preview-badge">
+                <span class="status-dot"></span>
+                <span data-i18n="shopPreview">Preview · orders open soon</span>
+              </span>
+            </header>
+            <div class="shop-filter" id="shop-filter"></div>
+            <div class="product-grid" id="product-grid"></div>
+            <div class="shop-order-card tilt-card">
+              <div>
+                <strong data-i18n="shopNeedHelp">Want to order?</strong>
+                <p data-i18n="shopNote">
+                  Message the club on Telegram and we will tell you when your
+                  favourite item is available.
+                </p>
+              </div>
+              <a
+                class="button button-primary"
+                id="shop-telegram-link"
+                href="https://t.me/Oukdomm7"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Telegram <span aria-hidden="true">↗</span></a
+              >
+            </div>
+          </section>
+
+          <section class="app-page account-page" id="account-page" hidden>
+            <header class="app-page-header">
+              <div class="eyebrow">
+                <span class="eyebrow-line"></span>
+                <span data-i18n="accountEyebrow">PROFILE</span>
+              </div>
+              <h1 data-i18n="accountTitle">My account</h1>
+              <p data-i18n="accountIntro">
+                Your profile, security and club contact details in one place.
+              </p>
+            </header>
+            <div class="account-grid">
+              <article class="account-profile-card tilt-card">
+                <div class="account-avatar" id="account-avatar">?</div>
+                <div class="account-profile-copy">
+                  <h2 id="account-name"></h2>
+                  <p id="account-role"></p>
+                  <span id="account-contact"></span>
+                </div>
+                <div class="account-meta" id="account-meta"></div>
+                <button
+                  class="button button-secondary"
+                  id="account-logout"
+                  type="button"
+                  data-i18n="logOut"
+                >
+                  Log out
+                </button>
+              </article>
+              <article class="account-security-card tilt-card">
+                <h2 data-i18n="recoverySetupTitle">Account recovery</h2>
+                <p data-i18n="recoverySetupIntro">
+                  Set a private recovery code so you can reset your password
+                  without email or SMS.
+                </p>
+                <span class="security-status" id="recovery-status"></span>
+                <form id="recovery-code-form">
+                  <label class="form-field"
+                    ><span data-i18n="recoveryCode">Recovery code</span
+                    ><input
+                      id="recovery-code-input"
+                      type="password"
+                      minlength="8"
+                      maxlength="64"
+                      autocomplete="new-password"
+                      data-i18n-placeholder="recoveryCodeHint"
+                      placeholder="At least 8 characters"
+                      required
+                  /></label>
+                  <button
+                    class="button button-primary button-small"
+                    type="submit"
+                    data-i18n="recoverySetButton"
+                  >
+                    Save recovery code
+                  </button>
+                </form>
+                <p
+                  class="form-error"
+                  id="recovery-code-error"
+                  role="alert"
+                  hidden
+                ></p>
+                <p class="form-success" id="recovery-code-success" hidden></p>
+                <button
+                  class="link-button"
+                  id="account-forgot-button"
+                  type="button"
+                  data-i18n="forgotPassword"
+                >
+                  Forgot password?
+                </button>
+              </article>
+            </div>
+            <section class="account-contact-section">
+              <div class="section-heading">
+                <div>
+                  <div class="eyebrow">
+                    <span class="eyebrow-line"></span>
+                    <span data-i18n="contactEyebrow">CONTACT &amp; SUPPORT</span>
+                  </div>
+                  <h2 data-i18n="contactTitle">Contact the club</h2>
+                </div>
+              </div>
+              <div class="contact-hub" id="account-contact-hub"></div>
+            </section>
+          </section>
+
           <footer class="page-footer">
             <span data-i18n="footerMotto">Made for the love of the game.</span
             ><span
@@ -750,6 +1039,43 @@
           </footer>
         </div>
       </main>
+      <nav
+        class="bottom-nav"
+        id="bottom-nav"
+        aria-label="App navigation"
+        data-i18n-aria="appNavigation"
+      >
+        <a class="bottom-nav-link" href="#teams" data-app-tab="home">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m3.5 10.5 8.5-7 8.5 7" />
+            <path d="M5.5 9.5V20h13V9.5" />
+            <path d="M9.5 20v-5.5h5V20" />
+          </svg>
+          <span data-i18n="homeTab">Home</span>
+        </a>
+        <a class="bottom-nav-link" href="#booking" data-app-tab="booking">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3.5" y="5" width="17" height="15" rx="3" />
+            <path d="M8 3.5V7m8-3.5V7M3.5 10.5h17" />
+            <circle cx="12" cy="15" r="1.4" fill="currentColor" stroke="none" />
+          </svg>
+          <span data-i18n="bookTab">Book</span>
+        </a>
+        <a class="bottom-nav-link" href="#shop" data-app-tab="shop">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5.2 8.5h13.6l-1.1 11H6.3l-1.1-11Z" />
+            <path d="M9 8.5V7a3 3 0 0 1 6 0v1.5" />
+          </svg>
+          <span data-i18n="shopTab">Shop</span>
+        </a>
+        <a class="bottom-nav-link" href="#account" data-app-tab="account">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="8.5" r="3.7" />
+            <path d="M4.5 20a7.5 7.5 0 0 1 15 0" />
+          </svg>
+          <span data-i18n="accountTab">Account</span>
+        </a>
+      </nav>
       <a class="staff-login-float" id="staff-login-float" href="#staff-login">
         <span aria-hidden="true">↗</span>
         <span data-i18n="staffLogin">Staff Login</span>
@@ -831,8 +1157,8 @@
             </div>
             <h2 data-i18n="authHeadline">Built for the love of the game.</h2>
             <p class="auth-intro" data-i18n="loginIntro">
-              Teams and rosters are open to view. Owners, developers, admins,
-              coaches, and team leaders can sign in for their tools.
+              Browse teams and club services without signing in. Club staff can
+              sign in to manage their tools.
             </p>
             <div class="auth-match-card">
               <div class="auth-match-label">
@@ -855,19 +1181,45 @@
                 <span class="auth-ball" aria-hidden="true">⚽</span>
               </div>
               <div class="auth-match-footer">
-                <span data-i18n="authOpenDirectory">OPEN TEAM DIRECTORY</span
+                <a
+                  href="#teams"
+                  id="auth-open-directory"
+                  data-i18n="authOpenDirectory"
+                  >OPEN TEAM DIRECTORY</a
                 ><span data-i18n="authSeason">CLUB SEASON · 2026</span>
               </div>
             </div>
-            <div class="auth-role-list">
-              <span data-i18n="authRolesLabel">ACCESS FOR</span>
-              <div>
-                <span data-i18n="devOwnerRole">Dev Owner</span
-                ><span data-i18n="adminSystemRole">Admin</span
-                ><span data-i18n="coachRole">Coach</span
-                ><span data-i18n="captainRole">Team Leader</span
-                ><span data-i18n="managerRole">Team manager</span>
+            <div class="auth-concierge">
+              <div class="auth-concierge-orb" aria-hidden="true">
+                <span></span>
               </div>
+              <div class="auth-concierge-copy">
+                <span data-i18n="assistantName">Sunny AI Concierge</span>
+                <p data-i18n="assistantAuthIntro">
+                  Ask about teams, stadium booking, the shop, or account
+                  recovery.
+                </p>
+              </div>
+              <button
+                class="auth-concierge-button"
+                id="auth-assistant-button"
+                type="button"
+              >
+                <span data-i18n="assistantAsk">Ask Sunny</span>
+                <span aria-hidden="true">→</span>
+              </button>
+            </div>
+            <div class="auth-quick-contact">
+              <a
+                id="auth-telegram-link"
+                href="https://t.me/Oukdomm7"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Telegram <span aria-hidden="true">↗</span></a
+              >
+              <a id="auth-phone-link" href="tel:+855966853140"
+                ><span data-i18n="contactCall">Call the club</span></a
+              >
             </div>
           </div>
           <div class="auth-showcase-foot">
@@ -949,6 +1301,15 @@
               <span data-i18n="logIn">Log in</span
               ><span aria-hidden="true">→</span>
             </button>
+            <p class="auth-recovery-link">
+              <button
+                type="button"
+                id="forgot-password-button"
+                data-i18n="forgotPassword"
+              >
+                Forgot password?
+              </button>
+            </p>
           </form>
           <form id="register-form" novalidate hidden>
             <label class="form-field"
@@ -1000,8 +1361,8 @@
                 required
             /></label>
             <p class="auth-hint" data-i18n="registerRoleNote">
-              New accounts are member accounts. Owner, admin, developer and
-              coach accounts are created directly by the club owner.
+              New registrations are member accounts. Club management access is
+              assigned by authorized club staff.
             </p>
             <p class="form-error" id="register-error" role="alert" hidden></p>
             <button
@@ -1030,6 +1391,14 @@
               >Private team tools · Authorized accounts only</span
             >
           </div>
+          <button
+            class="auth-return-public"
+            id="auth-return-public"
+            type="button"
+            data-i18n="authReturnPublic"
+          >
+            Back to the club
+          </button>
         </div>
       </div>
     </section>
@@ -1661,6 +2030,243 @@ Dara Vann</code>
         </button>
       </div>
     </dialog>
+
+    <dialog
+      class="recovery-dialog"
+      id="recovery-dialog"
+      aria-labelledby="recovery-dialog-title"
+    >
+      <div class="dialog-heading">
+        <div>
+          <div class="eyebrow">
+            <span class="eyebrow-line"></span>
+            <span data-i18n="accountSecurity">SECURITY</span>
+          </div>
+          <h2 id="recovery-dialog-title" data-i18n="recoveryTitle">
+            Recover your account
+          </h2>
+        </div>
+        <button
+          class="dialog-close"
+          type="button"
+          data-close-dialog
+          aria-label="Close dialog"
+          data-i18n-aria="closeDialog"
+        >
+          ×
+        </button>
+      </div>
+      <p class="dialog-description" data-i18n="recoveryIntro">
+        Enter your account, recovery code and a new password. No email or SMS is
+        needed.
+      </p>
+      <form id="recovery-form" novalidate>
+        <label class="form-field"
+          ><span data-i18n="recoveryIdentifier"
+            >Email, phone, or username</span
+          ><input
+            id="recovery-identifier"
+            type="text"
+            autocomplete="username"
+            maxlength="254"
+            required
+        /></label>
+        <label class="form-field"
+          ><span data-i18n="recoveryCode">Recovery code</span
+          ><input
+            id="recovery-code"
+            type="password"
+            autocomplete="off"
+            maxlength="64"
+            required
+        /></label>
+        <label class="form-field"
+          ><span data-i18n="recoveryNewPassword">New password</span
+          ><input
+            id="recovery-new-password"
+            type="password"
+            minlength="8"
+            autocomplete="new-password"
+            required
+        /></label>
+        <label class="form-field"
+          ><span data-i18n="recoveryConfirm">Confirm new password</span
+          ><input
+            id="recovery-confirm"
+            type="password"
+            minlength="8"
+            autocomplete="new-password"
+            required
+        /></label>
+        <p class="form-error" id="recovery-error" role="alert" hidden></p>
+        <p class="form-success" id="recovery-success" hidden></p>
+        <div class="dialog-actions">
+          <button
+            class="button button-primary"
+            id="recovery-submit"
+            type="submit"
+            data-i18n="recoverySubmit"
+          >
+            Set new password
+          </button>
+        </div>
+      </form>
+      <div class="recovery-support">
+        <p data-i18n="recoveryMissing">
+          No recovery code? Message the owner or an admin and we will verify
+          your account.
+        </p>
+        <div>
+          <a
+            class="button button-secondary button-small"
+            id="recovery-telegram-link"
+            href="https://t.me/Oukdomm7"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Telegram <span aria-hidden="true">↗</span></a
+          >
+          <a
+            class="button button-secondary button-small"
+            id="recovery-phone-link"
+            href="tel:+855966853140"
+            ><span data-i18n="contactCall">Call the club</span></a
+          >
+        </div>
+      </div>
+    </dialog>
+
+    <dialog
+      class="recovery-dialog"
+      id="reset-password-dialog"
+      aria-labelledby="reset-password-title"
+    >
+      <div class="dialog-heading">
+        <div>
+          <div class="eyebrow">
+            <span class="eyebrow-line"></span>
+            <span data-i18n="administration">ADMINISTRATION</span>
+          </div>
+          <h2 id="reset-password-title" data-i18n="resetPasswordTitle">
+            Reset account password
+          </h2>
+        </div>
+        <button
+          class="dialog-close"
+          type="button"
+          data-close-dialog
+          aria-label="Close dialog"
+          data-i18n-aria="closeDialog"
+        >
+          ×
+        </button>
+      </div>
+      <p class="dialog-description" id="reset-password-description"></p>
+      <form id="reset-password-form" novalidate>
+        <input id="reset-password-id" type="hidden" />
+        <label class="form-field"
+          ><span data-i18n="resetPasswordNew">New password</span
+          ><input
+            id="reset-password-value"
+            type="password"
+            minlength="8"
+            autocomplete="new-password"
+            required
+        /></label>
+        <p class="form-error" id="reset-password-error" role="alert" hidden></p>
+        <div class="dialog-actions">
+          <button
+            class="button button-primary"
+            type="submit"
+            data-i18n="resetPasswordSubmit"
+          >
+            Update password
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <button
+      class="assistant-launcher"
+      id="assistant-launcher"
+      type="button"
+      aria-expanded="false"
+      aria-controls="assistant-panel"
+    >
+      <span class="assistant-launcher-orb" aria-hidden="true"
+        ><span class="assistant-launcher-core"></span
+      ></span>
+      <span class="assistant-launcher-copy">
+        <strong data-i18n="assistantName">Sunny AI Concierge</strong>
+        <small data-i18n="assistantAsk">Ask Sunny</small>
+      </span>
+    </button>
+    <aside
+      class="assistant-panel"
+      id="assistant-panel"
+      aria-label="Sunny AI Concierge"
+      data-i18n-aria="assistantName"
+      hidden
+    >
+      <header class="assistant-header">
+        <span class="assistant-header-orb" aria-hidden="true"></span>
+        <div>
+          <strong data-i18n="assistantName">Sunny AI Concierge</strong>
+          <span class="assistant-status"
+            ><span class="status-dot"></span
+            ><span data-i18n="assistantOnline">Online · club guide</span></span
+          >
+        </div>
+        <button
+          class="assistant-close"
+          id="assistant-close"
+          type="button"
+          aria-label="Close assistant"
+          data-i18n-aria="assistantClose"
+        >
+          ×
+        </button>
+      </header>
+      <div
+        class="assistant-messages"
+        id="assistant-messages"
+        role="log"
+        aria-live="polite"
+      ></div>
+      <div class="assistant-chips" id="assistant-chips"></div>
+      <form class="assistant-form" id="assistant-form">
+        <label class="sr-only" for="assistant-input" data-i18n="assistantInput"
+          >Ask the club assistant</label
+        >
+        <input
+          id="assistant-input"
+          type="text"
+          maxlength="240"
+          autocomplete="off"
+          data-i18n-placeholder="assistantPlaceholder"
+          placeholder="Ask about booking, shop, teams, or recovery..."
+          required
+        />
+        <button
+          type="submit"
+          class="assistant-send"
+          aria-label="Send"
+          data-i18n-aria="assistantSend"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m4 12 16-7-6.5 14-2.2-5.2L4 12Z" />
+          </svg>
+        </button>
+      </form>
+      <a
+        class="assistant-human"
+        id="assistant-human-link"
+        href="https://t.me/Oukdomm7"
+        target="_blank"
+        rel="noopener noreferrer"
+        ><span data-i18n="assistantHuman">Talk to a human</span>
+        <span aria-hidden="true">↗</span></a
+      >
+    </aside>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
   </body>

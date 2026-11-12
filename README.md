@@ -13,6 +13,8 @@ This project is a browser-based club management interface built with plain HTML,
 - personalize the workspace background
 - organize team spotlight and directory information
 - store data locally in the browser
+- browse public teams, book the stadium, and preview club products without signing in
+- get navigation help from the bilingual Sunny Concierge
 
 ## Features
 
@@ -25,7 +27,7 @@ This project is a browser-based club management interface built with plain HTML,
 - Self-service member sign-up with a real email address or international phone number
 - Sign in with email, phone number, or username
 - **Shared accounts across devices** (phone, tablet, PC) through Supabase Auth
-- Sign-in gate: club content stays hidden until a visitor logs in or creates an account
+- Public team, booking, shop, and contact pages; sign-in is required for account settings and staff tools
 - Animated, colourful welcome screen after sign-in with the member's name and role
 - Owner, Admin, Developer, and Coach accounts issued only by the club owner
 - Role-based team creation: Owner, Admin, Developer, or Coach
@@ -34,6 +36,9 @@ This project is a browser-based club management interface built with plain HTML,
 - Animated football-themed landing screen with optional stadium sound
 - Language toggle for English / Khmer
 - Workspace background customization
+- Stadium booking with weekday/weekend rates and Telegram confirmation
+- Product catalogue preview for bookstore items, drinks, snacks and club merchandise
+- Icon-led club contacts, Telegram QR codes, and a navigation assistant with direct staff contacts when it cannot answer
 - **Automatic text contrast** that keeps text readable on any background colour or photo
 - **Editable content files** for teams, staff, accounts, logos and photos
 - Local browser storage keeps teams, members, and appearance settings per device
@@ -116,7 +121,10 @@ http://localhost:8000
 ```
 
 Without the API, sign-in falls back to accounts stored in this browser only.
-Opening `index.html` directly works the same way.
+Opening `index.html` directly works for public browsing, local bookings, and
+local accounts. Self-service password recovery uses the hosted auth API; when
+opened directly as a `file://` page, users can contact the owner or admin from
+the recovery dialog instead.
 
 ## Deploy to Vercel
 
