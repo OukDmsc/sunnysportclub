@@ -6,7 +6,7 @@ const {
   findUserByIdentifier,
   updateUser,
   verifyRecoveryCode,
-  verifySmsRecoveryCode,
+  verifyRecoveryDeliveryCode,
   rateLimitHit,
   resetRateLimit,
   fail,
@@ -40,25 +40,43 @@ module.exports = async (req, res) => {
     const user = await findUserByIdentifier(cfg, identifier);
     if (!user) return fail(res, 401, "invalid_recovery");
     const appMetadata = user.app_metadata || {};
-    const smsCodeValid =
+    const deliveryCodeValid = (delivery) =>
       /^\d{6}$/.test(code) &&
-      Number(appMetadata.smsRecoveryExpiresAt) > Date.now() &&
-      verifySmsRecoveryCode(cfg, user.id, code, appMetadata.smsRecoveryHash);
+      Number(appMetadata[`${delivery}RecoveryExpiresAt`]) > Date.now() &&
+      verifyRecoveryDeliveryCode(
+        cfg,
+        user.id,
+        code,
+        appMetadata[`${delivery}RecoveryHash`],
+      );
+    const smsCodeValid = deliveryCodeValid("sms");
+    const emailCodeValid = deliveryCodeValid("email");
     const recoveryCodeValid = await verifyRecoveryCode(
       code,
       appMetadata.recoveryHash,
     );
-    const valid = smsCodeValid || recoveryCodeValid;
+    const valid = smsCodeValid || emailCodeValid || recoveryCodeValid;
     if (!valid) return fail(res, 401, "invalid_recovery");
 
     await updateUser(cfg, user.id, {
       password,
-      ...(smsCodeValid
+      ...(smsCodeValid || emailCodeValid
         ? {
             appMetadata: {
-              smsRecoveryHash: null,
-              smsRecoveryExpiresAt: null,
-              smsRecoverySentAt: null,
+              ...(smsCodeValid
+                ? {
+                    smsRecoveryHash: null,
+                    smsRecoveryExpiresAt: null,
+                    smsRecoverySentAt: null,
+                  }
+                : {}),
+              ...(emailCodeValid
+                ? {
+                    emailRecoveryHash: null,
+                    emailRecoveryExpiresAt: null,
+                    emailRecoverySentAt: null,
+                  }
+                : {}),
             },
           }
         : {}),

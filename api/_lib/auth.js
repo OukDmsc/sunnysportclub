@@ -52,6 +52,32 @@ function getInfobipConfig() {
   return { apiKey, sender, baseUrl: baseUrl.origin };
 }
 
+function getInfobipEmailConfig() {
+  const apiKey = process.env.INFOBIP_API_KEY || "";
+  const sender = String(process.env.INFOBIP_EMAIL_SENDER || "").trim();
+  let baseUrl;
+  try {
+    baseUrl = new URL(process.env.INFOBIP_BASE_URL || "");
+  } catch {
+    return null;
+  }
+  if (
+    !apiKey ||
+    !sender ||
+    sender.length > 254 ||
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sender) ||
+    baseUrl.protocol !== "https:" ||
+    baseUrl.username ||
+    baseUrl.password ||
+    baseUrl.pathname !== "/" ||
+    baseUrl.search ||
+    baseUrl.hash
+  ) {
+    return null;
+  }
+  return { apiKey, sender, baseUrl: baseUrl.origin };
+}
+
 async function sendInfobipSms(cfg, phone, message) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 8000);
@@ -73,17 +99,44 @@ async function sendInfobipSms(cfg, phone, message) {
   }
 }
 
-function hashSmsRecoveryCode(cfg, userId, code) {
+async function sendInfobipEmail(cfg, email, subject, text) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 8000);
+  try {
+    return await fetch(`${cfg.baseUrl}/email/4/messages`, {
+      method: "POST",
+      headers: {
+        Authorization: `App ${cfg.apiKey}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        messages: [
+          {
+            destinations: [{ to: [{ destination: email }] }],
+            sender: cfg.sender,
+            content: { subject, text },
+          },
+        ],
+      }),
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function hashRecoveryDeliveryCode(cfg, userId, code) {
   return crypto
     .createHmac("sha256", cfg.authSecret)
     .update(`${userId}:${code}`)
     .digest("hex");
 }
 
-function verifySmsRecoveryCode(cfg, userId, code, stored) {
+function verifyRecoveryDeliveryCode(cfg, userId, code, stored) {
   const expected = Buffer.from(String(stored || ""), "hex");
   if (expected.length !== 32) return false;
-  const provided = Buffer.from(hashSmsRecoveryCode(cfg, userId, code), "hex");
+  const provided = Buffer.from(hashRecoveryDeliveryCode(cfg, userId, code), "hex");
   return crypto.timingSafeEqual(provided, expected);
 }
 
@@ -522,9 +575,11 @@ module.exports = {
   USERNAME_PATTERN,
   getConfig,
   getInfobipConfig,
+  getInfobipEmailConfig,
   sendInfobipSms,
-  hashSmsRecoveryCode,
-  verifySmsRecoveryCode,
+  sendInfobipEmail,
+  hashRecoveryDeliveryCode,
+  verifyRecoveryDeliveryCode,
   json,
   readBody,
   getIp,
