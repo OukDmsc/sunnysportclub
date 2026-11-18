@@ -142,6 +142,9 @@ the recovery dialog instead.
    | `SUPABASE_ANON_KEY` | Supabase public API key (used to verify passwords) |
    | `SUPABASE_SERVICE_ROLE_KEY` | Server-only admin key (never expose in the browser) |
    | `AUTH_SECRET` | Long random string used to sign 30-day session tokens |
+   | `INFOBIP_API_KEY` | Server-only Infobip API key for recovery SMS |
+   | `INFOBIP_BASE_URL` | Infobip API base URL from your account, e.g. `https://xxxxx.api.infobip.com` |
+   | `INFOBIP_SENDER` | Approved Infobip sender name or phone number |
 
 6. Deploy. Vercel serves `index.html`, `styles.css`, `app.js`, `data/` and
    `assets/` as static files and turns `api/auth/*` into serverless functions.
@@ -149,6 +152,12 @@ the recovery dialog instead.
 `SUPABASE_SERVICE_ROLE_KEY` must stay server-side. Do not put it in `app.js`,
 `data/`, or any file committed to Git. `.env.local` is already gitignored.
 `api/_lib/` is not deployed as a public route.
+
+Forgot-password recovery sends a six-digit SMS code to the phone registered on
+the account. Codes expire after 10 minutes and can only be used once. Configure
+the three `INFOBIP_*` variables in Vercel for Production and Preview; without
+them, SMS recovery is unavailable. The API response does not disclose whether
+an account or phone number exists.
 
 ## Edit content without coding
 

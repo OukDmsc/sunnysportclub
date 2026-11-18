@@ -6,6 +6,7 @@ const {
   findUserByIdentifier,
   updateUser,
   verifyRecoveryCode,
+  verifySmsRecoveryCode,
   rateLimitHit,
   resetRateLimit,
   fail,
@@ -38,11 +39,30 @@ module.exports = async (req, res) => {
   try {
     const user = await findUserByIdentifier(cfg, identifier);
     if (!user) return fail(res, 401, "invalid_recovery");
-    const stored = user.app_metadata?.recoveryHash;
-    const valid = await verifyRecoveryCode(code, stored);
+    const appMetadata = user.app_metadata || {};
+    const smsCodeValid =
+      /^\d{6}$/.test(code) &&
+      Number(appMetadata.smsRecoveryExpiresAt) > Date.now() &&
+      verifySmsRecoveryCode(cfg, user.id, code, appMetadata.smsRecoveryHash);
+    const recoveryCodeValid = await verifyRecoveryCode(
+      code,
+      appMetadata.recoveryHash,
+    );
+    const valid = smsCodeValid || recoveryCodeValid;
     if (!valid) return fail(res, 401, "invalid_recovery");
 
-    await updateUser(cfg, user.id, { password });
+    await updateUser(cfg, user.id, {
+      password,
+      ...(smsCodeValid
+        ? {
+            appMetadata: {
+              smsRecoveryHash: null,
+              smsRecoveryExpiresAt: null,
+              smsRecoverySentAt: null,
+            },
+          }
+        : {}),
+    });
     resetRateLimit(bucketKey);
     return json(res, 200, { ok: true });
   } catch (error) {

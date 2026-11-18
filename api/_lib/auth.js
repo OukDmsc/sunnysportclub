@@ -26,6 +26,67 @@ function getConfig() {
   };
 }
 
+function getInfobipConfig() {
+  const apiKey = process.env.INFOBIP_API_KEY || "";
+  const sender = String(process.env.INFOBIP_SENDER || "").trim();
+  let baseUrl;
+  try {
+    baseUrl = new URL(process.env.INFOBIP_BASE_URL || "");
+  } catch {
+    return null;
+  }
+  if (
+    !apiKey ||
+    !sender ||
+    sender.length > 20 ||
+    /[\r\n]/.test(sender) ||
+    baseUrl.protocol !== "https:" ||
+    baseUrl.username ||
+    baseUrl.password ||
+    baseUrl.pathname !== "/" ||
+    baseUrl.search ||
+    baseUrl.hash
+  ) {
+    return null;
+  }
+  return { apiKey, sender, baseUrl: baseUrl.origin };
+}
+
+async function sendInfobipSms(cfg, phone, message) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 8000);
+  try {
+    return await fetch(`${cfg.baseUrl}/sms/2/text/advanced`, {
+      method: "POST",
+      headers: {
+        Authorization: `App ${cfg.apiKey}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        messages: [{ from: cfg.sender, destinations: [{ to: phone }], text: message }],
+      }),
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function hashSmsRecoveryCode(cfg, userId, code) {
+  return crypto
+    .createHmac("sha256", cfg.authSecret)
+    .update(`${userId}:${code}`)
+    .digest("hex");
+}
+
+function verifySmsRecoveryCode(cfg, userId, code, stored) {
+  const expected = Buffer.from(String(stored || ""), "hex");
+  if (expected.length !== 32) return false;
+  const provided = Buffer.from(hashSmsRecoveryCode(cfg, userId, code), "hex");
+  return crypto.timingSafeEqual(provided, expected);
+}
+
 function json(res, status, payload) {
   res.statusCode = status;
   res.setHeader("Content-Type", "application/json; charset=utf-8");
@@ -460,6 +521,10 @@ module.exports = {
   TEAM_ROLES,
   USERNAME_PATTERN,
   getConfig,
+  getInfobipConfig,
+  sendInfobipSms,
+  hashSmsRecoveryCode,
+  verifySmsRecoveryCode,
   json,
   readBody,
   getIp,

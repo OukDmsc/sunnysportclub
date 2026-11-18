@@ -546,19 +546,22 @@ const TRANSLATIONS = {
     accountTitle: "My account",
     accountIntro: "Manage your profile, security and stadium bookings.",
     accountSecurity: "Account recovery",
-    recoverySetupTitle: "Recovery code",
-    recoverySetupIntro: "Set a private code so you can reset your password if you forget it.",
+    recoverySetupTitle: "Backup recovery code",
+    recoverySetupIntro: "SMS recovery works with a registered phone. You can also save a private backup code.",
     recoverySetButton: "Save recovery code",
-    recoveryCodeExists: "A recovery code is active on this account.",
+    recoveryCodeExists: "A private backup recovery code is saved.",
     recoveryCodeSaved: "Recovery code saved.",
-    recoveryMissing: "Set a recovery code to unlock password reset.",
-    recoveryCodeMissing: "Enter your recovery code.",
+    recoveryMissing: "No access to a registered phone or saved recovery code? Contact the owner or an admin.",
+    recoveryCodeMissing: "No backup code is set; SMS recovery may still be available.",
     recoveryCodeInvalid: "That recovery code is not correct.",
     forgotPassword: "Forgot password?",
     recoveryTitle: "Recover your account",
-    recoveryIntro: "Enter your username, email or phone, your recovery code, and a new password.",
+    recoveryIntro: "Enter your username, email or phone. We'll send a one-time code to the phone number on your account.",
     recoveryIdentifier: "Username, email or phone",
-    recoveryCode: "Recovery code",
+    recoveryCode: "SMS verification code or recovery code",
+    recoverySendCode: "Send SMS code",
+    recoveryCodeSent: "If this account has a registered phone number, a verification code has been sent.",
+    recoveryLegacy: "A previously saved recovery code can also be used here.",
     recoveryCodeHint: "Your private recovery code",
     recoveryNewPassword: "New password",
     recoveryConfirm: "Confirm new password",
@@ -1016,19 +1019,22 @@ const TRANSLATIONS = {
     accountTitle: "គណនីរបស់ខ្ញុំ",
     accountIntro: "គ្រប់គ្រងប្រវត្តិរូប សុវត្ថិភាព និងការកក់ទីលានរបស់អ្នក។",
     accountSecurity: "ការសង្គ្រោះគណនី",
-    recoverySetupTitle: "កូដសង្គ្រោះ",
-    recoverySetupIntro: "កំណត់កូដឯកជន ដើម្បីកំណត់ពាក្យសម្ងាត់ឡើងវិញប្រសិនបើអ្នកបំភ្លេច។",
+    recoverySetupTitle: "កូដសង្គ្រោះបម្រុង",
+    recoverySetupIntro: "ការសង្គ្រោះតាម SMS ប្រើលេខទូរស័ព្ទដែលភ្ជាប់គណនី។ អ្នកក៏អាចរក្សាទុកកូដឯកជនបម្រុងបានដែរ។",
     recoverySetButton: "រក្សាទុកកូដសង្គ្រោះ",
-    recoveryCodeExists: "កូដសង្គ្រោះកំពុងសកម្មលើគណនីនេះ។",
+    recoveryCodeExists: "បានរក្សាទុកកូដសង្គ្រោះបម្រុងឯកជន។",
     recoveryCodeSaved: "បានរក្សាទុកកូដសង្គ្រោះ។",
-    recoveryMissing: "កំណត់កូដសង្គ្រោះដើម្បីបើកការកំណត់ពាក្យសម្ងាត់ឡើងវិញ។",
-    recoveryCodeMissing: "សូមបញ្ចូលកូដសង្គ្រោះរបស់អ្នក។",
+    recoveryMissing: "មិនអាចប្រើលេខទូរស័ព្ទ ឬកូដសង្គ្រោះដែលបានរក្សាទុកទេ? សូមទាក់ទងម្ចាស់ ឬអ្នកគ្រប់គ្រង។",
+    recoveryCodeMissing: "មិនទាន់មានកូដបម្រុងទេ។ អ្នកអាចប្រើការសង្គ្រោះតាម SMS ប្រសិនបើមានលេខទូរស័ព្ទ។",
     recoveryCodeInvalid: "កូដសង្គ្រោះនេះមិនត្រឹមត្រូវទេ។",
     forgotPassword: "បំភ្លេចពាក្យសម្ងាត់?",
     recoveryTitle: "សង្គ្រោះគណនីរបស់អ្នក",
-    recoveryIntro: "បញ្ចូលឈ្មោះអ្នកប្រើ អ៊ីមែល ឬទូរស័ព្ទ កូដសង្គ្រោះ និងពាក្យសម្ងាត់ថ្មី។",
+    recoveryIntro: "បញ្ចូលឈ្មោះអ្នកប្រើ អ៊ីមែល ឬទូរស័ព្ទ។ យើងនឹងផ្ញើកូដទៅលេខទូរស័ព្ទដែលភ្ជាប់នឹងគណនី។",
     recoveryIdentifier: "ឈ្មោះអ្នកប្រើ អ៊ីមែល ឬទូរស័ព្ទ",
-    recoveryCode: "កូដសង្គ្រោះ",
+    recoveryCode: "កូដផ្ទៀងផ្ទាត់ SMS ឬកូដសង្គ្រោះ",
+    recoverySendCode: "ផ្ញើកូដ SMS",
+    recoveryCodeSent: "ប្រសិនបើគណនីនេះមានលេខទូរស័ព្ទ កូដផ្ទៀងផ្ទាត់ត្រូវបានផ្ញើហើយ។",
+    recoveryLegacy: "អ្នកក៏អាចប្រើកូដសង្គ្រោះដែលបានរក្សាទុកពីមុនបានដែរ។",
     recoveryCodeHint: "កូដសង្គ្រោះឯកជនរបស់អ្នក",
     recoveryNewPassword: "ពាក្យសម្ងាត់ថ្មី",
     recoveryConfirm: "បញ្ជាក់ពាក្យសម្ងាត់ថ្មី",
@@ -3332,12 +3338,59 @@ async function setRecoveryCode(event) {
 function openRecoveryDialog(prefill = "") {
   const dialog = document.querySelector("#recovery-dialog");
   document.querySelector("#recovery-form").reset();
+  document.querySelector("#recovery-password-fields").hidden = true;
+  document.querySelector("#recovery-send-code").hidden = false;
+  document.querySelector("#recovery-submit").hidden = true;
   document.querySelector("#recovery-error").hidden = true;
   document.querySelector("#recovery-success").hidden = true;
   document.querySelector("#recovery-identifier").value = prefill || "";
   applyContactLinks();
   dialog.showModal();
-  document.querySelector(prefill ? "#recovery-code" : "#recovery-identifier").focus();
+  document.querySelector("#recovery-identifier").focus();
+}
+
+async function sendRecoveryCode() {
+  const identifierInput = document.querySelector("#recovery-identifier");
+  const identifier = identifierInput.value.trim();
+  const error = document.querySelector("#recovery-error");
+  const success = document.querySelector("#recovery-success");
+  const sendButton = document.querySelector("#recovery-send-code");
+  error.hidden = true;
+  success.hidden = true;
+  if (!identifier) {
+    error.textContent = t("recoveryInvalid");
+    error.hidden = false;
+    identifierInput.focus();
+    return;
+  }
+
+  sendButton.disabled = true;
+  try {
+    const result = await authRequest("/recovery/request", {
+      method: "POST",
+      body: { identifier },
+    });
+    if (result.ok) {
+      document.querySelector("#recovery-password-fields").hidden = false;
+      document.querySelector("#recovery-submit").hidden = false;
+      success.textContent = t("recoveryCodeSent");
+      success.hidden = false;
+      document.querySelector("#recovery-code").focus();
+      return;
+    }
+    if (result.status === 429) {
+      error.textContent = t("authRateLimited");
+    } else if (result.status === 400) {
+      error.textContent = t("recoveryInvalid");
+    } else if (window.location.protocol === "file:" || result.network) {
+      error.textContent = t("recoveryOnlineOnly");
+    } else {
+      error.textContent = t("recoveryUnavailable");
+    }
+    error.hidden = false;
+  } finally {
+    sendButton.disabled = false;
+  }
 }
 
 async function submitRecovery(event) {
@@ -5719,6 +5772,9 @@ document.querySelector("#account-forgot-button").addEventListener("click", () =>
 document.querySelector("#forgot-password-button").addEventListener("click", () => {
   openRecoveryDialog(document.querySelector("#auth-username")?.value.trim() || "");
 });
+document
+  .querySelector("#recovery-send-code")
+  .addEventListener("click", sendRecoveryCode);
 document.querySelector("#recovery-form").addEventListener("submit", submitRecovery);
 document.querySelector("#reset-password-form").addEventListener("submit", submitPasswordReset);
 document.querySelector("#account-logout").addEventListener("click", logout);

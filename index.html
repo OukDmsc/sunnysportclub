@@ -2057,8 +2057,8 @@ Dara Vann</code>
         </button>
       </div>
       <p class="dialog-description" data-i18n="recoveryIntro">
-        Enter your account, recovery code and a new password. No email or SMS is
-        needed.
+        Enter your username, email or phone. We'll send a one-time code to the
+        phone number on your account.
       </p>
       <form id="recovery-form" novalidate>
         <label class="form-field"
@@ -2071,33 +2071,47 @@ Dara Vann</code>
             maxlength="254"
             required
         /></label>
-        <label class="form-field"
-          ><span data-i18n="recoveryCode">Recovery code</span
-          ><input
-            id="recovery-code"
-            type="password"
-            autocomplete="off"
-            maxlength="64"
-            required
-        /></label>
-        <label class="form-field"
-          ><span data-i18n="recoveryNewPassword">New password</span
-          ><input
-            id="recovery-new-password"
-            type="password"
-            minlength="8"
-            autocomplete="new-password"
-            required
-        /></label>
-        <label class="form-field"
-          ><span data-i18n="recoveryConfirm">Confirm new password</span
-          ><input
-            id="recovery-confirm"
-            type="password"
-            minlength="8"
-            autocomplete="new-password"
-            required
-        /></label>
+        <button
+          class="button button-secondary"
+          id="recovery-send-code"
+          type="button"
+          data-i18n="recoverySendCode"
+        >
+          Send SMS code
+        </button>
+        <div id="recovery-password-fields" hidden>
+          <label class="form-field"
+            ><span data-i18n="recoveryCode">Verification code</span
+            ><input
+              id="recovery-code"
+              type="text"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              maxlength="64"
+              required
+          /></label>
+          <label class="form-field"
+            ><span data-i18n="recoveryNewPassword">New password</span
+            ><input
+              id="recovery-new-password"
+              type="password"
+              minlength="8"
+              autocomplete="new-password"
+              required
+          /></label>
+          <label class="form-field"
+            ><span data-i18n="recoveryConfirm">Confirm new password</span
+            ><input
+              id="recovery-confirm"
+              type="password"
+              minlength="8"
+              autocomplete="new-password"
+              required
+          /></label>
+          <p class="form-success" data-i18n="recoveryLegacy">
+            A previously saved recovery code can also be used here.
+          </p>
+        </div>
         <p class="form-error" id="recovery-error" role="alert" hidden></p>
         <p class="form-success" id="recovery-success" hidden></p>
         <div class="dialog-actions">
@@ -2106,6 +2120,7 @@ Dara Vann</code>
             id="recovery-submit"
             type="submit"
             data-i18n="recoverySubmit"
+            hidden
           >
             Set new password
           </button>
